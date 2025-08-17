@@ -32,149 +32,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body x-data="{ 
-    sidebarOpen: false, 
-    currentView: '{{ request()->routeIs('chat') ? 'agent' : 'dashboard' }}',
-    closeSidebar() { this.sidebarOpen = false; }
-}" style="background: var(--gray-50);">
+<body x-data="{}" style="background: var(--gray-50);">
     <div class="page">
         <!-- Header -->
-        <header class="fixed top-0 left-0 right-0 z-fixed" style="height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--gray-200);">
-            <div class="container max-w-7xl mx-auto flex items-center justify-between h-full">
-                <!-- Menu mobile -->
-                <button 
-                    @click="sidebarOpen = !sidebarOpen" 
-                    class="touch-target rounded-lg hover:bg-gray-100 transition-colors md:hidden"
-                    aria-label="Menu"
-                >
-                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-                
-                <!-- Logo -->
-                <div class="flex items-center gap-2">
-                    <x-logo size="lg" />
-                </div>
-                
-                <!-- Navigation desktop -->
-                <nav class="hidden md:flex items-center bg-gray-100 rounded-lg p-1">
-                    <a 
-                        href="{{ route('dashboard') }}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors
-                               {{ request()->routeIs('dashboard') ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900' }}"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        <span class="hidden lg:inline">Dashboard</span>
-                    </a>
-                    <a 
-                        href="{{ route('chat') }}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors
-                               {{ request()->routeIs('chat') ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900' }}"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                        </svg>
-                        <span class="hidden lg:inline">Agent</span>
-                    </a>
-                </nav>
-                
-                <!-- Actions -->
-                <div class="flex items-center gap-2">
-                    <x-theme-toggle />
-                    <a href="{{ route('profile') }}" class="touch-target rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </header>
+        @include('components.navbar')
 
-        <!-- Sidebar mobile -->
-        <div 
-            x-show="sidebarOpen" 
-            x-transition:enter="transition-opacity duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition-opacity duration-300"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            @click="closeSidebar()"
-            class="fixed inset-0 z-overlay bg-black bg-opacity-50 md:hidden"
-            style="display: none;"
-        ></div>
-
-        <aside 
-            x-show="sidebarOpen"
-            x-transition:enter="transition-transform duration-300"
-            x-transition:enter-start="-translate-x-full"
-            x-transition:enter-end="translate-x-0"
-            x-transition:leave="transition-transform duration-300"
-            x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="-translate-x-full"
-            class="fixed top-0 left-0 z-modal h-full bg-white shadow-lg md:hidden"
-            style="width: var(--sidebar-width); display: none;"
-        >
-            <!-- Header sidebar -->
-            <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900">Menu</h2>
-                <button @click="closeSidebar()" class="touch-target rounded hover:bg-gray-100 transition-colors">
-                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Navigation mobile -->
-            <nav class="p-4 space-y-2">
-                <a href="{{ route('dashboard') }}" @click="closeSidebar()" 
-                   class="flex items-center gap-3 p-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('dashboard') ? 'bg-orange text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    Dashboard
-                </a>
-                
-                <a href="{{ route('chat') }}" @click="closeSidebar()" 
-                   class="flex items-center gap-3 p-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('chat') ? 'bg-orange text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                    </svg>
-                    Agent Chat
-                </a>
-                
-                <a href="{{ route('conversations.index') }}" @click="closeSidebar()" 
-                   class="flex items-center gap-3 p-3 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z"></path>
-                    </svg>
-                    Conversations
-                </a>
-                
-                <a href="{{ route('profile') }}" @click="closeSidebar()" 
-                   class="flex items-center gap-3 p-3 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    Profil
-                </a>
-                
-                <div class="border-t border-gray-200 pt-4 mt-4">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="flex items-center gap-3 w-full p-3 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
-                            Déconnexion
-                        </button>
-                    </form>
-                </div>
-            </nav>
-        </aside>
+        <!-- Sidebar mobile supprimé -->
         
         <!-- Contenu principal -->
         <main class="main" style="padding-bottom: var(--chat-height);">
@@ -183,68 +46,104 @@
 
         <!-- Chat fixe -->
         @auth
-        <div class="fixed bottom-0 left-0 right-0 z-sticky bg-white border-t border-gray-200" 
-             style="height: var(--chat-height);" x-data="fixedChat()">
-            <div class="container max-w-7xl mx-auto flex items-center gap-3 h-full">
-                <!-- Bouton fichier -->
-                <button 
-                    type="button"
-                    @click="$refs.fileInput.click()"
-                    class="touch-target rounded-lg hover:bg-gray-100 transition-colors"
-                    title="Joindre un fichier"
-                >
-                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                    </svg>
-                </button>
-                
-                <input 
-                    type="file" 
-                    x-ref="fileInput" 
-                    @change="handleFileUpload"
-                    accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                    class="hidden"
-                />
-                
-                <!-- Champ de saisie -->
-                <form @submit.prevent="sendMessage" class="flex-1 flex gap-2">
-                    <div class="flex-1 relative">
+        <div class="fixed bottom-0 left-0 right-0 z-sticky" 
+             style="background: var(--white); border-top: 1px solid var(--gray-200);" x-data="fixedChat()">
+            <div class="container max-w-4xl mx-auto p-4">
+                <!-- Suggestions tooltip (cachées par défaut) -->
+                <div id="suggestions-tooltip" class="mb-3 rounded-xl shadow-sm p-3 hidden" style="background: var(--white); border: 1px solid var(--gray-200);">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-medium" style="color: var(--gray-600);">Suggestions</span>
+                        <button type="button" id="refresh-suggestions" class="p-1 rounded transition-colors" style="color: var(--gray-600);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" title="Rafraîchir">
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-2">
+                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Aide-moi à créer un business plan détaillé pour ma startup">Aide-moi à créer un business plan détaillé pour ma startup</button>
+                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Quelles sont les opportunités de financement disponibles en Côte d'Ivoire ?">Quelles sont les opportunités de financement disponibles en Côte d'Ivoire ?</button>
+                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Comment valider mon idée d'entreprise avant de me lancer ?">Comment valider mon idée d'entreprise avant de me lancer ?</button>
+                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Crée-moi une stratégie marketing pour lancer ma startup en Afrique">Crée-moi une stratégie marketing pour lancer ma startup en Afrique</button>
+                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Quelles sont les étapes légales pour créer une entreprise en Côte d'Ivoire ?">Quelles sont les étapes légales pour créer une entreprise en Côte d'Ivoire ?</button>
+                    </div>
+                </div>
+
+                <!-- Modern chat input container -->
+                <form @submit.prevent="sendMessage" class="relative">
+                    <div class="relative rounded-2xl shadow-sm transition-all duration-200" style="background: var(--white); border: 1px solid var(--gray-200);" 
+                         onfocusin="this.style.borderColor='var(--orange)'; this.style.boxShadow='0 0 0 3px rgba(255, 107, 53, 0.1)'" 
+                         onfocusout="this.style.borderColor='var(--gray-200)'; this.style.boxShadow='none'">
+                        
                         <!-- Aperçu fichier -->
-                        <div x-show="attachedFile" class="absolute bottom-full mb-2 p-2 bg-gray-100 border border-gray-200 rounded-lg flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            <span x-text="attachedFile?.name" class="text-sm text-gray-700 flex-1"></span>
-                            <button type="button" @click="removeAttachment()" class="p-1 hover:bg-gray-200 rounded">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
+                        <div x-show="attachedFile" class="absolute bottom-full mb-2 p-2 rounded-lg flex items-center gap-2" style="background: var(--gray-100); border: 1px solid var(--gray-200);">
+                            <i data-lucide="paperclip" class="w-4 h-4" style="color: var(--gray-500);"></i>
+                            <span x-text="attachedFile?.name" class="text-sm flex-1" style="color: var(--gray-700);"></span>
+                            <button type="button" @click="removeAttachment()" class="p-1 rounded transition-colors" style="color: var(--gray-500);" onmouseover="this.style.background='var(--gray-200)'" onmouseout="this.style.background='transparent'">
+                                <i data-lucide="x" class="w-4 h-4"></i>
                             </button>
                         </div>
-                        
-                        <input 
+
+                        <textarea 
                             x-model="message"
-                            @keydown.enter.prevent="sendMessage"
+                            @keydown.enter.prevent="if (!$event.shiftKey) sendMessage()"
                             placeholder="Posez votre question à LAgentO..."
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
-                        />
+                            rows="1"
+                            class="w-full min-h-[52px] max-h-[100px] bg-transparent rounded-2xl p-4 pt-6 pb-12 text-sm resize-none overflow-y-auto"
+                            style="color: var(--gray-900); outline: none; border: none;"
+                            oninput="this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'"
+                        ></textarea>
+                        
+                        <!-- Bottom action bar -->
+                        <div class="flex items-center justify-between px-4 py-2">
+                            <!-- Left icons -->
+                            <div class="flex items-center gap-3">
+                                <input 
+                                    type="file" 
+                                    x-ref="fileInput" 
+                                    @change="handleFileUpload"
+                                    accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                                    class="hidden"
+                                />
+                                <button type="button" @click="$refs.fileInput.click()" 
+                                        class="p-1.5 rounded-lg transition-all" 
+                                        style="color: var(--gray-600);" 
+                                        onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'" 
+                                        onmouseout="this.style.color='var(--gray-600)'; this.style.background='transparent'"
+                                        title="Joindre un fichier">
+                                    <i data-lucide="paperclip" class="w-4 h-4"></i>
+                                </button>
+                                <button type="button" 
+                                        class="p-1.5 rounded-lg transition-all" 
+                                        style="color: var(--gray-600);" 
+                                        onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'" 
+                                        onmouseout="this.style.color='var(--gray-600)'; this.style.background='transparent'"
+                                        onclick="document.getElementById('suggestions-tooltip').classList.toggle('hidden')"
+                                        title="Suggestions">
+                                    <i data-lucide="lightbulb" class="w-4 h-4"></i>
+                                </button>
+                                <button type="button" 
+                                        class="p-1.5 rounded-lg transition-all" 
+                                        style="color: var(--gray-600);" 
+                                        onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'" 
+                                        onmouseout="this.style.color='var(--gray-600)'; this.style.background='transparent'"
+                                        title="Enregistrement vocal">
+                                    <i data-lucide="mic" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Send button -->
+                            <button 
+                                type="submit"
+                                :disabled="!message.trim() && !attachedFile || isLoading"
+                                class="p-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                :class="(!message.trim() && !attachedFile) || isLoading ? 'cursor-not-allowed' : ''"
+                                :style="(!message.trim() && !attachedFile) || isLoading ? 'background: var(--gray-300); color: var(--gray-500);' : 'background: var(--orange-primary); color: white;'"
+                                onmouseover="if (!this.disabled) this.style.background='var(--orange-dark)'"
+                                onmouseout="if (!this.disabled) this.style.background='var(--orange-primary)'"
+                            >
+                                <i data-lucide="send-horizontal" class="w-4 h-4" x-show="!isLoading"></i>
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin" x-show="isLoading"></i>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <!-- Bouton envoyer -->
-                    <button 
-                        type="submit"
-                        :disabled="!message.trim() && !attachedFile || isLoading"
-                        class="touch-target rounded-lg transition-colors"
-                        :class="(!message.trim() && !attachedFile) || isLoading ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-orange text-white hover:bg-orange-light'"
-                    >
-                        <svg x-show="!isLoading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                        </svg>
-                        <svg x-show="isLoading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </button>
                 </form>
             </div>
         </div>
@@ -318,7 +217,28 @@
             }
         }
     }
+    
+    // Fonctions pour les conversations  
+    function closeConversation(button) {
+        const tab = button.closest('.conversation-tab');
+        tab.remove();
+    }
+    
+    function createNewConversation() {
+        window.location.href = '{{ route("chat") }}';
+    }
     </script>
+    
+    <style>
+    /* Hide scrollbar but keep functionality */
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+    </style>
     @endauth
 </body>
 </html>

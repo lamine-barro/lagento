@@ -1,8 +1,14 @@
 :root {
   /* Palette de couleurs simplifiée */
   --orange: #FF6B35;
+  --orange-primary: #FF6B35;  /* Couleur principale orange */
   --orange-light: #FF8A5C;
   --orange-lighter: #FFA882;
+  --orange-lightest: #FFF4F0;
+  --orange-dark: #E55A2B;
+  --orange-100: #FFF4F0;
+  --orange-200: #FFDDD2;
+  --orange-700: #E55A2B;
   
   --white: #FFFFFF;
   --black: #1F2937;
@@ -19,8 +25,19 @@
 
   /* Couleurs fonctionnelles */
   --success: #059669;
+  --success-100: #DCFCE7;
+  --success-700: #15803D;
   --error: #DC2626;
+  --danger: #DC2626;
+  --danger-50: #FEF2F2;
+  --danger-100: #FEE2E2;
+  --danger-200: #FECACA;
   --warning: #D97706;
+  --warning-50: #FFFBEB;
+  --warning-100: #FEF3C7;
+  --warning-200: #FDE68A;
+  --warning-600: #D97706;
+  --warning-700: #B45309;
   --info: #2563EB;
 
   /* Typographie unifiée */

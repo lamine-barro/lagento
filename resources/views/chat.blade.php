@@ -4,28 +4,52 @@
 
 @section('content')
 <div class="min-h-screen bg-white" x-data="chatInterface()" data-conversation-id="{{ $conversation->id ?? '' }}">
-    <!-- Chat Header -->
+    <!-- Chat Header with Tabs -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
-        <div class="flex items-center justify-between max-w-7xl mx-auto">
-            <div class="flex items-center gap-3">
-                <button onclick="window.location.href = '{{ route('conversations.index') }}'" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <i data-lucide="message-square-more" class="w-5 h-5" style="color: var(--gray-600);"></i>
-                </button>
-                <div>
-                    <h1 class="font-medium" style="color: var(--gray-900);">
-                        {{ $conversation->title ?? 'LAgentO' }}
-                    </h1>
-                    <p class="text-xs" style="color: var(--gray-500);">En ligne</p>
+        <div class="max-w-4xl mx-auto">
+            <!-- Tabs conversations -->
+            <div class="flex items-center overflow-x-auto scrollbar-hidden" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <!-- Nouvelle conversation toujours en premier -->
+                    <button type="button" class="new-conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0" style="background: var(--gray-50); color: var(--gray-600); border: 1px solid var(--gray-200); border-style: dashed;" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='var(--gray-50)'" onclick="createNewConversation()">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Nouvelle conversation</span>
+                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-gray-300 transition-colors" onclick="closeConversation(this)">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </button>
+                    
+                    @if(isset($conversation) && $conversation->title && $conversation->title !== 'Nouvelle conversation')
+                    <!-- Conversation active/récente -->
+                    <button type="button" class="conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap" style="background: var(--orange-100); color: var(--orange-700); border: 1px solid var(--orange-200);">
+                        <span class="max-w-48 truncate">{{ $conversation->title }}</span>
+                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-orange-200 transition-colors" onclick="closeConversation(this)">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </button>
+                    @endif
+                    
+                    <!-- Conversations par ordre chronologique (plus récent au moins récent) -->
+                    <button type="button" class="conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap" style="background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200);" onmouseover="this.style.background='var(--gray-200)'" onmouseout="this.style.background='var(--gray-100)'">
+                        <span class="max-w-48 truncate">Financement PME Côte d'Ivoire</span>
+                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-gray-300 transition-colors" onclick="closeConversation(this)">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </button>
+                    
+                    <button type="button" class="conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap" style="background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200);" onmouseover="this.style.background='var(--gray-200)'" onmouseout="this.style.background='var(--gray-100)'">
+                        <span class="max-w-48 truncate">Stratégie marketing digital</span>
+                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-gray-300 transition-colors" onclick="closeConversation(this)">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </button>
                 </div>
             </div>
-            <button @click="$dispatch('open-conversation-menu')" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <i data-lucide="more-vertical" class="w-5 h-5" style="color: var(--gray-600);"></i>
-            </button>
         </div>
     </div>
 
     <!-- Messages Area -->
-    <div class="max-w-5xl mx-auto p-4 space-y-4" x-ref="messagesArea">
+    <div class="max-w-4xl mx-auto p-4 space-y-4" x-ref="messagesArea">
         
         <!-- Welcome Message -->
         @if(($messages ?? collect())->isEmpty())
@@ -60,14 +84,6 @@
                         <span class="text-sm" style="color: var(--gray-900);">Trouver des financements</span>
                     </button>
                     
-                    <button 
-                        @click="sendQuickMessage('Analyser la viabilité de mon projet')"
-                        class="flex items-center gap-3 p-3 text-left border rounded-lg hover:shadow-sm transition-shadow"
-                        style="border-color: var(--gray-200);"
-                    >
-                        <i data-lucide="trending-up" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                        <span class="text-sm" style="color: var(--gray-900);">Analyser mon projet</span>
-                    </button>
                     
                     <button 
                         @click="sendQuickMessage('Quelles sont mes obligations légales ?')"
@@ -86,9 +102,9 @@
             <!-- User Message -->
             @if($message->role === 'user')
                 <div class="flex justify-end">
-                    <div class="max-w-xs lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-lg" style="background: var(--orange-primary); color: white;">
+                    <div class="max-w-xs lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-lg" style="color: var(--gray-900);">
                         <p class="text-sm">{{ $message->content }}</p>
-                        <div class="text-xs mt-1 opacity-80">
+                        <div class="text-xs mt-1" style="color: var(--gray-500);">
                             {{ $message->created_at->format('H:i') }}
                         </div>
                     </div>
@@ -148,9 +164,22 @@
 </div>
 
 @push('scripts')
+<style>
+/* Hide scrollbar but keep functionality */
+.scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+}
+</style>
+
 <script>
 function chatInterface() {
     return {
+        isTyping: false,
+        
         copyMessage(content, event) {
             navigator.clipboard.writeText(content).then(() => {
                 // Show temporary feedback
@@ -173,6 +202,7 @@ function chatInterface() {
         }
     }
 }
+
 
 // Custom card interactions
 function contactInstitution() {

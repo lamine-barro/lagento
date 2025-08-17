@@ -52,6 +52,11 @@
     background-color: var(--surface) !important;
 }
 
+/* Landing and Verify OTP background override */
+[data-theme="dark"] [data-dark-bg] {
+    background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%) !important;
+}
+
 /* Borders */
 [data-theme="dark"] .border-gray-200 {
     border-color: var(--border) !important;

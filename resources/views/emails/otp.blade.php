@@ -30,12 +30,10 @@
         }
         
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #111827;
+            height: 60px;
+            width: auto;
             margin-bottom: 10px;
         }
-        .logo span { color: #FF6B35; }
         
         .header-subtitle {
             color: #6B7280;
@@ -139,7 +137,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">LAgent<span>O</span></div>
+            <img src="{{ asset('logo-light.png') }}" alt="LAgentO" style="height: 60px; width: auto; margin-bottom: 10px;">
             <div class="header-subtitle">Votre assistant IA entrepreneurial</div>
         </div>
         

@@ -12,7 +12,7 @@
 <div class="w-full max-w-4xl mx-auto" x-data>
     <!-- Top bar with logo + logout -->
     <div class="flex items-center justify-between py-3 mb-4" style="border-bottom: 1px solid var(--gray-100);">
-        <a href="<?php echo e(route('dashboard')); ?>" class="flex items-center">
+        <a href="<?php echo e(route('diagnostic')); ?>" class="flex items-center">
             <?php if (isset($component)) { $__componentOriginal987d96ec78ed1cf75b349e2e5981978f = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.logo','data' => ['size' => 'lg']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>

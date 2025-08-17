@@ -26,17 +26,16 @@ class User extends Authenticatable
         'email',
         'email_verified_at',
         'phone',
-        'profile_type',
         'verification_status',
-        'company_name',
-        'business_sector',
-        'business_stage',
-        'team_size',
-        'monthly_revenue',
         'main_challenges',
         'objectives',
         'preferred_support',
         'onboarding_completed',
+        'is_public',
+        'email_notifications',
+        'diagnostics_used_this_month',
+        'diagnostics_month_reset',
+        'last_diagnostic_at',
     ];
 
     /**
@@ -61,6 +60,10 @@ class User extends Authenticatable
             'objectives' => 'array', 
             'preferred_support' => 'array',
             'onboarding_completed' => 'boolean',
+            'is_public' => 'boolean',
+            'email_notifications' => 'boolean',
+            'diagnostics_month_reset' => 'date',
+            'last_diagnostic_at' => 'datetime',
         ];
     }
 
@@ -77,5 +80,54 @@ class User extends Authenticatable
     public function projets(): HasMany
     {
         return $this->hasMany(Projet::class);
+    }
+
+    /**
+     * Get remaining diagnostics for this month
+     */
+    public function getRemainingDiagnostics(): int
+    {
+        $this->resetDiagnosticsIfNewMonth();
+        return max(0, 3 - $this->diagnostics_used_this_month);
+    }
+
+    /**
+     * Check if user can run a diagnostic
+     */
+    public function canRunDiagnostic(): bool
+    {
+        return $this->getRemainingDiagnostics() > 0;
+    }
+
+    /**
+     * Use a diagnostic (increment counter)
+     */
+    public function useDiagnostic(): bool
+    {
+        if (!$this->canRunDiagnostic()) {
+            return false;
+        }
+
+        $this->resetDiagnosticsIfNewMonth();
+        $this->increment('diagnostics_used_this_month');
+        $this->update(['last_diagnostic_at' => now()]);
+        
+        return true;
+    }
+
+    /**
+     * Reset diagnostics counter if new month
+     */
+    private function resetDiagnosticsIfNewMonth(): void
+    {
+        $currentMonth = now()->format('Y-m');
+        $resetMonth = $this->diagnostics_month_reset?->format('Y-m');
+
+        if ($resetMonth !== $currentMonth) {
+            $this->update([
+                'diagnostics_used_this_month' => 0,
+                'diagnostics_month_reset' => now()->startOfMonth(),
+            ]);
+        }
     }
 }

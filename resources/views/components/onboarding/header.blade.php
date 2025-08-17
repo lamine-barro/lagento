@@ -12,7 +12,7 @@
 <div class="w-full max-w-4xl mx-auto" x-data>
     <!-- Top bar with logo + logout -->
     <div class="flex items-center justify-between py-3 mb-4" style="border-bottom: 1px solid var(--gray-100);">
-        <a href="{{ route('dashboard') }}" class="flex items-center">
+        <a href="{{ route('diagnostic') }}" class="flex items-center">
             <x-logo size="lg" />
         </a>
         <div class="flex items-center gap-2">

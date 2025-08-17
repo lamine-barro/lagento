@@ -45,7 +45,7 @@
             <!-- Produits/Services (100 mots max) -->
             <div>
                 <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Produits/Services proposés</label>
-                <textarea name="produits_services" rows="3" class="input-field w-full resize-none" placeholder="Décrivez vos offres en 100 mots maximum"></textarea>
+                <textarea name="produits_services" rows="3" class="input-field w-full resize-none" placeholder="Décrivez vos offres en 100 mots maximum" maxlength="600"></textarea>
             </div>
 
             <!-- Clients cibles -->

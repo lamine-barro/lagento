@@ -51,7 +51,7 @@
 ])); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="min-h-screen flex flex-col" style="background: linear-gradient(180deg, #fff 0%, #fff7f2 100%);">
+<div class="min-h-screen flex flex-col bg-white" style="background: linear-gradient(180deg, #fff 0%, #fff7f2 100%);" data-dark-bg>
 
     <!-- Main Content -->
     <main class="flex-1 flex items-center justify-center p-4">
@@ -60,14 +60,14 @@
             <div class="mx-auto mb-6">
                 <?php if (isset($component)) { $__componentOriginal987d96ec78ed1cf75b349e2e5981978f = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.logo','data' => ['size' => '2xl','class' => 'mx-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.logo','data' => ['size' => 'xl','class' => 'mx-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('logo'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['size' => '2xl','class' => 'mx-auto']); ?>
+<?php $component->withAttributes(['size' => 'xl','class' => 'mx-auto']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal987d96ec78ed1cf75b349e2e5981978f)): ?>
@@ -121,14 +121,7 @@ unset($__errorArgs, $__bag); ?>
             </form>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="p-4 text-center">
-        <p class="text-sm" style="color: var(--gray-500);">
-            © 2024 Agent O. Tous droits réservés.
-        </p>
-        <a href="<?php echo e(route('legal')); ?>" class="text-sm" style="color: var(--gray-700);">Mentions légales</a>
-    </footer>
+    
 </div>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.guest', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/landing.blade.php ENDPATH**/ ?>

@@ -1,266 +1,107 @@
 <?php $__env->startSection('title', 'Profil'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="min-h-screen bg-white">
-    <!-- Header -->
-    <div class="sticky top-0 z-10 bg-white border-b p-4" style="border-color: var(--gray-100);">
-        <div class="flex items-center gap-3">
-            <button onclick="history.back()" class="btn btn-ghost p-2">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            </button>
-            <h1 class="text-xl font-medium" style="color: var(--gray-900);">Profil</h1>
-        </div>
-    </div>
-
+<div class="min-h-screen bg-white" x-data="profileManager()">
     <!-- Profile Content -->
-    <div class="max-w-4xl mx-auto p-4 space-y-6" x-data="profileManager()">
+    <div class="max-w-4xl mx-auto p-4">
+        <h2 class="font-medium mb-6" style="color: var(--gray-900);">Profil</h2>
         
-        <!-- User Info Section -->
-        <div class="border" style="border-color: var(--black); border-radius: var(--radius-md);">
-            <div class="p-4 border-b" style="border-color: var(--black);">
-                <h2 class="font-medium" style="color: var(--gray-900);">Informations personnelles</h2>
-            </div>
+        <div class="space-y-8">
             
-            <form @submit.prevent="updateProfile" class="p-4 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Nom complet
-                    </label>
-                    <input 
-                        type="text"
-                        x-model="profile.name"
-                        class="input-field w-full"
-                        required
-                    />
+            <!-- Informations personnelles -->
+            <form @submit.prevent="updateProfile">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="font-medium mb-4" style="color: var(--gray-900);">Informations personnelles</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
+                                    Nom complet *
+                                </label>
+                                <input 
+                                    type="text"
+                                    x-model="profile.name"
+                                    class="input-field w-full"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
+                                    Téléphone
+                                </label>
+                                <input 
+                                    type="tel"
+                                    x-model="profile.phone"
+                                    placeholder="+225 XX XX XX XX XX"
+                                    class="input-field w-full"
+                                />
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
+                                    Email *
+                                </label>
+                                <input 
+                                    type="email"
+                                    x-model="profile.email"
+                                    class="input-field w-full"
+                                    required
+                                />
+                                <p class="text-xs mt-1" style="color: var(--gray-500);">
+                                    Votre email de connexion. Un code de vérification sera envoyé si vous le modifiez.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            Mettre à jour
+                        </button>
+                    </div>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Email
-                    </label>
-                    <input 
-                        type="email"
-                        x-model="profile.email"
-                        class="input-field w-full"
-                        readonly
-                        style="background: var(--gray-100);"
-                    />
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Téléphone
-                    </label>
-                    <input 
-                        type="tel"
-                        x-model="profile.phone"
-                        placeholder="+225 XX XX XX XX XX"
-                        class="input-field w-full"
-                    />
-                </div>
-                
-                <button type="submit" class="btn btn-primary">
-                    Mettre à jour
-                </button>
             </form>
-        </div>
-
-        <!-- Company Info Section -->
-        <div class="border" style="border-color: var(--black); border-radius: var(--radius-md);">
-            <div class="p-4 border-b" style="border-color: var(--black);">
-                <h2 class="font-medium" style="color: var(--gray-900);">Entreprise</h2>
-            </div>
             
-            <form @submit.prevent="updateCompany" class="p-4 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Nom de l'entreprise
-                    </label>
-                    <input 
-                        type="text"
-                        x-model="profile.company_name"
-                        class="input-field w-full"
-                        required
-                    />
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Secteur d'activité
-                    </label>
-                    <select x-model="profile.business_sector" class="input-field w-full">
-                        <option value="">Sélectionnez votre secteur</option>
-                        <?php $__currentLoopData = config('constants.SECTEURS'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($key); ?>"><?php echo e($value); ?></option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Stade de développement
-                    </label>
-                    <select x-model="profile.business_stage" class="input-field w-full">
-                        <option value="">Sélectionnez votre stade</option>
-                        <?php $__currentLoopData = config('constants.STADES_MATURITE'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($key); ?>"><?php echo e($value); ?></option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Taille de l'équipe
-                    </label>
-                    <select x-model="profile.team_size" class="input-field w-full">
-                        <option value="">Sélectionnez la taille</option>
-                        <?php $__currentLoopData = config('constants.TEAM_SIZES'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($size); ?>"><?php echo e($size); ?> personnes</option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">
-                    Mettre à jour
-                </button>
-            </form>
-        </div>
-
-        <!-- Project Section -->
-        <div class="border" style="border-color: var(--black); border-radius: var(--radius-md);">
-            <div class="p-4 border-b" style="border-color: var(--black);">
-                <h2 class="font-medium" style="color: var(--gray-900);">Projet</h2>
-            </div>
-            
-            <form @submit.prevent="updateProject" class="p-4 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Description du projet
-                    </label>
-                    <textarea 
-                        x-model="project.description"
-                        rows="4"
-                        placeholder="Décrivez votre projet en quelques lignes..."
-                        class="input-field w-full resize-none"
-                    ></textarea>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Marché cible
-                    </label>
-                    <select x-model="project.target_market" class="input-field w-full">
-                        <option value="">Sélectionnez votre marché</option>
-                        <?php $__currentLoopData = config('constants.CIBLES'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($key); ?>"><?php echo e($value); ?></option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Modèle de revenus
-                    </label>
-                    <select x-model="project.revenue_model" class="input-field w-full">
-                        <option value="">Sélectionnez votre modèle</option>
-                        <?php $__currentLoopData = config('constants.MODELES_REVENUS'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($key); ?>"><?php echo e($value); ?></option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">
-                    Mettre à jour
-                </button>
-            </form>
-        </div>
-
-        <!-- Data Sources Section -->
-        <div class="border" style="border-color: var(--black); border-radius: var(--radius-md);">
-            <div class="p-4 border-b" style="border-color: var(--black);">
-                <h2 class="font-medium" style="color: var(--gray-900);">Sources de données</h2>
-            </div>
-            
-            <div class="p-4 space-y-3">
-                <div class="flex items-center justify-between p-3 border" style="border-color: var(--black); border-radius: var(--radius-md);">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="file-text" class="w-5 h-5" style="color: var(--gray-500);"></i>
-                        <div>
-                            <div class="text-sm font-medium" style="color: var(--gray-900);">Documents d'entreprise</div>
-                            <div class="text-xs" style="color: var(--gray-500);">Statuts, bilans, etc.</div>
+            <!-- Préférences -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="font-medium mb-4" style="color: var(--gray-900);">Préférences et confidentialité</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3">
+                            <div>
+                                <div class="text-sm font-medium" style="color: var(--gray-900);">Profil public</div>
+                                <div class="text-xs" style="color: var(--gray-500);">Permettre aux autres utilisateurs de voir votre profil dans l'annuaire</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" x-model="profile.is_public" @change="updatePreferences()" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3">
+                            <div>
+                                <div class="text-sm font-medium" style="color: var(--gray-900);">Notifications email</div>
+                                <div class="text-xs" style="color: var(--gray-500);">Recevoir des notifications sur les opportunités et actualités</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" x-model="profile.email_notifications" @change="updatePreferences()" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                            </label>
                         </div>
                     </div>
-                    <button @click="$dispatch('open-documents-modal')" class="btn btn-ghost btn-sm">
-                        Gérer
-                    </button>
                 </div>
-                
-                <div class="flex items-center justify-between p-3 border" style="border-color: var(--black); border-radius: var(--radius-md);">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="link" class="w-5 h-5" style="color: var(--gray-500);"></i>
-                        <div>
-                            <div class="text-sm font-medium" style="color: var(--gray-900);">Intégrations</div>
-                            <div class="text-xs" style="color: var(--gray-500);">API, webhooks</div>
-                        </div>
-                    </div>
-                    <button @click="$dispatch('open-integrations-modal')" class="btn btn-ghost btn-sm">
-                        Configurer
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Privacy Section -->
-        <div class="border" style="border-color: var(--black); border-radius: var(--radius-md);">
-            <div class="p-4 border-b" style="border-color: var(--black);">
-                <h2 class="font-medium" style="color: var(--gray-900);">Confidentialité</h2>
             </div>
             
-            <div class="p-4 space-y-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="text-sm font-medium" style="color: var(--gray-900);">Profil public</div>
-                        <div class="text-xs" style="color: var(--gray-500);">Permettre aux autres utilisateurs de voir votre profil</div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" x-model="profile.is_public" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-                    </label>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="text-sm font-medium" style="color: var(--gray-900);">Notifications email</div>
-                        <div class="text-xs" style="color: var(--gray-500);">Recevoir des notifications par email</div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" x-model="profile.email_notifications" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-                    </label>
-                </div>
-                
-                <button @click="updatePrivacy()" class="btn btn-primary">
-                    Sauvegarder les préférences
-                </button>
-            </div>
-        </div>
-
-        <!-- Danger Zone -->
-        <div class="border" style="border-color: var(--danger); border-radius: var(--radius-md);">
-            <div class="p-4 border-b" style="border-color: var(--danger);">
-                <h2 class="font-medium" style="color: var(--danger);">Zone de danger</h2>
-            </div>
-            
-            <div class="p-4 space-y-4">
-                <div>
-                    <h3 class="text-sm font-medium mb-2" style="color: var(--gray-900);">Supprimer mon compte</h3>
-                    <p class="text-xs mb-3" style="color: var(--gray-500);">
+            <!-- Zone de danger -->
+            <div class="card mb-60">
+                <div class="card-body" style="background: var(--danger-50); border: 1px solid var(--danger-200);">
+                    <h3 class="font-medium mb-2" style="color: var(--danger);">Zone de danger</h3>
+                    <p class="text-sm mb-4" style="color: var(--gray-700);">
                         Cette action est irréversible. Toutes vos données seront définitivement supprimées.
                     </p>
                     <button 
                         @click="$dispatch('open-delete-account-modal')"
-                        class="btn btn-sm"
-                        style="background: var(--danger); color: white;"
+                        class="btn-danger-outline text-sm"
                     >
                         Supprimer mon compte
                     </button>
@@ -274,60 +115,123 @@
 <div x-data="{ open: false }" 
      @open-delete-account-modal.window="open = true"
      x-show="open" 
-     class="fixed inset-0 z-50" 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 z-50 flex items-center justify-center" 
      style="display: none;">
     
-    <div class="modal-backdrop" @click="open = false">
-        <div @click.stop class="modal max-w-md">
-            <div class="p-6">
-                <div class="flex items-center gap-3 mb-4">
-                    <i data-lucide="alert-triangle" class="w-6 h-6" style="color: var(--danger);"></i>
-                    <h3 class="text-lg font-medium" style="color: var(--gray-900);">
-                        Supprimer le compte
-                    </h3>
-                </div>
-                
-                <p class="text-sm mb-4" style="color: var(--gray-700);">
-                    Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données seront définitivement supprimées.
-                </p>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
-                        Tapez "SUPPRIMER" pour confirmer
-                    </label>
-                    <input 
-                        type="text"
-                        x-model="confirmText"
-                        placeholder="SUPPRIMER"
-                        class="input-field w-full"
-                    />
-                </div>
-                
-                <div class="flex gap-3">
-                    <button 
-                        type="button"
-                        @click="open = false"
-                        class="btn btn-ghost flex-1"
-                    >
-                        Annuler
-                    </button>
-                    <button 
-                        type="button"
-                        @click="deleteAccount()"
-                        :disabled="confirmText !== 'SUPPRIMER'"
-                        class="btn flex-1"
-                        style="background: var(--danger); color: white;"
-                        :style="confirmText !== 'SUPPRIMER' ? 'opacity: 0.5; cursor: not-allowed;' : ''"
-                    >
-                        Supprimer
-                    </button>
-                </div>
+    <!-- Backdrop with blur -->
+    <div class="fixed inset-0 backdrop-blur-sm" style="background: rgba(0, 0, 0, 0.5);" @click="open = false"></div>
+    
+    <!-- Modal -->
+    <div @click.stop 
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="relative w-full max-w-md mx-4 bg-white rounded-lg shadow-2xl">
+        
+        <div class="p-6">
+            <!-- Header -->
+            <h3 class="text-lg font-semibold mb-4" style="color: var(--gray-900);">
+                Supprimer le compte
+            </h3>
+            
+            <!-- Content -->
+            <p class="text-sm mb-6" style="color: var(--gray-700);">
+                Êtes-vous absolument sûr de vouloir supprimer votre compte ? Toutes vos données, conversations, projets et analytics seront définitivement supprimés.
+            </p>
+            
+            <!-- Confirmation -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">
+                    Tapez "SUPPRIMER" pour confirmer
+                </label>
+                <input 
+                    type="text"
+                    x-model="confirmText"
+                    placeholder="SUPPRIMER"
+                    class="input-field w-full"
+                />
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <button 
+                    type="button"
+                    @click="open = false; confirmText = ''"
+                    class="btn btn-ghost flex-1"
+                >
+                    Annuler
+                </button>
+                <button 
+                    type="button"
+                    @click="deleteAccount()"
+                    :disabled="confirmText !== 'SUPPRIMER'"
+                    class="btn-danger-outline flex-1 transition-all duration-200"
+                    :style="confirmText !== 'SUPPRIMER' ? 'opacity: 0.5; cursor: not-allowed;' : ''"
+                >
+                    Supprimer
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <?php $__env->startPush('scripts'); ?>
+<style>
+/* Hide scrollbar but keep functionality */
+.scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+}
+
+/* Danger outline buttons */
+.btn-danger-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    background-color: transparent;
+    color: #dc2626;
+    border: 1px solid #dc2626;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+    background-color: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+.btn-danger-outline:focus {
+    outline: 2px solid #dc2626;
+    outline-offset: 2px;
+}
+
+.btn-danger-outline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Remove shadow from cards */
+.card {
+    box-shadow: none !important;
+}
+</style>
+
 <script>
 function profileManager() {
     return {
@@ -347,34 +251,46 @@ function profileManager() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Profil mis à jour avec succès');
+                    if (data.email_changed) {
+                        alert(data.message || 'Email mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse.');
+                        // Optionnel: rediriger vers la page de vérification OTP
+                        // window.location.href = '<?php echo e(route("auth.verify-otp-form")); ?>';
+                    } else {
+                        alert(data.message || 'Profil mis à jour avec succès');
+                    }
+                } else {
+                    alert('Erreur lors de la mise à jour du profil');
                 }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la mise à jour du profil');
             });
         },
         
-        updateCompany() {
-            this.updateProfile();
-        },
         
-        updateProject() {
-            fetch('<?php echo e(route("profile.project.update")); ?>', {
+        updatePreferences() {
+            fetch('<?php echo e(route("profile.update")); ?>', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(this.project)
+                body: JSON.stringify({
+                    name: this.profile.name,
+                    email: this.profile.email,
+                    phone: this.profile.phone,
+                    is_public: this.profile.is_public,
+                    email_notifications: this.profile.email_notifications
+                })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Projet mis à jour avec succès');
+                    // Show a subtle toast or visual feedback
+                    console.log('Préférences mises à jour');
                 }
             });
-        },
-        
-        updatePrivacy() {
-            this.updateProfile();
         },
         
         deleteAccount() {

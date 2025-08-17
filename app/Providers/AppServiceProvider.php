@@ -30,14 +30,7 @@ class AppServiceProvider extends ServiceProvider
             return new UuidEloquentUserProvider($app['hash'], $config['model']);
         });
 
-        // Bind observers for analytics
-        $this->app->resolving(UserActivityObserver::class, function ($observer, $app) {
-            // no-op; let container inject dependencies
-        });
-
-        User::updated(function (User $user) {
-            app(UserActivityObserver::class)->userUpdated($user);
-        });
+        // Observers supprimés - analytics géré uniquement via le bouton diagnostic
 
         // Conversation and message analytics hooks are disabled to avoid
         // performance issues and rely on explicit tracking in services.

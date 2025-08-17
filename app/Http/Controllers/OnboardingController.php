@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\UserAnalyticsService;
 use App\Models\Projet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,12 +9,6 @@ use Intervention\Image\Laravel\Facades\Image;
 
 class OnboardingController extends Controller
 {
-    private UserAnalyticsService $analyticsService;
-
-    public function __construct(UserAnalyticsService $analyticsService)
-    {
-        $this->analyticsService = $analyticsService;
-    }
     public function showStep1()
     {
         return view('onboarding.step1');
@@ -61,7 +54,8 @@ class OnboardingController extends Controller
             'is_public' => true,
         ]);
 
-        return redirect()->route('onboarding.step2');
+        // Sauvegarde de progression effectuée, poursuivre
+        return redirect()->route('onboarding.step2')->with('progress_saved', true);
     }
     
     public function showStep2()
@@ -117,7 +111,7 @@ class OnboardingController extends Controller
             'reseaux_sociaux' => array_filter($social),
         ]);
 
-        return redirect()->route('onboarding.step3');
+        return redirect()->route('onboarding.step3')->with('progress_saved', true);
     }
     
     public function showStep3()
@@ -159,7 +153,7 @@ class OnboardingController extends Controller
             'revenus' => $request->revenus,
         ]);
 
-        return redirect()->route('onboarding.step4');
+        return redirect()->route('onboarding.step4')->with('progress_saved', true);
     }
 
     public function showStep4()
@@ -204,14 +198,11 @@ class OnboardingController extends Controller
             'details_besoins' => $request->additional_info,
         ]);
 
-        // Vérifier si l'onboarding est complet
+        // Vérifier si l'onboarding est complet (Finaliser)
         if ($projet->isOnboardingComplete()) {
-            $this->analyticsService->updateEntrepreneurProfile($user, [
-                'projet_id' => $projet->id,
-                'termine_le' => now()->toISOString(),
-            ]);
+            // Analytics désactivé - géré uniquement via le bouton diagnostic
             
-            return redirect()->route('dashboard')->with('success', 'Félicitations ! Votre profil est maintenant complet.');
+            return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet.');
         } else {
             // Rediriger vers l'étape manquante
             $progress = $projet->getOnboardingProgress();

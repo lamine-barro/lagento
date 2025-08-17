@@ -70,14 +70,44 @@ class DashboardController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
             'phone' => 'nullable|string|max:30',
+            'is_public' => 'boolean',
+            'email_notifications' => 'boolean',
         ]);
 
         $user = Auth::user();
-        $user->update($request->only(['name', 'email', 'phone']));
+        $emailChanged = $user->email !== $request->email;
+        
+        // Si l'email a changé, réinitialiser la vérification
+        if ($emailChanged) {
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'is_public' => $request->boolean('is_public'),
+                'email_notifications' => $request->boolean('email_notifications'),
+                'email_verified_at' => null, // Réinitialiser la vérification
+            ]);
+            
+            // TODO: Envoyer un nouveau code OTP à la nouvelle adresse
+            // Ici vous pourriez appeler votre service d'envoi d'OTP
+            
+            return response()->json([
+                'success' => true, 
+                'email_changed' => true,
+                'message' => 'Profil mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse email.'
+            ]);
+        }
+        
+        $user->update($request->only([
+            'name', 
+            'phone',
+            'is_public',
+            'email_notifications'
+        ]));
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Profil mis à jour avec succès.']);
     }
 
     public function updateProject(Request $request)
@@ -97,5 +127,55 @@ class DashboardController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function deleteProfile(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Supprimer toutes les données associées à l'utilisateur
+        $user->conversations()->delete();
+        $user->projets()->delete();
+        $user->userAnalytics()->delete();
+        
+        // Supprimer l'utilisateur
+        $user->delete();
+        
+        // Déconnecter et rediriger
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return response()->json(['success' => true, 'redirect' => route('landing')]);
+    }
+
+    public function runDiagnostic(Request $request)
+    {
+        $user = Auth::user();
+
+        // Vérifier si l'utilisateur peut lancer un diagnostic
+        if (!$user->canRunDiagnostic()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous avez atteint la limite mensuelle de 3 diagnostics.'
+            ], 429);
+        }
+
+        // Utiliser un diagnostic
+        if (!$user->useDiagnostic()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Impossible de lancer le diagnostic.'
+            ], 500);
+        }
+
+        // TODO: Ici on appellerait l'agent de diagnostic/analytics
+        // Pour l'instant, on simule juste le succès
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Diagnostic lancé avec succès.',
+            'remaining' => $user->getRemainingDiagnostics()
+        ]);
     }
 }

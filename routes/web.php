@@ -46,10 +46,12 @@ Route::middleware(['auth'])->group(function () {
     
     // Routes protégées qui nécessitent un onboarding complet
     Route::middleware(['onboarding.complete'])->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/diagnostic', [DashboardController::class, 'index'])->name('diagnostic');
+        Route::post('/diagnostic/run', [DashboardController::class, 'runDiagnostic'])->name('diagnostic.run');
         Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
         Route::post('/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
         Route::post('/profile/project', [DashboardController::class, 'updateProject'])->name('profile.project.update');
+        Route::delete('/profile', [DashboardController::class, 'deleteProfile'])->name('profile.delete');
         
         // Chat
         Route::get('/chat', [ChatController::class, 'index'])->name('chat');

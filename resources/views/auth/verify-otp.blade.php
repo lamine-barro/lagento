@@ -3,11 +3,11 @@
 @section('title', 'Vérification - Agent O')
 
 @section('content')
-<div class="min-h-screen bg-white flex items-center justify-center p-4">
+<div class="min-h-screen flex items-center justify-center p-4" style="background: var(--gray-50);" data-dark-bg>
     <div class="w-full max-w-md">
         <!-- Logo -->
-        <div class="mx-auto mb-6 text-3xl sm:text-4xl font-semibold text-center" style="font-family: 'Poppins', sans-serif; color: var(--gray-900);">
-            Lagent<span style="color: var(--orange);">O</span>
+        <div class="mx-auto mb-6 text-center">
+            <x-logo size="xl" class="mx-auto" />
         </div>
 
         <!-- Header -->

@@ -53,14 +53,14 @@
 ]))
 
 @section('content')
-<div class="min-h-screen flex flex-col" style="background: linear-gradient(180deg, #fff 0%, #fff7f2 100%);">
+<div class="min-h-screen flex flex-col bg-white" style="background: linear-gradient(180deg, #fff 0%, #fff7f2 100%);" data-dark-bg>
 
     <!-- Main Content -->
     <main class="flex-1 flex items-center justify-center p-4">
         <div class="w-full max-w-2xl text-center">
             <!-- Logo adaptive -->
             <div class="mx-auto mb-6">
-                <x-logo size="2xl" class="mx-auto" />
+                <x-logo size="xl" class="mx-auto" />
             </div>
             
             <!-- Subtitle -->
@@ -97,13 +97,6 @@
             </form>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="p-4 text-center">
-        <p class="text-sm" style="color: var(--gray-500);">
-            © 2024 Agent O. Tous droits réservés.
-        </p>
-        <a href="{{ route('legal') }}" class="text-sm" style="color: var(--gray-700);">Mentions légales</a>
-    </footer>
+    
 </div>
 @endsection
