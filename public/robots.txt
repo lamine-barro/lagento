@@ -1,0 +1,33 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://lagento.ci/sitemap.xml
+
+# Disallow sensitive areas
+Disallow: /auth/
+Disallow: /onboarding/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /chat/
+Disallow: /conversations/
+Disallow: /admin/
+Disallow: /*.pdf$
+
+# Allow public content
+Allow: /projets/
+Allow: /legal
+Allow: /
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Specific rules for different search engines
+User-agent: Googlebot
+Crawl-delay: 1
+
+User-agent: Bingbot
+Crawl-delay: 2
+
+User-agent: Slurp
+Crawl-delay: 2

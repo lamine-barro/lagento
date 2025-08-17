@@ -1,0 +1,23 @@
+{
+    "name": "LAgentO",
+    "short_name": "LAgentO",
+    "description": "Assistant IA Entrepreneurial pour la Côte d'Ivoire",
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#FF6B35",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/",
+    "lang": "fr-CI",
+    "orientation": "portrait-primary"
+}
