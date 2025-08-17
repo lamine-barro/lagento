@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\DocumentChunk;
+use App\Models\MorceauDocument;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +28,7 @@ class SemanticSearchService
                 return [];
             }
 
-            return DocumentChunk::similarTo($queryEmbedding, $threshold)
+            return MorceauDocument::similarTo($queryEmbedding, $threshold)
                 ->limit($limit)
                 ->get()
                 ->toArray();
@@ -54,7 +54,7 @@ class SemanticSearchService
                 return [];
             }
 
-            return DocumentChunk::ofType($sourceType)
+            return MorceauDocument::ofType($sourceType)
                 ->similarTo($queryEmbedding, $threshold)
                 ->limit($limit)
                 ->get()

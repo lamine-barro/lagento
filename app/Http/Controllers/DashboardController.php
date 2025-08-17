@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Opportunity;
-use App\Models\Project;
+use App\Models\Opportunite;
+use App\Models\Projet;
 use App\Models\UserAnalytics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,15 +15,15 @@ class DashboardController extends Controller
         $user = Auth::user();
         
         // Get matched opportunities
-        $opportunities = Opportunity::where('business_sector', $user->business_sector)
+        $opportunities = Opportunite::where('business_sector', $user->business_sector)
             ->orWhere('business_sector', 'all')
             ->where('deadline', '>=', now())
             ->latest()
             ->limit(5)
             ->get();
         
-        // Get user's project
-        $project = Project::where('user_id', $user->id)->first();
+        // Récupérer le projet utilisateur (unique)
+        $project = Projet::where('user_id', $user->id)->first();
         
         // Get user statistics
         $analytics = UserAnalytics::where('user_id', $user->id)->first();
@@ -41,7 +41,7 @@ class DashboardController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        $project = Project::where('user_id', $user->id)->first();
+        $project = Projet::where('user_id', $user->id)->first();
         return view('profile', compact('user', 'project'));
     }
     
@@ -68,11 +68,11 @@ class DashboardController extends Controller
         ]);
 
         $user = Auth::user();
-        $project = Project::firstOrCreate(['user_id' => $user->id], ['project_name' => '']);
+        $project = Projet::firstOrCreate(['user_id' => $user->id], ['nom_projet' => $user->company_name ?? '']);
         $project->update([
-            'products_services' => json_encode(['text' => $request->description]),
-            'targets' => json_encode([$request->target_market]),
-            'revenue_models' => json_encode([$request->revenue_model])
+            'description' => $request->description,
+            'cibles' => $request->target_market ? [$request->target_market] : [],
+            'modeles_revenus' => $request->revenue_model ? [$request->revenue_model] : [],
         ]);
 
         return response()->json(['success' => true]);

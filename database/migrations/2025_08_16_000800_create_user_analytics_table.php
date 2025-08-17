@@ -9,9 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_analytics', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();
+            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->uuid('projet_id')->nullable();
+            $table->foreign('projet_id')->references('id')->on('projets')->nullOnDelete();
             $table->timestamp('generated_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->json('entrepreneur_profile')->nullable();

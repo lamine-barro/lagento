@@ -6,23 +6,23 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- SEO Meta Tags -->
-    <title>@yield('seo_title', '@yield('title', 'Dashboard') - LAgentO Assistant IA Entrepreneurial')</title>
+    <title>@yield('title', 'Dashboard') - LAgentO Assistant IA Entrepreneurial</title>
     <meta name="description" content="@yield('meta_description', 'Tableau de bord LAgentO : Gérez vos projets entrepreneuriaux, consultez votre assistant IA et accédez aux opportunités en Côte d\'Ivoire.')">
     <meta name="keywords" content="@yield('meta_keywords', 'dashboard entrepreneur, projets startup, assistant IA, gestion entreprise côte ivoire')">
     <meta name="robots" content="@yield('meta_robots', 'noindex, nofollow')">
     
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="@yield('og_title', '@yield('title', 'Dashboard') - LAgentO')">
-    <meta property="og:description" content="@yield('og_description', '@yield('meta_description', 'Tableau de bord LAgentO pour entrepreneurs ivoiriens')')">
+    <meta property="og:title" content="@yield('og_title', 'LAgentO')">
+    <meta property="og:description" content="@yield('og_description', 'Tableau de bord LAgentO pour entrepreneurs ivoiriens')">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:image" content="@yield('og_image', asset('images/lagento-dashboard.jpg'))">
     <meta property="og:site_name" content="LAgentO">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="@yield('twitter_title', '@yield('title', 'Dashboard') - LAgentO')">
-    <meta name="twitter:description" content="@yield('twitter_description', '@yield('meta_description', 'Tableau de bord LAgentO pour entrepreneurs')')">
+    <meta name="twitter:title" content="@yield('twitter_title', 'LAgentO')">
+    <meta name="twitter:description" content="@yield('twitter_description', 'Tableau de bord LAgentO pour entrepreneurs')">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
@@ -232,6 +232,10 @@
                 // Create FormData for file upload
                 const formData = new FormData();
                 formData.append('message', userMessage);
+                const conversationId = document.querySelector('[data-conversation-id]')?.getAttribute('data-conversation-id');
+                if (conversationId) {
+                    formData.append('conversation_id', conversationId);
+                }
                 if (file) {
                     formData.append('file', file);
                 }

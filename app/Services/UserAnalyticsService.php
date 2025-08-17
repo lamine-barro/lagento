@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserAnalytics;
-use App\Models\Project;
+use App\Models\Projet;
 use App\Models\UserMessage;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;

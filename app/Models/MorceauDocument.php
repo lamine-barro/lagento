@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class DocumentChunk extends Model
+class MorceauDocument extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
-        'source_type',
+        'type_source',
         'source_id',
-        'content',
+        'contenu',
         'embedding'
     ];
 
@@ -25,7 +27,7 @@ class DocumentChunk extends Model
      */
     public function source()
     {
-        return $this->morphTo(__FUNCTION__, 'source_type', 'source_id');
+        return $this->morphTo(__FUNCTION__, 'type_source', 'source_id');
     }
 
     /**
@@ -33,15 +35,15 @@ class DocumentChunk extends Model
      */
     public function scopeOfType($query, string $sourceType)
     {
-        return $query->where('source_type', $sourceType);
+        return $query->where('type_source', $sourceType);
     }
 
     /**
      * Scope to filter by source
      */
-    public function scopeFromSource($query, string $sourceType, int $sourceId)
+    public function scopeFromSource($query, string $sourceType, string $sourceId)
     {
-        return $query->where('source_type', $sourceType)
+        return $query->where('type_source', $sourceType)
                      ->where('source_id', $sourceId);
     }
 

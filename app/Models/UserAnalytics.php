@@ -14,7 +14,7 @@ class UserAnalytics extends Model
 
     protected $fillable = [
         'user_id',
-        'project_id',
+        'projet_id',
         'generated_at',
         'expires_at',
         'entrepreneur_profile',
@@ -45,9 +45,9 @@ class UserAnalytics extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function project(): BelongsTo
+    public function projet(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Projet::class, 'projet_id');
     }
 }
 

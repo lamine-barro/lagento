@@ -41,7 +41,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Téléphone</label>
-                    <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="Ex: +225 07 00 00 00" class="input-field w-full" />
+                    <input type="tel" name="telephone" value="{{ old('telephone') }}" placeholder="Ex: +225 07 00 00 00" class="input-field w-full" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Email</label>
@@ -49,15 +49,15 @@
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Site web</label>
-                    <input type="url" name="website" value="{{ old('website') }}" placeholder="https://" class="input-field w-full" />
+                    <input type="url" name="site_web" value="{{ old('site_web') }}" placeholder="https://" class="input-field w-full" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nom & prénom du représentant</label>
-                    <input type="text" name="rep_name" value="{{ old('rep_name') }}" class="input-field w-full" />
+                    <input type="text" name="nom_representant" value="{{ old('nom_representant') }}" class="input-field w-full" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Position du représentant</label>
-                    <input type="text" name="rep_role" value="{{ old('rep_role') }}" class="input-field w-full" />
+                    <input type="text" name="role_representant" value="{{ old('role_representant') }}" class="input-field w-full" />
                 </div>
             </div>
 
@@ -65,13 +65,13 @@
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Réseaux sociaux</label>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input type="url" name="social_instagram" placeholder="Instagram" class="input-field w-full" value="{{ old('social_instagram') }}" />
-                    <input type="url" name="social_youtube" placeholder="YouTube" class="input-field w-full" value="{{ old('social_youtube') }}" />
-                    <input type="url" name="social_x" placeholder="X (Twitter)" class="input-field w-full" value="{{ old('social_x') }}" />
-                    <input type="url" name="social_tiktok" placeholder="TikTok" class="input-field w-full" value="{{ old('social_tiktok') }}" />
-                    <input type="url" name="social_linkedin" placeholder="LinkedIn" class="input-field w-full" value="{{ old('social_linkedin') }}" />
-                    <input type="url" name="social_facebook" placeholder="Facebook" class="input-field w-full" value="{{ old('social_facebook') }}" />
-                    <input type="url" name="social_whatsapp" placeholder="WhatsApp" class="input-field w-full" value="{{ old('social_whatsapp') }}" />
+                    <input type="url" name="reseaux_instagram" placeholder="Instagram" class="input-field w-full" value="{{ old('reseaux_instagram') }}" />
+                    <input type="url" name="reseaux_youtube" placeholder="YouTube" class="input-field w-full" value="{{ old('reseaux_youtube') }}" />
+                    <input type="url" name="reseaux_x" placeholder="X (Twitter)" class="input-field w-full" value="{{ old('reseaux_x') }}" />
+                    <input type="url" name="reseaux_tiktok" placeholder="TikTok" class="input-field w-full" value="{{ old('reseaux_tiktok') }}" />
+                    <input type="url" name="reseaux_linkedin" placeholder="LinkedIn" class="input-field w-full" value="{{ old('reseaux_linkedin') }}" />
+                    <input type="url" name="reseaux_facebook" placeholder="Facebook" class="input-field w-full" value="{{ old('reseaux_facebook') }}" />
+                    <input type="url" name="reseaux_whatsapp" placeholder="WhatsApp" class="input-field w-full" value="{{ old('reseaux_whatsapp') }}" />
                 </div>
             </div>
         </form>

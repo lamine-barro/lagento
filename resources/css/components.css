@@ -42,6 +42,16 @@
   border: 1px solid var(--black);
 }
 
+.btn-outline-primary {
+  background: transparent;
+  color: var(--orange-primary);
+  border: 1px solid var(--orange-primary);
+}
+
+.btn-outline-primary:hover:not(:disabled) {
+  background: var(--orange-lightest);
+}
+
 .btn-secondary:hover:not(:disabled) {
   background: var(--gray-100);
 }

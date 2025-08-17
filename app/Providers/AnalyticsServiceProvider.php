@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
-use App\Models\Project;
+use App\Models\Projet;
 use App\Observers\UserActivityObserver;
 use App\Services\UserAnalyticsService;
 use Illuminate\Support\ServiceProvider;
@@ -30,21 +30,21 @@ class AnalyticsServiceProvider extends ServiceProvider
         // Only observe User updates; we disable message and conversation observers per request
         User::observe($observer);
 
-        // When a project is created/updated, refresh entrepreneur analytics
-        Project::saved(function (Project $project) {
-            $user = $project->user;
+        // Quand un projet est créé/mis à jour, rafraîchir l'analytics entrepreneur
+        Projet::saved(function (Projet $projet) {
+            $user = $projet->user;
             if (!$user) return;
             $data = [
-                'business_name' => $project->company_name,
-                'project_name' => $project->project_name,
-                'business_sector' => $project->sectors,
-                'business_stage' => $project->maturity,
-                'region' => $project->region,
-                'targets' => $project->targets,
-                'revenue_models' => $project->revenue_models,
-                'revenue_range' => $project->revenue_range,
-                'team_size' => $project->team_size,
-                'support_types' => $project->support_types,
+                'raison_sociale' => $projet->raison_sociale,
+                'nom_projet' => $projet->nom_projet,
+                'secteurs' => $projet->secteurs,
+                'maturite' => $projet->maturite,
+                'region' => $projet->region,
+                'cibles' => $projet->cibles,
+                'modeles_revenus' => $projet->modeles_revenus,
+                'revenus' => $projet->revenus,
+                'taille_equipe' => $projet->taille_equipe,
+                'types_soutien' => $projet->types_soutien,
                 'updated_at' => now()->toISOString(),
             ];
             app(\App\Services\UserAnalyticsService::class)->updateEntrepreneurProfile($user, $data);

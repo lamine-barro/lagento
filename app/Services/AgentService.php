@@ -28,11 +28,31 @@ class AgentService
     public function processMessage(string $message, int $userId, ?int $conversationId = null): array
     {
         $agent = new AgentPrincipal($this->llm, $this->embedding, $this->search);
-        
+
+        // Injecter le contexte: 4 derniers messages + résumé de conversation
+        $contextMessages = [];
+        $conversationSummary = '';
+        if ($conversationId) {
+            $conv = \App\Models\UserConversation::find($conversationId);
+            if ($conv) {
+                $conversationSummary = (string) ($conv->summary ?? '');
+                $contextMessages = \App\Models\UserMessage::where('conversation_id', $conversationId)
+                    ->latest()
+                    ->limit(4)
+                    ->get()
+                    ->sortBy('created_at')
+                    ->map(fn($m) => ['role' => $m->role, 'content' => $m->content])
+                    ->values()
+                    ->toArray();
+            }
+        }
+
         return $agent->execute([
             'user_message' => $message,
             'user_id' => $userId,
-            'conversation_id' => $conversationId
+            'conversation_id' => $conversationId,
+            'recent_messages' => $contextMessages,
+            'conversation_summary' => $conversationSummary,
         ]);
     }
 
@@ -110,11 +130,48 @@ class AgentService
 
             if ($result['success'] && !empty($result['title'])) {
                 $conversation->update(['title' => $result['title']]);
+
+                // Générer le résumé (500 tokens max) via gpt-5-nano et indexer l'embedding
+                $summary = $this->generateConversationSummary($conversation);
+                if ($summary) {
+                    $conversation->summary = $summary;
+                    $emb = $this->embedding->embed([$summary]);
+                    $conversation->summary_embedding = $emb[0] ?? null;
+                    $conversation->save();
+                }
+
                 return $result['title'];
             }
         }
 
         return null;
+    }
+
+    /**
+     * Generate conversation summary using a lightweight model (gpt-5-nano)
+     */
+    private function generateConversationSummary(\App\Models\UserConversation $conversation): ?string
+    {
+        try {
+            $lastMessages = $conversation->messages()
+                ->latest()
+                ->limit(50)
+                ->get()
+                ->sortBy('created_at')
+                ->map(fn($m) => ($m->role === 'user' ? 'Utilisateur: ' : 'Assistant: ') . $m->content)
+                ->implode("\n\n");
+
+            $prompt = "Résume cette conversation en français en 500 tokens maximum. Conserve le contexte clé, sujets, décisions, prochaines étapes. Pas de détails inutiles.\n\nConversation:\n" . $lastMessages;
+            $messages = [
+                ['role' => 'system', 'content' => 'Tu es un assistant qui produit des résumés concis et factuels en français.'],
+                ['role' => 'user', 'content' => $prompt],
+            ];
+            $raw = $this->llm->chat($messages, 'gpt-5-nano', 0.2, 1200);
+            return trim($raw);
+        } catch (\Throwable $e) {
+            \Log::error('Conversation summary generation failed', ['id' => $conversation->id, 'error' => $e->getMessage()]);
+            return null;
+        }
     }
 
     /**

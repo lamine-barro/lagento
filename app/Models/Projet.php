@@ -11,6 +11,9 @@ class Projet extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $table = 'projets';
 
     protected $fillable = [

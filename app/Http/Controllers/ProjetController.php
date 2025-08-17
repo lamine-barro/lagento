@@ -6,6 +6,7 @@ use App\Models\Projet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ProjetController extends Controller
 {
@@ -73,7 +74,7 @@ class ProjetController extends Controller
             'logo' => 'nullable|image|max:2048',
             
             // Formalisation
-            'formalise' => 'required|in:OUI,NON',
+            'formalise' => 'required|in:oui,non',
             'annee_creation' => 'nullable|string',
             'numero_rccm' => 'nullable|string|max:50',
             
@@ -125,7 +126,12 @@ class ProjetController extends Controller
 
         // Upload du logo si présent
         if ($request->hasFile('logo')) {
-            $validated['logo_url'] = $request->file('logo')->store('projets/logos', 'public');
+            $image = Image::read($request->file('logo'));
+            $image->scaleDown(1024, 1024);
+            $encoded = $image->toJpeg(quality: 80);
+            $filename = 'projets/logos/' . uniqid('logo_', true) . '.jpg';
+            Storage::disk('public')->put($filename, (string) $encoded);
+            $validated['logo_url'] = $filename;
         }
 
         // Nettoyer les réseaux sociaux (supprimer les champs vides)
@@ -185,7 +191,7 @@ class ProjetController extends Controller
             'description' => 'required|string|min:50',
             'logo' => 'nullable|image|max:2048',
             
-            'formalise' => 'required|in:OUI,NON',
+            'formalise' => 'required|in:oui,non',
             'annee_creation' => 'nullable|string',
             'numero_rccm' => 'nullable|string|max:50',
             
@@ -227,7 +233,12 @@ class ProjetController extends Controller
             if ($projet->logo_url) {
                 Storage::disk('public')->delete($projet->logo_url);
             }
-            $validated['logo_url'] = $request->file('logo')->store('projets/logos', 'public');
+            $image = Image::read($request->file('logo'));
+            $image->scaleDown(1024, 1024);
+            $encoded = $image->toJpeg(quality: 80);
+            $filename = 'projets/logos/' . uniqid('logo_', true) . '.jpg';
+            Storage::disk('public')->put($filename, (string) $encoded);
+            $validated['logo_url'] = $filename;
         }
 
         // Nettoyer les réseaux sociaux

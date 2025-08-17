@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\DocumentChunk;
+use App\Models\MorceauDocument;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
@@ -88,7 +88,7 @@ class EmbeddingService
         string $sourceType,
         int $sourceId,
         string $content
-    ): ?DocumentChunk {
+    ): ?MorceauDocument {
         $embeddings = $this->embed([$content]);
         $embedding = $embeddings[0] ?? [];
         
@@ -102,10 +102,10 @@ class EmbeddingService
         }
 
         try {
-            return DocumentChunk::create([
-                'source_type' => $sourceType,
+            return MorceauDocument::create([
+                'type_source' => $sourceType,
                 'source_id' => $sourceId,
-                'content' => $content,
+                'contenu' => $content,
                 'embedding' => $embedding
             ]);
         } catch (\Exception $e) {

@@ -32,12 +32,7 @@ class AppServiceProvider extends ServiceProvider
             app(UserActivityObserver::class)->userUpdated($user);
         });
 
-        UserConversation::created(function (UserConversation $conversation) {
-            app(UserActivityObserver::class)->conversationCreated($conversation);
-        });
-
-        UserMessage::created(function (UserMessage $message) {
-            app(UserActivityObserver::class)->messageCreated($message);
-        });
+        // Conversation and message analytics hooks are disabled to avoid
+        // performance issues and rely on explicit tracking in services.
     }
 }

@@ -9,8 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_messages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('conversation_id')->constrained('user_conversations')->cascadeOnDelete();
+            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('conversation_id');
+            $table->foreign('conversation_id')->references('id')->on('user_conversations')->cascadeOnDelete();
             $table->enum('role', ['user', 'assistant']);
             $table->longText('text_content')->nullable();
             $table->longText('markdown_content')->nullable();

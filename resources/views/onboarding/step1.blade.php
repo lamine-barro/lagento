@@ -41,12 +41,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nom du projet *</label>
-                    <input type="text" name="project_name" value="{{ old('project_name') }}" placeholder="Ex: Etudesk" class="input-field w-full" required />
+                    <input type="text" name="nom_projet" value="{{ old('nom_projet') }}" placeholder="Ex: Etudesk" class="input-field w-full" required />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale *</label>
-                    <input type="text" name="company_name" value="{{ old('company_name') }}" placeholder="Ex: Etudesk SAS" class="input-field w-full" required />
-                    @error('company_name')<p class="text-sm mt-1" style="color: var(--danger);">{{ $message }}</p>@enderror
+                    <input type="text" name="raison_sociale" value="{{ old('raison_sociale') }}" placeholder="Ex: Etudesk SAS" class="input-field w-full" required />
+                    @error('raison_sociale')<p class="text-sm mt-1" style="color: var(--danger);">{{ $message }}</p>@enderror
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Description</label>
@@ -54,19 +54,19 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Année de création *</label>
-                    <select name="year" class="input-field w-full" required>
+                    <select name="annee_creation" class="input-field w-full" required>
                         <option value="">Sélectionnez</option>
                         @for ($y = date('Y'); $y >= 2010; $y--)
-                            <option value="{{ $y }}" {{ old('year') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                            <option value="{{ $y }}" {{ old('annee_creation') == $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endfor
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Projet formalisé *</label>
-                    <select name="formalized" class="input-field w-full" required>
+                    <select name="formalise" class="input-field w-full" required>
                         <option value="">Sélectionnez</option>
                         @foreach(config('constants.FORMALISE_OPTIONS') as $key => $label)
-                            <option value="{{ $key }}" {{ old('formalized')===$key ? 'selected' : '' }}>{{ $label }}</option>
+                            <option value="{{ $key }}" {{ old('formalise')===$key ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>

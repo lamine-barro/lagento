@@ -10,6 +10,9 @@ class UserMessage extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $table = 'user_messages';
 
     protected $fillable = [

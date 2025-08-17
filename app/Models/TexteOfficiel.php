@@ -6,56 +6,58 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OfficialText extends Model
+class TexteOfficiel extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
         // Identification
         'institution_id',
-        'category',
-        'legal_classification',
-        'status',
-        // File
-        'file_path',
-        'original_name',
+        'categorie',
+        'classification_juridique',
+        'statut',
+        // Fichier
+        'chemin_fichier',
+        'nom_original',
         'mime_type',
-        'file_size',
-        'raw_text',
-        'page_count',
-        // Content
-        'title',
-        'summary',
+        'taille_fichier',
+        'texte_brut',
+        'nombre_pages',
+        // Contenu
+        'titre',
+        'resume',
         'tags',
         // Source
         'source',
-        'source_url',
-        'document_version',
-        'language',
+        'url_source',
+        'version_document',
+        'langue',
         // Dates
-        'published_at',
-        'effective_at',
-        'repealed_at',
-        'decision_date',
+        'publie_le',
+        'entre_en_vigueur_le',
+        'abroge_le',
+        'date_decision',
         // Relations
         'parent_id',
-        'replaces_document_id',
-        'associated_document_ids',
+        'remplace_document_id',
+        'documents_associes_ids',
     ];
 
     protected $casts = [
-        'institution_id' => 'integer',
-        'category' => 'string',
-        'file_size' => 'integer',
-        'page_count' => 'integer',
+        'institution_id' => 'string',
+        'categorie' => 'string',
+        'taille_fichier' => 'integer',
+        'nombre_pages' => 'integer',
         'tags' => 'array',
-        'published_at' => 'date',
-        'effective_at' => 'date',
-        'repealed_at' => 'date',
-        'decision_date' => 'date',
-        'parent_id' => 'integer',
-        'replaces_document_id' => 'integer',
-        'associated_document_ids' => 'array',
+        'publie_le' => 'date',
+        'entre_en_vigueur_le' => 'date',
+        'abroge_le' => 'date',
+        'date_decision' => 'date',
+        'parent_id' => 'string',
+        'remplace_document_id' => 'string',
+        'documents_associes_ids' => 'array',
     ];
 
     public function institution(): BelongsTo

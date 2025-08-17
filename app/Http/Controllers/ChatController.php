@@ -37,7 +37,7 @@ class ChatController extends Controller
                 
             if (!$conversation) {
                 $conversation = UserConversation::create([
-                    'user_id' => $user->id,
+                    'user_id' => (string) $user->id,
                     'title' => 'Nouvelle conversation',
                     'last_message_at' => now()
                 ]);
@@ -71,6 +71,7 @@ class ChatController extends Controller
         $conversationId = $request->get('conversation_id');
         
         // Get or create conversation
+        $conversation = null;
         if ($conversationId) {
             $conversation = UserConversation::where('user_id', $user->id)
                 ->where('id', $conversationId)

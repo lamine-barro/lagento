@@ -73,16 +73,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download');
     });
     
-    // Projets
+    // Projets (annuaire public + édition unique via profil)
     Route::prefix('projets')->group(function () {
         Route::get('/', [ProjetController::class, 'index'])->name('projets.index');
-        Route::get('/mes-projets', [ProjetController::class, 'mesProjects'])->name('projets.mes-projets');
-        Route::get('/create', [ProjetController::class, 'create'])->name('projets.create');
-        Route::post('/', [ProjetController::class, 'store'])->name('projets.store');
         Route::get('/{projet}', [ProjetController::class, 'show'])->name('projets.show');
-        Route::get('/{projet}/edit', [ProjetController::class, 'edit'])->name('projets.edit');
-        Route::put('/{projet}', [ProjetController::class, 'update'])->name('projets.update');
-        Route::delete('/{projet}', [ProjetController::class, 'destroy'])->name('projets.destroy');
         Route::post('/{projet}/toggle-visibility', [ProjetController::class, 'toggleVisibility'])->name('projets.toggle-visibility');
         Route::get('/api/search', [ProjetController::class, 'search'])->name('projets.search');
     });

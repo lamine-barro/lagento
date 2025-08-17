@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\DocumentChunk;
+use App\Models\MorceauDocument;
 use App\Services\EmbeddingService;
 use App\Services\SemanticSearchService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,16 +17,16 @@ class EmbeddingSystemTest extends TestCase
      */
     public function test_document_chunks_can_be_created(): void
     {
-        $chunk = DocumentChunk::create([
-            'source_type' => 'test',
-            'source_id' => 1,
-            'content' => 'Test content for embedding',
+        $chunk = MorceauDocument::create([
+            'type_source' => 'test',
+            'source_id' => (string) \Illuminate\Support\Str::uuid(),
+            'contenu' => 'Test content for embedding',
             'embedding' => array_fill(0, 1024, 0.1) // Fake embedding
         ]);
 
-        $this->assertInstanceOf(DocumentChunk::class, $chunk);
-        $this->assertEquals('test', $chunk->source_type);
-        $this->assertEquals('Test content for embedding', $chunk->content);
+        $this->assertInstanceOf(MorceauDocument::class, $chunk);
+        $this->assertEquals('test', $chunk->type_source);
+        $this->assertEquals('Test content for embedding', $chunk->contenu);
         $this->assertIsArray($chunk->embedding);
         $this->assertCount(1024, $chunk->embedding);
     }
@@ -63,29 +63,30 @@ class EmbeddingSystemTest extends TestCase
     public function test_document_chunk_scopes(): void
     {
         // Create test chunks
-        DocumentChunk::create([
-            'source_type' => 'official_text',
-            'source_id' => 1,
-            'content' => 'Official text content',
+        MorceauDocument::create([
+            'type_source' => 'official_text',
+            'source_id' => (string) \Illuminate\Support\Str::uuid(),
+            'contenu' => 'Official text content',
             'embedding' => array_fill(0, 1024, 0.1)
         ]);
         
-        DocumentChunk::create([
-            'source_type' => 'opportunity',
-            'source_id' => 1,
-            'content' => 'Opportunity content',
+        MorceauDocument::create([
+            'type_source' => 'opportunity',
+            'source_id' => (string) \Illuminate\Support\Str::uuid(),
+            'contenu' => 'Opportunity content',
             'embedding' => array_fill(0, 1024, 0.2)
         ]);
 
         // Test type filtering
-        $officialChunks = DocumentChunk::ofType('official_text')->get();
+        $officialChunks = MorceauDocument::ofType('official_text')->get();
         $this->assertCount(1, $officialChunks);
-        $this->assertEquals('Official text content', $officialChunks->first()->content);
+        $this->assertEquals('Official text content', $officialChunks->first()->contenu);
 
         // Test source filtering
-        $sourceChunks = DocumentChunk::fromSource('opportunity', 1)->get();
+        $sourceId = MorceauDocument::where('type_source', 'opportunity')->first()->source_id;
+        $sourceChunks = MorceauDocument::fromSource('opportunity', $sourceId)->get();
         $this->assertCount(1, $sourceChunks);
-        $this->assertEquals('Opportunity content', $sourceChunks->first()->content);
+        $this->assertEquals('Opportunity content', $sourceChunks->first()->contenu);
     }
 
     /**
@@ -103,25 +104,25 @@ class EmbeddingSystemTest extends TestCase
     public function test_document_chunks_can_be_queried(): void
     {
         // Create test chunks
-        DocumentChunk::create([
-            'source_type' => 'test',
-            'source_id' => 1,
-            'content' => 'Entrepreneurship in Côte d\'Ivoire',
+        MorceauDocument::create([
+            'type_source' => 'test',
+            'source_id' => (string) \Illuminate\Support\Str::uuid(),
+            'contenu' => 'Entrepreneurship in Côte d\'Ivoire',
             'embedding' => array_fill(0, 1024, 0.5)
         ]);
         
-        DocumentChunk::create([
-            'source_type' => 'test',
-            'source_id' => 2,
-            'content' => 'Technology startups in Africa',
+        MorceauDocument::create([
+            'type_source' => 'test',
+            'source_id' => (string) \Illuminate\Support\Str::uuid(),
+            'contenu' => 'Technology startups in Africa',
             'embedding' => array_fill(0, 1024, 0.3)
         ]);
 
-        $chunks = DocumentChunk::all();
+        $chunks = MorceauDocument::all();
         $this->assertCount(2, $chunks);
         
         // Test that we can filter by type
-        $testChunks = DocumentChunk::ofType('test')->get();
+        $testChunks = MorceauDocument::ofType('test')->get();
         $this->assertCount(2, $testChunks);
     }
 }

@@ -41,7 +41,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     @foreach(config('constants.SECTEURS') as $key => $value)
                         <label class="flex items-center">
-                            <input type="checkbox" name="business_sector_multi[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
+                            <input type="checkbox" name="secteurs[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
                             <span>{{ $value }}</span>
                         </label>
                     @endforeach
@@ -51,7 +51,7 @@
             <!-- Produits/Services (100 mots max) -->
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Produits/Services proposés (100 mots max)</label>
-                <textarea name="products" rows="3" class="input-field w-full resize-none" placeholder="Décrivez vos offres en 100 mots maximum"></textarea>
+                <textarea name="produits_services" rows="3" class="input-field w-full resize-none" placeholder="Décrivez vos offres en 100 mots maximum"></textarea>
             </div>
 
             <!-- Clients cibles -->
@@ -60,7 +60,7 @@
                 <div class="space-y-2">
                     @foreach(config('constants.CIBLES') as $key => $value)
                         <label class="flex items-center">
-                            <input type="checkbox" name="target_clients[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
+                            <input type="checkbox" name="cibles[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
                             <span>{{ $value }}</span>
                         </label>
                     @endforeach
@@ -71,7 +71,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Maturité du projet</label>
-                    <select name="business_stage" class="input-field w-full">
+                    <select name="maturite" class="input-field w-full">
                         <option value="">Sélectionnez</option>
                         @foreach(config('constants.STADES_MATURITE') as $key => $value)
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -80,7 +80,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Stade de financement</label>
-                    <select name="funding_stage" class="input-field w-full">
+                    <select name="stade_financement" class="input-field w-full">
                         <option value="">Sélectionnez</option>
                         @foreach(config('constants.STADES_FINANCEMENT') as $key => $value)
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -89,7 +89,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Revenus actuels</label>
-                    <select name="monthly_revenue" class="input-field w-full">
+                    <select name="revenus" class="input-field w-full">
                         <option value="">Sélectionnez</option>
                         @foreach(config('constants.TRANCHES_REVENUS') as $key => $value)
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -104,7 +104,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     @foreach(config('constants.MODELES_REVENUS') as $key => $value)
                         <label class="flex items-center">
-                            <input type="checkbox" name="revenue_models[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
+                            <input type="checkbox" name="modeles_revenus[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
                             <span>{{ $value }}</span>
                         </label>
                     @endforeach

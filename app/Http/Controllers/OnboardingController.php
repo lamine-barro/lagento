@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\UserAnalyticsService;
-use App\Models\Project;
+use App\Models\Projet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Laravel\Facades\Image;
 
 class OnboardingController extends Controller
 {
@@ -23,11 +24,11 @@ class OnboardingController extends Controller
     public function processStep1(Request $request)
     {
         $request->validate([
-            'project_name' => 'required|string|max:255',
-            'company_name' => 'required|string|max:255',
+            'nom_projet' => 'required|string|max:255',
+            'raison_sociale' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'year' => 'nullable|integer|min:2010|max:' . date('Y'),
-            'formalized' => 'required|in:OUI,NON',
+            'annee_creation' => 'nullable|integer|min:2010|max:' . date('Y'),
+            'formalise' => 'required|in:OUI,NON',
             'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:10240',
             'region' => 'required|string',
             'latitude' => 'nullable|numeric',
@@ -35,24 +36,29 @@ class OnboardingController extends Controller
         ]);
 
         $user = Auth::user();
-        $project = Project::firstOrCreate(['user_id' => $user->id], ['project_name' => $request->project_name]);
+        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $request->nom_projet]);
 
-        $logoUrl = $project->logo_url;
+        $logoUrl = $projet->logo_url;
         if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('logos', 'public');
-            $logoUrl = '/storage/' . $path;
+            $image = Image::read($request->file('logo'));
+            $image->scaleDown(1024, 1024); // limite dimensions
+            $encoded = $image->toJpeg(quality: 80);
+            $filename = 'logos/' . uniqid('logo_', true) . '.jpg';
+            \Storage::disk('public')->put($filename, (string) $encoded);
+            $logoUrl = '/storage/' . $filename;
         }
 
-        $project->update([
-            'project_name' => $request->project_name,
-            'company_name' => $request->company_name,
+        $projet->update([
+            'nom_projet' => $request->nom_projet,
+            'raison_sociale' => $request->raison_sociale,
             'description' => $request->description,
-            'incorporation_year' => $request->year,
-            'formalized' => strtolower($request->formalized),
+            'annee_creation' => $request->annee_creation,
+            'formalise' => strtolower($request->formalise),
             'logo_url' => $logoUrl,
             'region' => $request->region,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
+            'is_public' => true,
         ]);
 
         return redirect()->route('onboarding.step2');
@@ -66,36 +72,36 @@ class OnboardingController extends Controller
     public function processStep2(Request $request)
     {
         $request->validate([
-            'phone' => 'nullable|string|max:30',
+            'telephone' => 'nullable|string|max:30',
             'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'rep_name' => 'nullable|string|max:255',
-            'rep_role' => 'nullable|string|max:255',
-            'social_instagram' => 'nullable|url',
-            'social_youtube' => 'nullable|url',
-            'social_x' => 'nullable|url',
-            'social_tiktok' => 'nullable|url',
-            'social_linkedin' => 'nullable|url',
-            'social_facebook' => 'nullable|url',
-            'social_whatsapp' => 'nullable|url',
+            'site_web' => 'nullable|url',
+            'nom_representant' => 'nullable|string|max:255',
+            'role_representant' => 'nullable|string|max:255',
+            'reseaux_instagram' => 'nullable|url',
+            'reseaux_youtube' => 'nullable|url',
+            'reseaux_x' => 'nullable|url',
+            'reseaux_tiktok' => 'nullable|url',
+            'reseaux_linkedin' => 'nullable|url',
+            'reseaux_facebook' => 'nullable|url',
+            'reseaux_whatsapp' => 'nullable|url',
         ]);
 
         $user = Auth::user();
-        $project = Project::firstOrCreate(['user_id' => $user->id], ['project_name' => '']);
+        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $user->company_name ?? '']);
         $social = [
-            'instagram' => $request->social_instagram,
-            'youtube' => $request->social_youtube,
-            'x' => $request->social_x,
-            'tiktok' => $request->social_tiktok,
-            'linkedin' => $request->social_linkedin,
-            'facebook' => $request->social_facebook,
-            'whatsapp_business' => $request->social_whatsapp, // map vers clé canonique
+            'instagram' => $request->reseaux_instagram,
+            'youtube' => $request->reseaux_youtube,
+            'x' => $request->reseaux_x,
+            'tiktok' => $request->reseaux_tiktok,
+            'linkedin' => $request->reseaux_linkedin,
+            'facebook' => $request->reseaux_facebook,
+            'whatsapp_business' => $request->reseaux_whatsapp,
         ];
-        $project->update([
-            'phone' => $request->phone,
+        $projet->update([
+            'telephone' => $request->telephone,
             'email' => $request->email,
-            'website' => $request->website,
-            'social_links' => json_encode($social),
+            'site_web' => $request->site_web,
+            'reseaux_sociaux' => array_filter($social),
         ]);
 
         return redirect()->route('onboarding.step3');
@@ -110,24 +116,24 @@ class OnboardingController extends Controller
     public function processStep3(Request $request)
     {
         $request->validate([
-            'business_sector_multi' => 'nullable|array|max:5',
-            'products' => 'nullable|string|max:1000',
-            'target_clients' => 'nullable|array',
-            'business_stage' => 'nullable|string',
-            'funding_stage' => 'nullable|string',
-            'revenue_models' => 'nullable|array|max:5',
-            'monthly_revenue' => 'nullable|string',
+            'secteurs' => 'nullable|array|max:5',
+            'produits_services' => 'nullable|string|max:1000',
+            'cibles' => 'nullable|array',
+            'maturite' => 'nullable|string',
+            'stade_financement' => 'nullable|string',
+            'modeles_revenus' => 'nullable|array|max:5',
+            'revenus' => 'nullable|string',
         ]);
         $user = Auth::user();
-        $project = Project::firstOrCreate(['user_id' => $user->id], ['project_name' => '']);
-        $project->update([
-            'sectors' => json_encode($request->business_sector_multi),
-            'products_services' => json_encode(['text' => $request->products]),
-            'targets' => json_encode($request->target_clients),
-            'maturity' => $request->business_stage,
-            'funding_stage' => $request->funding_stage,
-            'revenue_models' => json_encode($request->revenue_models),
-            'revenue_range' => $request->monthly_revenue,
+        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $user->company_name ?? '']);
+        $projet->update([
+            'secteurs' => $request->secteurs ?: [],
+            'produits_services' => $request->produits_services ? [$request->produits_services] : [],
+            'cibles' => $request->cibles ?: [],
+            'maturite' => $request->maturite,
+            'stade_financement' => $request->stade_financement,
+            'modeles_revenus' => $request->modeles_revenus ?: [],
+            'revenus' => $request->revenus,
         ]);
 
         return redirect()->route('onboarding.step4');
@@ -142,32 +148,32 @@ class OnboardingController extends Controller
     public function processStep4(Request $request)
     {
         $request->validate([
-            'founders_count' => 'required|integer|min:1',
-            'female_founders_count' => 'required|integer|min:0',
-            'age_ranges' => 'nullable|array',
-            'founders_location' => 'nullable|string',
-            'team_size' => 'nullable|string',
-            'support_structures' => 'nullable|array',
-            'support_types' => 'nullable|array|max:3',
-            'additional_info' => 'nullable|string|max:1000'
+            'nombre_fondateurs' => 'required|integer|min:1',
+            'nombre_fondatrices' => 'required|integer|min:0',
+            'tranches_age_fondateurs' => 'nullable|array',
+            'localisation_fondateurs' => 'nullable|string',
+            'taille_equipe' => 'nullable|string',
+            'structures_accompagnement' => 'nullable|array',
+            'types_soutien' => 'nullable|array|max:3',
+            'details_besoins' => 'nullable|string|max:1000'
         ]);
 
         $user = Auth::user();
-        $project = Project::firstOrCreate(['user_id' => $user->id], ['project_name' => '']);
-        $project->update([
-            'team_size' => $request->team_size,
-            'num_founders_male' => max(0, (int)$request->founders_count - (int)$request->female_founders_count),
-            'num_founders_female' => (int)$request->female_founders_count,
-            'founder_age_ranges' => json_encode($request->age_ranges),
-            'founder_location' => strtolower((string)$request->founders_location),
-            'support_structures' => json_encode($request->support_structures),
-            'support_types' => json_encode($request->support_types),
-            'needs_details' => $request->additional_info,
+        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $user->company_name ?? '']);
+        $projet->update([
+            'taille_equipe' => $request->taille_equipe,
+            'nombre_fondateurs' => (int)$request->nombre_fondateurs,
+            'nombre_fondatrices' => (int)$request->nombre_fondatrices,
+            'tranches_age_fondateurs' => $request->tranches_age_fondateurs ?: [],
+            'localisation_fondateurs' => strtolower((string)$request->localisation_fondateurs),
+            'structures_accompagnement' => $request->structures_accompagnement ?: [],
+            'types_soutien' => $request->types_soutien ?: [],
+            'details_besoins' => $request->details_besoins,
         ]);
 
         $this->analyticsService->updateEntrepreneurProfile($user, [
-            'project_id' => $project->id,
-            'completed_at' => now()->toISOString(),
+            'projet_id' => $projet->id,
+            'termine_le' => now()->toISOString(),
         ]);
 
         return redirect()->route('dashboard');

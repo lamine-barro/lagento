@@ -11,12 +11,15 @@ class UserConversation extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $table = 'user_conversations';
 
     protected $fillable = [
         'user_id',
         'title',
-        'context',
+        'summary',
         'status',
         'satisfaction_score',
         'last_message_at',

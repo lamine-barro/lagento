@@ -40,7 +40,7 @@ class AuthController extends Controller
         try {
             // Send OTP via email
             Mail::to($email)->send(new OtpMail($otp, $userName));
-            Log::info("OTP sent to {$email}: {$otp}");
+            Log::info("OTP generated for {$email}");
         } catch (\Exception $e) {
             Log::error("Failed to send OTP email to {$email}: " . $e->getMessage());
             return back()->withErrors(['email' => 'Erreur lors de l\'envoi de l\'email. Veuillez réessayer.']);
@@ -61,7 +61,7 @@ class AuthController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'otp' => 'required|string|size:6'
+            'otp' => 'required|digits:6'
         ]);
         
         $sessionOtp = session('otp');
@@ -129,7 +129,7 @@ class AuthController extends Controller
         try {
             // Send new OTP via email
             Mail::to($email)->send(new OtpMail($otp, $userName));
-            Log::info("New OTP sent to {$email}: {$otp}");
+            Log::info("New OTP generated for {$email}");
             
             return back()->with('success', 'Un nouveau code de vérification a été envoyé à votre email.');
         } catch (\Exception $e) {

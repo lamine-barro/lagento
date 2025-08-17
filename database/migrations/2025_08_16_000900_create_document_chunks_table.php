@@ -10,9 +10,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('document_chunks', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
             $table->string('source_type'); // e.g., 'official_text'
-            $table->unsignedBigInteger('source_id');
+            $table->uuid('source_id');
             $table->text('content');
             $table->vector('embedding', 1024); // adjust dimension to Voyage model
             $table->timestamps();

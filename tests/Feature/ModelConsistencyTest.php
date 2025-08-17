@@ -6,7 +6,7 @@ use App\Constants\BusinessConstants;
 use App\Models\User;
 use App\Models\UserConversation;
 use App\Models\UserMessage;
-use App\Models\Project;
+use App\Models\Projet;
 use App\Models\Institution;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -146,30 +146,30 @@ class ModelConsistencyTest extends TestCase
         $this->assertArrayHasKey('Abidjan', $regions);
     }
 
-    public function test_project_model_consistency(): void
+    public function test_projet_model_consistency(): void
     {
-        $project = Project::create([
-            'project_name' => 'Test Project',
-            'company_name' => 'Test Company',
-            'description' => 'A test project',
-            'formalized' => 'oui',
-            'incorporation_year' => 2023,
-            'sectors' => ['NUMERIQUE'],
-            'targets' => ['B2B'],
-            'maturity' => 'CROISSANCE',
+        $projet = Projet::create([
+            'nom_projet' => 'Test Projet',
+            'raison_sociale' => 'Test Entreprise',
+            'description' => 'Un projet de test',
+            'formalise' => 'oui',
+            'annee_creation' => 2023,
+            'secteurs' => ['NUMERIQUE'],
+            'cibles' => ['B2B'],
+            'maturite' => 'CROISSANCE',
             'region' => 'Abidjan',
-            'team_size' => '1-5',
-            'newsletter_opt_in' => true
+            'taille_equipe' => '1-5',
+            'abonne_newsletter' => true
         ]);
 
-        $this->assertDatabaseHas('projects', [
-            'project_name' => 'Test Project',
-            'formalized' => 'oui',
-            'newsletter_opt_in' => true
+        $this->assertDatabaseHas('projets', [
+            'nom_projet' => 'Test Projet',
+            'formalise' => 'oui',
+            'abonne_newsletter' => true
         ]);
 
-        $this->assertEquals(['NUMERIQUE'], $project->sectors);
-        $this->assertEquals(['B2B'], $project->targets);
+        $this->assertEquals(['NUMERIQUE'], $projet->secteurs);
+        $this->assertEquals(['B2B'], $projet->cibles);
     }
 
     public function test_analytics_integration_consistency(): void

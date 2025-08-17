@@ -3,11 +3,11 @@
 namespace App\Agents;
 
 use App\Models\User;
-use App\Models\Project;
+use App\Models\Projet;
 use App\Models\UserAnalytics;
-use App\Models\Opportunity;
+use App\Models\Opportunite;
 use App\Models\Institution;
-use App\Models\OfficialText;
+use App\Models\TexteOfficiel;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 
@@ -77,7 +77,23 @@ class AgentPrincipal extends BaseAgent
 
             // Generate response using LLM
             $config = $this->getConfig();
-            $messages = $this->formatMessages($systemPrompt, $userMessage);
+            // Injecter contexte conversationnel
+            $recent = $inputs['recent_messages'] ?? [];
+            $summary = trim((string)($inputs['conversation_summary'] ?? ''));
+
+            $contextBlock = '';
+            if (!empty($recent)) {
+                $contextBlock .= "\n\nContexte récent (4 messages):\n";
+                foreach ($recent as $r) {
+                    $prefix = $r['role'] === 'user' ? 'Utilisateur' : 'Assistant';
+                    $contextBlock .= "- {$prefix}: " . $r['content'] . "\n";
+                }
+            }
+            if ($summary !== '') {
+                $contextBlock .= "\nRésumé de la conversation:\n" . $summary . "\n";
+            }
+
+            $messages = $this->formatMessages($systemPrompt . $contextBlock, $userMessage);
             
             $response = $this->llm->chat(
                 $messages,
