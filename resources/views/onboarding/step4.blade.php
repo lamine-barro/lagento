@@ -4,45 +4,53 @@
 
 @section('content')
 <div class="min-h-screen bg-white flex flex-col p-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-        <button onclick="history.back()" class="btn btn-ghost p-2">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-        </button>
-        <div class="text-center">
-            <div class="text-sm font-medium" style="color: var(--orange-primary);">Étape 4 sur 4</div>
-        </div>
-        <div class="w-10"></div>
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="mb-8">
-        <div class="h-2 rounded-full" style="background: var(--gray-100);">
-            <div class="h-2 rounded-full transition-all duration-500" style="background: var(--orange-primary); width: 100%;"></div>
-        </div>
-    </div>
+    <x-onboarding.header :current-step="4" />
 
     <!-- Main Content -->
-    <div class="flex-1 w-full" style="max-width: 720px; margin-left: auto; margin-right: auto;">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-medium mb-2" style="color: var(--gray-900);">
-                <i data-lucide="users" class="w-5 h-5 mr-2 align-[-2px]"></i>
-                Équipe & Accompagnement
-            </h1>
-            <p style="color: var(--gray-700);">Composition de l'équipe et besoins de soutien</p>
-        </div>
+    <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form method="POST" action="{{ route('onboarding.step4') }}" class="space-y-6">
+        <form id="step4-form" method="POST" action="{{ route('onboarding.step4') }}" class="space-y-6 mt-4">
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Nombre de fondateurs -->
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nombre de fondateurs *</label>
-                    <input type="number" min="1" step="1" name="founders_count" value="{{ old('founders_count', 1) }}" class="input-field w-full" required />
+                    <div class="flex items-center border rounded-lg" style="border-color: var(--gray-300);" x-data="{ count: {{ old('founders_count', 1) }} }">
+                        <div class="flex items-center gap-3 px-3 py-2 flex-1">
+                            <i data-lucide="users" class="w-4 h-4" style="color: var(--gray-500); stroke-width: 1.25;"></i>
+                            <span x-text="count" class="text-lg font-medium" style="color: var(--gray-900);"></span>
+                        </div>
+                        <div class="flex">
+                            <button type="button" @click="if(count > 1) count--" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
+                                <i data-lucide="minus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                            </button>
+                            <button type="button" @click="count++" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
+                                <i data-lucide="plus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" name="founders_count" x-model="count" />
+                    </div>
                 </div>
+
+                <!-- Nombre de fondatrices -->
                 <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nombre de fondatrices *</label>
-                    <input type="number" min="0" step="1" name="female_founders_count" value="{{ old('female_founders_count', 0) }}" class="input-field w-full" required />
+                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nombre de femmes fondatrices *</label>
+                    <div class="flex items-center border rounded-lg" style="border-color: var(--gray-300);" x-data="{ count: {{ old('female_founders_count', 0) }} }">
+                        <div class="flex items-center gap-3 px-3 py-2 flex-1">
+                            <i data-lucide="user-check" class="w-4 h-4" style="color: var(--gray-500); stroke-width: 1.25;"></i>
+                            <span x-text="count" class="text-lg font-medium" style="color: var(--gray-900);"></span>
+                        </div>
+                        <div class="flex">
+                            <button type="button" @click="if(count > 0) count--" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
+                                <i data-lucide="minus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                            </button>
+                            <button type="button" @click="count++" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
+                                <i data-lucide="plus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" name="female_founders_count" x-model="count" />
+                    </div>
                     <p class="text-xs mt-1" style="color: var(--gray-500);">Doit être ≤ nombre de fondateurs</p>
                 </div>
             </div>
@@ -50,11 +58,12 @@
             <!-- Tranches d'âge -->
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Tranches d'âge des fondateurs</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <p class="text-sm mb-4" style="color: var(--gray-600);">Sélectionnez toutes les tranches d'âge qui s'appliquent</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach(config('constants.AGE_RANGES') as $a)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="age_ranges[]" value="{{ $a }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
-                            <span>{{ $a }} ans</span>
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="age_ranges[]" value="{{ $a }}" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                            <span class="text-sm font-medium">{{ $a }} ans</span>
                         </label>
                     @endforeach
                 </div>
@@ -83,29 +92,43 @@
 
             <!-- Structures d'accompagnement -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Structures d'accompagnement existants</label>
-                <div class="space-y-2">
+                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Structures d'accompagnement</label>
+                <p class="text-sm mb-4" style="color: var(--gray-600);">Avez-vous déjà bénéficié de l'accompagnement d'une structure d'appui ?</p>
+                <div class="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto border rounded-lg p-4" style="border-color: var(--gray-200);">
                     @foreach(config('constants.STRUCTURES_ACCOMPAGNEMENT') as $s)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="support_structures[]" value="{{ $s }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
-                            <span>{{ $s }}</span>
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="support_structures[]" value="{{ $s }}" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                            <span class="text-sm">{{ $s }}</span>
                         </label>
                     @endforeach
                 </div>
             </div>
 
             <!-- Types de soutien (max 3) -->
-            <div x-data="{ selected: [] }">
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Types de soutien nécessaires (max 3)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div x-data="supportSelection()">
+                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Quels sont vos besoins prioritaires ? (5 max)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @foreach(config('constants.TYPES_SOUTIEN') as $key => $value)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="support_types[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);" @change="(e)=>{ if(e.target.checked && selected.length>=3){ e.target.checked=false; } else { selected = Array.from(document.querySelectorAll('input[name=\\'support_types[]\\']:checked')).map(i=>i.value) } }">
-                            <span>{{ $value }}</span>
-                        </label>
+                        <button type="button" 
+                                @click="toggleSupport('{{ $key }}')"
+                                :class="isSelected('{{ $key }}') ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:border-gray-400'"
+                                :disabled="!isSelected('{{ $key }}') && selected.length >= 5"
+                                class="p-4 rounded-lg border-2 transition-all text-left font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                            {{ $value }}
+                        </button>
                     @endforeach
                 </div>
-                <p class="text-xs mt-1" style="color: var(--gray-500);" x-text="selected.length + ' / 3 sélectionnés'"></p>
+                <p class="text-sm mt-3 flex items-center gap-2" style="color: var(--gray-600);">
+                    <span x-text="selected.length + '/5 besoins sélectionnés'"></span>
+                    <template x-if="selected.length === 5">
+                        <span class="text-orange-600 text-xs">(Maximum atteint)</span>
+                    </template>
+                </p>
+                
+                <!-- Inputs cachés pour le formulaire -->
+                <template x-for="item in selected">
+                    <input type="hidden" name="support_types[]" :value="item">
+                </template>
             </div>
 
             <!-- Détails des besoins -->
@@ -116,10 +139,34 @@
         </form>
     </div>
 
-    <!-- Footer Navigation -->
-    <div class="flex justify-between items-center mt-8">
-        <button onclick="history.back()" class="btn btn-ghost">Retour</button>
-        <button type="submit" class="btn btn-primary" onclick="document.querySelector('form').submit()">Finaliser</button>
-    </div>
+    <x-onboarding.footer :next-form-id="'step4-form'" next-label="Finaliser" :is-final="true" />
 </div>
+
+@push('scripts')
+<script>
+function supportSelection() {
+    return {
+        selected: [],
+        
+        toggleSupport(key) {
+            const index = this.selected.indexOf(key);
+            if (index > -1) {
+                // Désélectionner
+                this.selected.splice(index, 1);
+            } else {
+                // Sélectionner si on n'a pas atteint le maximum
+                if (this.selected.length < 5) {
+                    this.selected.push(key);
+                }
+            }
+        },
+        
+        isSelected(key) {
+            return this.selected.includes(key);
+        }
+    }
+}
+</script>
+@endpush
+
 @endsection

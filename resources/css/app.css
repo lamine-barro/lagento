@@ -5,6 +5,7 @@
 @import './animations.css';
 @import './layouts.css';
 @import './markdown.css';
+@import './dark-mode.css';
 
 /* Keep existing Tailwind for backward compatibility */
 @import 'tailwindcss';
@@ -17,4 +18,10 @@
 @theme {
     --font-sans: 'Poppins', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Onboarding nav tweaks */
+.onboarding-nav-item-active {
+    color: var(--black);
+    background: var(--gray-50);
 }

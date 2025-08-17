@@ -9,8 +9,24 @@
     <meta name="description" content="@yield('meta_description', 'Assistant IA entrepreneurial pour la Côte d\'Ivoire')">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/favicon.png">
+    <link rel="icon" type="image/png" href="/favicon-light.png" id="favicon">
+    <link rel="apple-touch-icon" href="/favicon-light.png">
+    
+    <!-- Theme Script (doit être avant les styles) -->
+    <script>
+        // Appliquer le thème avant le rendu pour éviter les flashes
+        (function() {
+            const theme = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Update favicon
+            const favicon = document.getElementById('favicon');
+            if (favicon) {
+                favicon.href = theme === 'dark' ? '/favicon-dark.png' : '/favicon-light.png';
+            }
+        })();
+    </script>
     
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -20,11 +36,11 @@
     sidebarOpen: false, 
     currentView: '{{ request()->routeIs('chat') ? 'agent' : 'dashboard' }}',
     closeSidebar() { this.sidebarOpen = false; }
-}" class="bg-gray-50">
+}" style="background: var(--gray-50);">
     <div class="page">
         <!-- Header -->
-        <header class="fixed top-0 left-0 right-0 z-fixed bg-white border-b border-gray-200" style="height: var(--header-height);">
-            <div class="container flex items-center justify-between h-full">
+        <header class="fixed top-0 left-0 right-0 z-fixed" style="height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--gray-200);">
+            <div class="container max-w-7xl mx-auto flex items-center justify-between h-full">
                 <!-- Menu mobile -->
                 <button 
                     @click="sidebarOpen = !sidebarOpen" 
@@ -38,9 +54,7 @@
                 
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
-                    <h1 class="text-xl font-semibold text-gray-900">
-                        LAgent<span class="text-orange">O</span>
-                    </h1>
+                    <x-logo size="lg" />
                 </div>
                 
                 <!-- Navigation desktop -->
@@ -67,8 +81,9 @@
                     </a>
                 </nav>
                 
-                <!-- Profil -->
-                <div class="hidden md:block">
+                <!-- Actions -->
+                <div class="flex items-center gap-2">
+                    <x-theme-toggle />
                     <a href="{{ route('profile') }}" class="touch-target rounded-lg hover:bg-gray-100 transition-colors">
                         <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -170,7 +185,7 @@
         @auth
         <div class="fixed bottom-0 left-0 right-0 z-sticky bg-white border-t border-gray-200" 
              style="height: var(--chat-height);" x-data="fixedChat()">
-            <div class="container flex items-center gap-3 h-full">
+            <div class="container max-w-7xl mx-auto flex items-center gap-3 h-full">
                 <!-- Bouton fichier -->
                 <button 
                     type="button"

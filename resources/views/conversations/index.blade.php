@@ -19,7 +19,7 @@
     </div>
 
     <!-- Conversations List -->
-    <div class="p-4 space-y-3">
+    <div class="max-w-4xl mx-auto p-4 space-y-3">
         @forelse($conversations ?? [] as $conversation)
             <div class="border rounded-lg p-4 cursor-pointer hover:shadow-sm transition-shadow" 
                  style="border-color: var(--gray-100);"

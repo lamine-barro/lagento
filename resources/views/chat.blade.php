@@ -6,7 +6,7 @@
 <div class="min-h-screen bg-white" x-data="chatInterface()" data-conversation-id="{{ $conversation->id ?? '' }}">
     <!-- Chat Header -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
-        <div class="flex items-center justify-between max-w-4xl mx-auto">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center gap-3">
                 <button onclick="window.location.href = '{{ route('conversations.index') }}'" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <i data-lucide="message-square-more" class="w-5 h-5" style="color: var(--gray-600);"></i>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Messages Area -->
-    <div class="max-w-4xl mx-auto p-4 space-y-4" x-ref="messagesArea">
+    <div class="max-w-5xl mx-auto p-4 space-y-4" x-ref="messagesArea">
         
         <!-- Welcome Message -->
         @if(($messages ?? collect())->isEmpty())
@@ -41,7 +41,7 @@
                 </p>
                 
                 <!-- Quick Actions -->
-                <div class="grid grid-cols-1 gap-3 max-w-sm mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-md mx-auto">
                     <button 
                         @click="sendQuickMessage('Comment formaliser mon entreprise en Côte d\'Ivoire ?')"
                         class="flex items-center gap-3 p-3 text-left border rounded-lg hover:shadow-sm transition-shadow"
@@ -86,7 +86,7 @@
             <!-- User Message -->
             @if($message->role === 'user')
                 <div class="flex justify-end">
-                    <div class="max-w-xs lg:max-w-md px-4 py-3 rounded-lg" style="background: var(--orange-primary); color: white;">
+                    <div class="max-w-xs lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-lg" style="background: var(--orange-primary); color: white;">
                         <p class="text-sm">{{ $message->content }}</p>
                         <div class="text-xs mt-1 opacity-80">
                             {{ $message->created_at->format('H:i') }}

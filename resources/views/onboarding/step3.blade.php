@@ -4,45 +4,22 @@
 
 @section('content')
 <div class="min-h-screen bg-white flex flex-col p-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-        <button onclick="history.back()" class="btn btn-ghost p-2">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-        </button>
-        <div class="text-center">
-            <div class="text-sm font-medium" style="color: var(--orange-primary);">Étape 3 sur 3</div>
-        </div>
-        <div class="w-10"></div> <!-- Spacer -->
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="mb-8">
-        <div class="h-2 rounded-full" style="background: var(--gray-100);">
-            <div class="h-2 rounded-full transition-all duration-500" style="background: var(--orange-primary); width: 100%;"></div>
-        </div>
-    </div>
+    <x-onboarding.header :current-step="3" />
 
     <!-- Main Content -->
-    <div class="flex-1 w-full" style="max-width: 720px; margin-left: auto; margin-right: auto;">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-medium mb-2" style="color: var(--gray-900);">
-                <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2 align-[-2px]"></i>
-                Activité & Développement
-            </h1>
-            <p style="color: var(--gray-700);">Votre offre, vos cibles et votre maturité</p>
-        </div>
+    <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form method="POST" action="{{ route('onboarding.step3') }}" class="space-y-6">
+        <form id="step3-form" method="POST" action="{{ route('onboarding.step3') }}" class="space-y-6 mt-4">
             @csrf
         
             <!-- Secteurs d'activité (max 5) -->
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Secteurs d'activité (max 5)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @foreach(config('constants.SECTEURS') as $key => $value)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="secteurs[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
-                            <span>{{ $value }}</span>
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="secteurs[]" value="{{ $key }}" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                            <span class="text-sm font-medium">{{ $value }}</span>
                         </label>
                     @endforeach
                 </div>
@@ -57,11 +34,11 @@
             <!-- Clients cibles -->
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Clients cibles</label>
-                <div class="space-y-2">
+                <div class="grid grid-cols-1 gap-3">
                     @foreach(config('constants.CIBLES') as $key => $value)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="cibles[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
-                            <span>{{ $value }}</span>
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="cibles[]" value="{{ $key }}" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                            <span class="text-sm font-medium">{{ $value }}</span>
                         </label>
                     @endforeach
                 </div>
@@ -101,11 +78,11 @@
             <!-- Modèles de revenus (max 5) -->
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Modèles de revenus (max 5)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @foreach(config('constants.MODELES_REVENUS') as $key => $value)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="modeles_revenus[]" value="{{ $key }}" class="w-4 h-4 mr-3" style="accent-color: var(--orange-primary);">
-                            <span>{{ $value }}</span>
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="modeles_revenus[]" value="{{ $key }}" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                            <span class="text-sm font-medium">{{ $value }}</span>
                         </label>
                     @endforeach
                 </div>
@@ -113,19 +90,6 @@
         </form>
     </div>
 
-    <!-- Footer Navigation -->
-    <div class="flex justify-between items-center mt-8">
-        <button onclick="history.back()" class="btn btn-ghost">
-            Retour
-        </button>
-        <button 
-            type="submit" 
-            class="btn btn-primary"
-            onclick="document.querySelector('form').submit()"
-            x-bind:disabled="supportTypes.length === 0 || challenges.length === 0"
-        >
-            Finaliser mon profil
-        </button>
-    </div>
+    <x-onboarding.footer :next-form-id="'step3-form'" next-label="Suivant" />
 </div>
 @endsection

@@ -32,7 +32,7 @@ Route::prefix('auth')->group(function () {
 
 // Protected routes
 Route::middleware(['auth'])->group(function () {
-    // Onboarding
+    // Onboarding (pas de vérification d'onboarding pour ces routes)
     Route::prefix('onboarding')->group(function () {
         Route::get('/step1', [OnboardingController::class, 'showStep1'])->name('onboarding.step1');
         Route::post('/step1', [OnboardingController::class, 'processStep1']);
@@ -44,36 +44,38 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/step4', [OnboardingController::class, 'processStep4']);
     });
     
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
-    Route::post('/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/profile/project', [DashboardController::class, 'updateProject'])->name('profile.project.update');
-    
-    // Chat
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat');
-    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
-    Route::get('/chat/suggestions', [ChatController::class, 'getSuggestions'])->name('chat.suggestions');
-    Route::post('/chat/suggestions/refresh', [ChatController::class, 'refreshSuggestions'])->name('chat.suggestions.refresh');
-    
-    // Conversations
-    Route::get('/conversations', function () {
-        $conversations = \App\Models\UserConversation::where('user_id', auth()->id())
-            ->with('lastMessage')
-            ->orderBy('is_pinned', 'desc')
-            ->orderBy('last_message_at', 'desc')
-            ->get();
-        return view('conversations.index', compact('conversations'));
-    })->name('conversations.index');
-    
-    // Documents
-    Route::prefix('documents')->group(function () {
-        Route::get('/', [DocumentController::class, 'index'])->name('documents.index');
-        Route::post('/upload', [DocumentController::class, 'upload'])->name('documents.upload');
-        Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download');
+    // Routes protégées qui nécessitent un onboarding complet
+    Route::middleware(['onboarding.complete'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+        Route::post('/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/profile/project', [DashboardController::class, 'updateProject'])->name('profile.project.update');
+        
+        // Chat
+        Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+        Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+        Route::get('/chat/suggestions', [ChatController::class, 'getSuggestions'])->name('chat.suggestions');
+        Route::post('/chat/suggestions/refresh', [ChatController::class, 'refreshSuggestions'])->name('chat.suggestions.refresh');
+        
+        // Conversations
+        Route::get('/conversations', function () {
+            $conversations = \App\Models\UserConversation::where('user_id', auth()->id())
+                ->with('lastMessage')
+                ->orderBy('is_pinned', 'desc')
+                ->orderBy('last_message_at', 'desc')
+                ->get();
+            return view('conversations.index', compact('conversations'));
+        })->name('conversations.index');
+        
+        // Documents
+        Route::prefix('documents')->group(function () {
+            Route::get('/', [DocumentController::class, 'index'])->name('documents.index');
+            Route::post('/upload', [DocumentController::class, 'upload'])->name('documents.upload');
+            Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download');
+        });
     });
     
-    // Projets (annuaire public + édition unique via profil)
+    // Projets (annuaire public accessible sans onboarding complet)
     Route::prefix('projets')->group(function () {
         Route::get('/', [ProjetController::class, 'index'])->name('projets.index');
         Route::get('/{projet}', [ProjetController::class, 'show'])->name('projets.show');

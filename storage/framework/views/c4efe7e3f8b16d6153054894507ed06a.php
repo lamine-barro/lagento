@@ -17,7 +17,7 @@
     </div>
 
     <!-- Conversations List -->
-    <div class="p-4 space-y-3">
+    <div class="max-w-4xl mx-auto p-4 space-y-3">
         <?php $__empty_1 = true; $__currentLoopData = $conversations ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $conversation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <div class="border rounded-lg p-4 cursor-pointer hover:shadow-sm transition-shadow" 
                  style="border-color: var(--gray-100);"

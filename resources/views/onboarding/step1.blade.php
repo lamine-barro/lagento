@@ -4,48 +4,23 @@
 
 @section('content')
 <div class="min-h-screen bg-white flex flex-col p-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-        <button onclick="history.back()" class="btn btn-ghost p-2">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-        </button>
-        <div class="text-center">
-            <div class="text-sm font-medium" style="color: var(--orange-primary);">Étape 1 sur 3</div>
-        </div>
-        <div class="w-10"></div> <!-- Spacer -->
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="mb-8">
-        <div class="h-2 rounded-full" style="background: var(--gray-100);">
-            <div class="h-2 rounded-full transition-all duration-500" style="background: var(--orange-primary); width: 33.33%;"></div>
-        </div>
-    </div>
+    <x-onboarding.header :current-step="1" />
 
     <!-- Main Content -->
-    <div class="flex-1 w-full" style="max-width: 720px; margin-left: auto; margin-right: auto;">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-medium mb-2" style="color: var(--gray-900);">
-                <i data-lucide="badge-check" class="w-5 h-5 mr-2 align-[-2px]"></i>
-                Identité de votre entreprise
-            </h1>
-            <p style="color: var(--gray-700);">
-                Commençons par l'essentiel : qui êtes-vous et où êtes-vous ?
-            </p>
-        </div>
+    <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form id="step1-form" method="POST" action="{{ route('onboarding.step1') }}" enctype="multipart/form-data" class="space-y-6">
+        <form id="step1-form" method="POST" action="{{ route('onboarding.step1') }}" enctype="multipart/form-data" class="space-y-6 mt-4">
             @csrf
 
             <!-- Identité & Contact -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nom du projet *</label>
                     <input type="text" name="nom_projet" value="{{ old('nom_projet') }}" placeholder="Ex: Etudesk" class="input-field w-full" required />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale *</label>
-                    <input type="text" name="raison_sociale" value="{{ old('raison_sociale') }}" placeholder="Ex: Etudesk SAS" class="input-field w-full" required />
+                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale</label>
+                    <input type="text" name="raison_sociale" value="{{ old('raison_sociale') }}" placeholder="Ex: Etudesk SAS" class="input-field w-full" />
                     @error('raison_sociale')<p class="text-sm mt-1" style="color: var(--danger);">{{ $message }}</p>@enderror
                 </div>
                 <div class="md:col-span-2">
@@ -70,57 +45,152 @@
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Logo (PNG/JPG, 10 Mo max)</label>
-                    <input type="file" name="logo" accept=".png,.jpg,.jpeg" class="input-field w-full" />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Région *</label>
-                    <select name="region" class="input-field w-full" required>
-                        <option value="">Sélectionnez votre région</option>
-                        @foreach(config('constants.REGIONS') as $region => $coords)
-                            <option value="{{ $region }}" {{ old('region') == $region ? 'selected' : '' }}>{{ $region }}</option>
-                        @endforeach
-                    </select>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Logo du projet</label>
+                    <div class="flex flex-col items-center justify-center w-full" x-data="logoUpload()">
+                        <!-- Zone d'upload -->
+                        <div @drop.prevent="handleDrop($event)" @dragover.prevent @dragenter.prevent 
+                             class="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition-all hover:border-orange-400 hover:bg-orange-50 pt-8 pb-6"
+                             :class="isDragging ? 'border-orange-500 bg-orange-50' : 'border-gray-300'"
+                             @dragenter="isDragging = true" @dragleave="isDragging = false" @click="$refs.fileInput.click()">
+                            
+                            <!-- Aperçu de l'image -->
+                            <template x-if="previewUrl">
+                                <div class="flex flex-col items-center">
+                                    <img :src="previewUrl" alt="Logo preview" class="w-20 h-20 object-cover rounded-lg mb-2">
+                                    <p class="text-sm text-gray-600" x-text="fileName"></p>
+                                </div>
+                            </template>
+                            
+                            <!-- État initial -->
+                            <template x-if="!previewUrl">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-3 mt-2">
+                                        <i data-lucide="image" class="w-8 h-8" style="color: var(--gray-500); stroke-width: 1.25;"></i>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-4 py-2 text-white rounded-md mt-4" style="background-color: var(--orange); color: #FFFFFF;">
+                                        <i data-lucide="upload" class="w-4 h-4" style="stroke-width: 1.25; color: #FFFFFF;"></i>
+                                        <span style="color: #FFFFFF;">Télécharger un logo</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 text-center">
+                                        Glissez-déposez votre logo ici ou cliquez pour parcourir<br>
+                                        <span class="text-xs">PNG, JPG jusqu'à 10 Mo</span>
+                                    </p>
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <input type="file" name="logo" accept=".png,.jpg,.jpeg" x-ref="fileInput" @change="handleFileSelect($event)" class="hidden" />
+                        
+                        <!-- Bouton de suppression -->
+                        <template x-if="previewUrl">
+                            <button type="button" @click="clearFile()" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                                Supprimer le logo
+                            </button>
+                        </template>
+                    </div>
                 </div>
             </div>
 
-            <!-- Localisation -->
+            <!-- Localisation et Région -->
             <div x-data="onboardingMap()">
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Coordonnées GPS</label>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input x-ref="lat" type="text" name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" class="input-field w-full" />
-                    <input x-ref="lng" type="text" name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" class="input-field w-full" />
-                    <button type="button" class="btn btn-secondary w-full" @click="centerOnInputs()">Pointer sur la carte</button>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Géolocalisation de votre projet</label>
+                <p class="text-sm mb-3" style="color: var(--gray-600);">Cliquez sur la carte pour placer votre position ou utilisez le bouton de géolocalisation</p>
+                <button type="button" class="btn btn-secondary w-full mb-4" @click="geolocate()">
+                    <i data-lucide="crosshair" class="w-4 h-4 mr-2"></i>
+                    Me localiser
+                </button>
+                <div id="map" class="mb-4" style="height: 260px; border-radius: var(--radius-md);"></div>
+                
+                <!-- Région -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Région *</label>
+                    <select x-ref="regionSelect" name="region" class="input-field w-full" required @change="onRegionChange()">
+                        <option value="">Sélectionnez votre région</option>
+                        @foreach(config('constants.REGIONS') as $region => $coords)
+                            <option value="{{ $region }}" data-lat="{{ $coords['lat'] }}" data-lng="{{ $coords['lng'] }}" {{ old('region') == $region ? 'selected' : '' }}>{{ $region }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                <div id="map" class="mt-4" style="height: 240px; border: 1px solid var(--black); border-radius: var(--radius-md);"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Latitude</label>
+                        <input x-ref="lat" type="text" name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Longitude</label>
+                        <input x-ref="lng" type="text" name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
+                    </div>
+                </div>
             </div>
         </form>
     </div>
 
-    <!-- Footer Navigation -->
-    <div class="flex justify-between items-center mt-8" x-data>
-        <button onclick="history.back()" class="btn btn-ghost">
-            Retour
-        </button>
-        <button 
-            type="submit" 
-            class="btn btn-primary"
-            form="step1-form"
-        >
-            Continuer
-        </button>
-    </div>
+    <x-onboarding.footer :next-form-id="'step1-form'" next-label="Suivant" />
 </div>
 @endsection
 
 @push('scripts')
 <script>
-// Minimal Mapbox init with click-to-locate
+// Logo upload component
+function logoUpload() {
+    return {
+        isDragging: false,
+        previewUrl: null,
+        fileName: '',
+        
+        handleDrop(event) {
+            this.isDragging = false;
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                this.handleFile(files[0]);
+            }
+        },
+        
+        handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.handleFile(file);
+            }
+        },
+        
+        handleFile(file) {
+            // Validation
+            if (!file.type.startsWith('image/')) {
+                alert('Veuillez sélectionner un fichier image');
+                return;
+            }
+            
+            if (file.size > 10 * 1024 * 1024) { // 10MB
+                alert('Le fichier ne doit pas dépasser 10 Mo');
+                return;
+            }
+            
+            this.fileName = file.name;
+            
+            // Créer aperçu
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.previewUrl = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+        
+        clearFile() {
+            this.previewUrl = null;
+            this.fileName = '';
+            this.$refs.fileInput.value = '';
+        }
+    }
+}
+
+// Minimal Mapbox init with click-to-locate & geolocation
 function onboardingMap() {
     return {
         map: null,
         marker: null,
+        regions: @json(config('constants.REGIONS')),
         init() {
             const token = @json(config('services.mapbox.token'));
             if (!token) return;
@@ -145,8 +215,9 @@ function onboardingMap() {
                 this.map = new mapboxgl.Map({
                     container: 'map',
                     style: 'mapbox://styles/mapbox/streets-v12',
-                    center: [-4.0083, 5.3599], // Abidjan approx
-                    zoom: 9
+                    center: [-4.024, 5.345],
+                    zoom: 9,
+                    attributionControl: false // Supprime les attributions
                 });
                 this.map.addControl(new mapboxgl.NavigationControl());
                 this.map.on('click', (e) => {
@@ -154,6 +225,7 @@ function onboardingMap() {
                     this.$refs.lat.value = lat.toFixed(6);
                     this.$refs.lng.value = lng.toFixed(6);
                     this.placeMarker([lng, lat]);
+                    this.detectRegion(lat, lng);
                 });
             };
             initMap();
@@ -164,14 +236,63 @@ function onboardingMap() {
             this.marker = new mapboxgl.Marker().setLngLat(lngLat).addTo(this.map);
             this.map.flyTo({ center: lngLat, zoom: 12 });
         },
-        centerOnInputs() {
-            const lat = parseFloat(this.$refs.lat.value);
-            const lng = parseFloat(this.$refs.lng.value);
-            if (!isNaN(lat) && !isNaN(lng)) {
+        detectRegion(lat, lng) {
+            // Trouver la région la plus proche
+            let closestRegion = null;
+            let minDistance = Infinity;
+            
+            for (const [region, coords] of Object.entries(this.regions)) {
+                const distance = Math.sqrt(
+                    Math.pow(coords.lat - lat, 2) + 
+                    Math.pow(coords.lng - lng, 2)
+                );
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestRegion = region;
+                }
+            }
+            
+            // Sélectionner la région trouvée
+            if (closestRegion && this.$refs.regionSelect) {
+                this.$refs.regionSelect.value = closestRegion;
+            }
+        },
+        onRegionChange() {
+            const select = this.$refs.regionSelect;
+            const option = select.options[select.selectedIndex];
+            if (option && option.dataset.lat && option.dataset.lng) {
+                const lat = parseFloat(option.dataset.lat);
+                const lng = parseFloat(option.dataset.lng);
+                this.$refs.lat.value = lat.toFixed(6);
+                this.$refs.lng.value = lng.toFixed(6);
                 this.placeMarker([lng, lat]);
             }
+        },
+        geolocate() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                this.$refs.lat.value = lat.toFixed(6);
+                this.$refs.lng.value = lng.toFixed(6);
+                this.placeMarker([lng, lat]);
+                this.detectRegion(lat, lng);
+            });
         }
     }
 }
 </script>
+
+<style>
+/* Masquer toutes les attributions Mapbox */
+.mapboxgl-ctrl-attrib,
+.mapboxgl-ctrl-logo {
+    display: none !important;
+}
+
+.mapboxgl-ctrl-bottom-right,
+.mapboxgl-ctrl-bottom-left {
+    display: none !important;
+}
+</style>
 @endpush

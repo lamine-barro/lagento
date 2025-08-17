@@ -48,6 +48,8 @@ class Projet extends Model
         'telephone',
         'email',
         'site_web',
+        'nom_representant',
+        'role_representant',
         'reseaux_sociaux',
         
         // Équipe
@@ -180,6 +182,43 @@ class Projet extends Model
             $labels[] = BusinessConstants::TYPES_SOUTIEN[$key] ?? $key;
         }
         return $labels;
+    }
+
+    // Méthodes de validation
+    public function isOnboardingComplete(): bool
+    {
+        // Step 1: Identité obligatoire
+        if (empty($this->nom_projet) || empty($this->raison_sociale) || empty($this->formalise) || empty($this->region)) {
+            return false;
+        }
+
+        // Step 2: Pas de champs obligatoires
+
+        // Step 3: Pas de champs obligatoires
+
+        // Step 4: Fondateurs obligatoire
+        if (is_null($this->nombre_fondateurs) || is_null($this->nombre_fondatrices)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getOnboardingProgress(): array
+    {
+        $steps = [
+            'step1' => !empty($this->nom_projet) && !empty($this->raison_sociale) && !empty($this->formalise) && !empty($this->region),
+            'step2' => true, // Pas de champs obligatoires
+            'step3' => true, // Pas de champs obligatoires  
+            'step4' => !is_null($this->nombre_fondateurs) && !is_null($this->nombre_fondatrices)
+        ];
+
+        return [
+            'steps' => $steps,
+            'completed' => array_sum($steps),
+            'total' => count($steps),
+            'percentage' => round((array_sum($steps) / count($steps)) * 100)
+        ];
     }
 
     // Scopes pour les recherches

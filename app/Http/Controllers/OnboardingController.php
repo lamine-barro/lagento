@@ -25,7 +25,7 @@ class OnboardingController extends Controller
     {
         $request->validate([
             'nom_projet' => 'required|string|max:255',
-            'raison_sociale' => 'required|string|max:255',
+            'raison_sociale' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'annee_creation' => 'nullable|integer|min:2010|max:' . date('Y'),
             'formalise' => 'required|in:OUI,NON',
@@ -66,6 +66,14 @@ class OnboardingController extends Controller
     
     public function showStep2()
     {
+        $user = Auth::user();
+        $projet = Projet::where('user_id', $user->id)->latest()->first();
+        
+        // S'assurer que step 1 est complété
+        if (!$projet || empty($projet->nom_projet)) {
+            return redirect()->route('onboarding.step1')->with('warning', 'Veuillez d\'abord compléter l\'étape 1.');
+        }
+        
         return view('onboarding.step2');
     }
     
@@ -87,7 +95,10 @@ class OnboardingController extends Controller
         ]);
 
         $user = Auth::user();
-        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $user->company_name ?? '']);
+        $projet = Projet::where('user_id', $user->id)->latest()->first();
+        if (!$projet) {
+            return redirect()->route('onboarding.step1');
+        }
         $social = [
             'instagram' => $request->reseaux_instagram,
             'youtube' => $request->reseaux_youtube,
@@ -101,6 +112,8 @@ class OnboardingController extends Controller
             'telephone' => $request->telephone,
             'email' => $request->email,
             'site_web' => $request->site_web,
+            'nom_representant' => $request->nom_representant,
+            'role_representant' => $request->role_representant,
             'reseaux_sociaux' => array_filter($social),
         ]);
 
@@ -109,7 +122,14 @@ class OnboardingController extends Controller
     
     public function showStep3()
     {
-        // Activity & Development
+        $user = Auth::user();
+        $projet = Projet::where('user_id', $user->id)->latest()->first();
+        
+        // S'assurer que step 1 est complété
+        if (!$projet || empty($projet->nom_projet)) {
+            return redirect()->route('onboarding.step1')->with('warning', 'Veuillez d\'abord compléter l\'étape 1.');
+        }
+        
         return view('onboarding.step3');
     }
 
@@ -125,7 +145,10 @@ class OnboardingController extends Controller
             'revenus' => 'nullable|string',
         ]);
         $user = Auth::user();
-        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $user->company_name ?? '']);
+        $projet = Projet::where('user_id', $user->id)->latest()->first();
+        if (!$projet) {
+            return redirect()->route('onboarding.step1');
+        }
         $projet->update([
             'secteurs' => $request->secteurs ?: [],
             'produits_services' => $request->produits_services ? [$request->produits_services] : [],
@@ -141,41 +164,68 @@ class OnboardingController extends Controller
 
     public function showStep4()
     {
-        // Team & Support
+        $user = Auth::user();
+        $projet = Projet::where('user_id', $user->id)->latest()->first();
+        
+        // S'assurer que step 1 est complété
+        if (!$projet || empty($projet->nom_projet)) {
+            return redirect()->route('onboarding.step1')->with('warning', 'Veuillez d\'abord compléter l\'étape 1.');
+        }
+        
         return view('onboarding.step4');
     }
 
     public function processStep4(Request $request)
     {
         $request->validate([
-            'nombre_fondateurs' => 'required|integer|min:1',
-            'nombre_fondatrices' => 'required|integer|min:0',
-            'tranches_age_fondateurs' => 'nullable|array',
-            'localisation_fondateurs' => 'nullable|string',
-            'taille_equipe' => 'nullable|string',
-            'structures_accompagnement' => 'nullable|array',
-            'types_soutien' => 'nullable|array|max:3',
-            'details_besoins' => 'nullable|string|max:1000'
+            'founders_count' => 'required|integer|min:1',
+            'female_founders_count' => 'required|integer|min:0',
+            'age_ranges' => 'nullable|array',
+            'founders_location' => 'nullable|string',
+            'team_size' => 'nullable|string',
+            'support_structures' => 'nullable|array',
+            'support_types' => 'nullable|array|max:3',
+            'additional_info' => 'nullable|string|max:1000'
         ]);
 
         $user = Auth::user();
-        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $user->company_name ?? '']);
+        $projet = Projet::where('user_id', $user->id)->latest()->first();
+        if (!$projet) {
+            return redirect()->route('onboarding.step1');
+        }
         $projet->update([
-            'taille_equipe' => $request->taille_equipe,
-            'nombre_fondateurs' => (int)$request->nombre_fondateurs,
-            'nombre_fondatrices' => (int)$request->nombre_fondatrices,
-            'tranches_age_fondateurs' => $request->tranches_age_fondateurs ?: [],
-            'localisation_fondateurs' => strtolower((string)$request->localisation_fondateurs),
-            'structures_accompagnement' => $request->structures_accompagnement ?: [],
-            'types_soutien' => $request->types_soutien ?: [],
-            'details_besoins' => $request->details_besoins,
+            'taille_equipe' => $request->team_size,
+            'nombre_fondateurs' => (int)$request->founders_count,
+            'nombre_fondatrices' => (int)$request->female_founders_count,
+            'tranches_age_fondateurs' => $request->age_ranges ?: [],
+            'localisation_fondateurs' => strtolower((string)$request->founders_location),
+            'structures_accompagnement' => $request->support_structures ?: [],
+            'types_soutien' => $request->support_types ?: [],
+            'details_besoins' => $request->additional_info,
         ]);
 
-        $this->analyticsService->updateEntrepreneurProfile($user, [
-            'projet_id' => $projet->id,
-            'termine_le' => now()->toISOString(),
-        ]);
-
-        return redirect()->route('dashboard');
+        // Vérifier si l'onboarding est complet
+        if ($projet->isOnboardingComplete()) {
+            $this->analyticsService->updateEntrepreneurProfile($user, [
+                'projet_id' => $projet->id,
+                'termine_le' => now()->toISOString(),
+            ]);
+            
+            return redirect()->route('dashboard')->with('success', 'Félicitations ! Votre profil est maintenant complet.');
+        } else {
+            // Rediriger vers l'étape manquante
+            $progress = $projet->getOnboardingProgress();
+            
+            if (!$progress['steps']['step1']) {
+                return redirect()->route('onboarding.step1')->with('warning', 'Veuillez compléter les informations de votre entreprise.');
+            }
+            
+            if (!$progress['steps']['step4']) {
+                return redirect()->route('onboarding.step4')->with('warning', 'Veuillez compléter les informations sur votre équipe.');
+            }
+            
+            // Si toutes les étapes semblent complètes mais isOnboardingComplete() retourne false
+            return redirect()->route('onboarding.step1')->with('error', 'Veuillez vérifier et compléter toutes les informations obligatoires.');
+        }
     }
 }

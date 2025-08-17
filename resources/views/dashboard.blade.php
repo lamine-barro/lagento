@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="container section">
+<div class="container max-w-7xl mx-auto section">
     <!-- En-tête -->
     <div class="mb-6">
         <h1 class="text-primary mb-2">Dashboard</h1>
@@ -11,7 +11,7 @@
     </div>
     
     <!-- Grille des cartes -->
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         
         <!-- Opportunités matchées -->
         <div class="card">
@@ -212,14 +212,14 @@
         </div>
         
         <!-- Statistiques détaillées -->
-        <div class="card md:col-span-2 lg:col-span-3">
+        <div class="card md:col-span-2 lg:col-span-3 xl:col-span-4">
             <div class="card-header">
                 <h3 class="card-title">Statistiques détaillées</h3>
                 <p class="card-description">Vue d'ensemble de votre activité</p>
             </div>
             
             <div class="card-body">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-6">
                     <div class="text-center">
                         <div class="text-3xl font-semibold text-orange mb-2">{{ isset($userAnalytics) ? $userAnalytics->interactions_count ?? 0 : 0 }}</div>
                         <div class="text-sm text-muted">Interactions avec l'IA</div>
@@ -277,6 +277,16 @@
   
   .lg\:col-span-3 {
     grid-column: span 3 / span 3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  
+  .xl\:col-span-4 {
+    grid-column: span 4 / span 4;
   }
 }
 

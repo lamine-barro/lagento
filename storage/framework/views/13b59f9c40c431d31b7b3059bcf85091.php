@@ -55,7 +55,7 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex items-center justify-center p-4">
-        <div class="w-full max-w-xl text-center">
+        <div class="w-full max-w-2xl text-center">
             <!-- Logo Text Centered -->
             <div class="mx-auto mb-6 text-3xl sm:text-4xl font-semibold" style="font-family: 'Poppins', sans-serif; color: var(--gray-900);">
                 Lagent<span style="color: var(--orange);">O</span>

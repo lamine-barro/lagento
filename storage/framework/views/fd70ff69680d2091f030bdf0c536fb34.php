@@ -24,7 +24,7 @@
     <div class="page">
         <!-- Header -->
         <header class="fixed top-0 left-0 right-0 z-fixed bg-white border-b border-gray-200" style="height: var(--header-height);">
-            <div class="container flex items-center justify-between h-full">
+            <div class="container max-w-7xl mx-auto flex items-center justify-between h-full">
                 <!-- Menu mobile -->
                 <button 
                     @click="sidebarOpen = !sidebarOpen" 
@@ -170,7 +170,7 @@
         <?php if(auth()->guard()->check()): ?>
         <div class="fixed bottom-0 left-0 right-0 z-sticky bg-white border-t border-gray-200" 
              style="height: var(--chat-height);" x-data="fixedChat()">
-            <div class="container flex items-center gap-3 h-full">
+            <div class="container max-w-7xl mx-auto flex items-center gap-3 h-full">
                 <!-- Bouton fichier -->
                 <button 
                     type="button"

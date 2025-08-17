@@ -8,9 +8,9 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background-color: #F9FAFB;
+            color: #1F2937;
         }
         
         .container {
@@ -19,24 +19,26 @@
             background-color: #ffffff;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E5E7EB;
         }
         
         .header {
-            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
-            padding: 40px 30px;
+            background-color: #FFFFFF;
+            padding: 32px 30px;
             text-align: center;
+            border-bottom: 1px solid #E5E7EB;
         }
         
         .logo {
             font-size: 24px;
             font-weight: bold;
-            color: white;
+            color: #111827;
             margin-bottom: 10px;
         }
+        .logo span { color: #FF6B35; }
         
         .header-subtitle {
-            color: rgba(255, 255, 255, 0.9);
+            color: #6B7280;
             font-size: 16px;
         }
         
@@ -47,38 +49,38 @@
         .greeting {
             font-size: 18px;
             margin-bottom: 20px;
-            color: #333;
+            color: #1F2937;
         }
         
         .message {
             font-size: 16px;
             line-height: 1.6;
             margin-bottom: 30px;
-            color: #555;
+            color: #374151;
         }
         
         .otp-container {
             text-align: center;
             margin: 30px 0;
-            padding: 25px;
-            background-color: #f8f9fa;
+            padding: 24px;
+            background-color: #F3F4F6;
             border-radius: 8px;
-            border: 2px dashed #FF6B35;
+            border: 1px solid #E5E7EB;
         }
         
         .otp-label {
             font-size: 14px;
-            color: #666;
+            color: #6B7280;
             margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.08em;
         }
         
         .otp-code {
             font-size: 36px;
             font-weight: bold;
             color: #FF6B35;
-            letter-spacing: 8px;
+            letter-spacing: 6px;
             font-family: 'Courier New', monospace;
         }
         
@@ -86,21 +88,21 @@
             font-size: 16px;
             line-height: 1.6;
             margin-bottom: 25px;
-            color: #555;
+            color: #374151;
         }
         
         .warning {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
+            background-color: #FFFBEB;
+            border: 1px solid #FDE68A;
             border-radius: 6px;
             padding: 15px;
             margin: 20px 0;
             font-size: 14px;
-            color: #856404;
+            color: #92400E;
         }
         
         .footer {
-            background-color: #f8f9fa;
+            background-color: #F9FAFB;
             padding: 25px 30px;
             text-align: center;
             border-top: 1px solid #e9ecef;
@@ -108,7 +110,7 @@
         
         .footer-text {
             font-size: 14px;
-            color: #6c757d;
+            color: #6B7280;
             margin-bottom: 10px;
         }
         
@@ -137,7 +139,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">LAgent<span style="color: #FFE4B5;">O</span></div>
+            <div class="logo">LAgent<span>O</span></div>
             <div class="header-subtitle">Votre assistant IA entrepreneurial</div>
         </div>
         
