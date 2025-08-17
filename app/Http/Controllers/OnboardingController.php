@@ -80,11 +80,11 @@ class OnboardingController extends Controller
     public function processStep2(Request $request)
     {
         $request->validate([
-            'telephone' => 'nullable|string|max:30',
-            'email' => 'nullable|email',
+            'telephone' => 'required|string|max:30',
+            'email' => 'required|email',
             'site_web' => 'nullable|url',
-            'nom_representant' => 'nullable|string|max:255',
-            'role_representant' => 'nullable|string|max:255',
+            'nom_representant' => 'required|string|max:255',
+            'role_representant' => 'required|string|max:255',
             'reseaux_instagram' => 'nullable|url',
             'reseaux_youtube' => 'nullable|url',
             'reseaux_x' => 'nullable|url',

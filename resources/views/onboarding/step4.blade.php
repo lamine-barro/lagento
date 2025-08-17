@@ -12,46 +12,43 @@
         <form id="step4-form" method="POST" action="{{ route('onboarding.step4') }}" class="space-y-6 mt-4">
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: {{ old('founders_count', 1) }}, female: {{ old('female_founders_count', 0) }}, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
                 <!-- Nombre de fondateurs -->
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nombre de fondateurs *</label>
-                    <div class="flex items-center border rounded-lg" style="border-color: var(--gray-300);" x-data="{ count: {{ old('founders_count', 1) }} }">
-                        <div class="flex items-center gap-3 px-3 py-2 flex-1">
-                            <i data-lucide="users" class="w-4 h-4" style="color: var(--gray-500); stroke-width: 1.25;"></i>
-                            <span x-text="count" class="text-lg font-medium" style="color: var(--gray-900);"></span>
+                    <div class="flex items-center border rounded-lg" style="border-color: var(--gray-300);">
+                        <div class="flex items-center px-4 py-2 flex-1">
+                            <span x-text="founders" class="text-base font-medium" style="color: var(--gray-900);"></span>
                         </div>
-                        <div class="flex">
-                            <button type="button" @click="if(count > 1) count--" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
-                                <i data-lucide="minus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                        <div class="flex gap-1">
+                            <button type="button" @click="decFounders()" class="px-4 py-2 transition-colors border-l text-gray-700 hover:text-orange-600 active:text-orange-700" style="border-color: var(--gray-300);">
+                                <span class="text-base">−</span>
                             </button>
-                            <button type="button" @click="count++" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
-                                <i data-lucide="plus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                            <button type="button" @click="incFounders()" class="px-4 py-2 transition-colors border-l text-gray-700 hover:text-orange-600 active:text-orange-700" style="border-color: var(--gray-300);">
+                                <span class="text-base">+</span>
                             </button>
                         </div>
-                        <input type="hidden" name="founders_count" x-model="count" />
+                        <input type="hidden" name="founders_count" x-model="founders" />
                     </div>
                 </div>
 
                 <!-- Nombre de fondatrices -->
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nombre de femmes fondatrices *</label>
-                    <div class="flex items-center border rounded-lg" style="border-color: var(--gray-300);" x-data="{ count: {{ old('female_founders_count', 0) }} }">
-                        <div class="flex items-center gap-3 px-3 py-2 flex-1">
-                            <i data-lucide="user-check" class="w-4 h-4" style="color: var(--gray-500); stroke-width: 1.25;"></i>
-                            <span x-text="count" class="text-lg font-medium" style="color: var(--gray-900);"></span>
+                    <div class="flex items-center border rounded-lg" style="border-color: var(--gray-300);">
+                        <div class="flex items-center px-4 py-2 flex-1">
+                            <span x-text="female" class="text-base font-medium" style="color: var(--gray-900);"></span>
                         </div>
-                        <div class="flex">
-                            <button type="button" @click="if(count > 0) count--" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
-                                <i data-lucide="minus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                        <div class="flex gap-1">
+                            <button type="button" @click="decFemale()" class="px-4 py-2 transition-colors border-l text-gray-700 hover:text-orange-600 active:text-orange-700" style="border-color: var(--gray-300);">
+                                <span class="text-base">−</span>
                             </button>
-                            <button type="button" @click="count++" class="p-2 hover:bg-gray-100 transition-colors border-l" style="border-color: var(--gray-300);">
-                                <i data-lucide="plus" class="w-4 h-4" style="color: var(--gray-600); stroke-width: 1.25;"></i>
+                            <button type="button" @click="incFemale()" class="px-4 py-2 transition-colors border-l text-gray-700 hover:text-orange-600 active:text-orange-700" style="border-color: var(--gray-300);">
+                                <span class="text-base">+</span>
                             </button>
                         </div>
-                        <input type="hidden" name="female_founders_count" x-model="count" />
+                        <input type="hidden" name="female_founders_count" x-model="female" />
                     </div>
-                    <p class="text-xs mt-1" style="color: var(--gray-500);">Doit être ≤ nombre de fondateurs</p>
                 </div>
             </div>
 
@@ -59,17 +56,17 @@
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Tranches d'âge des fondateurs</label>
                 <p class="text-sm mb-4" style="color: var(--gray-600);">Sélectionnez toutes les tranches d'âge qui s'appliquent</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'age_ranges[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     @foreach(config('constants.AGE_RANGES') as $a)
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="age_ranges[]" value="{{ $a }}" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="age_ranges[]" value="{{ $a }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);" @change="onChange($event)">
                             <span class="text-sm font-medium">{{ $a }} ans</span>
                         </label>
                     @endforeach
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Localisation des fondateurs</label>
                     <select name="founders_location" class="input-field w-full">
@@ -92,49 +89,35 @@
 
             <!-- Structures d'accompagnement -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Structures d'accompagnement</label>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Structures d'accompagnement (max 5)</label>
                 <p class="text-sm mb-4" style="color: var(--gray-600);">Avez-vous déjà bénéficié de l'accompagnement d'une structure d'appui ?</p>
-                <div class="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto border rounded-lg p-4" style="border-color: var(--gray-200);">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'support_structures[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     @foreach(config('constants.STRUCTURES_ACCOMPAGNEMENT') as $s)
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="support_structures[]" value="{{ $s }}" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
-                            <span class="text-sm">{{ $s }}</span>
+                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="support_structures[]" value="{{ $s }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
+                            <span class="text-sm font-medium">{{ $s }}</span>
                         </label>
                     @endforeach
                 </div>
             </div>
 
-            <!-- Types de soutien (max 3) -->
-            <div x-data="supportSelection()">
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Quels sont vos besoins prioritaires ? (5 max)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Types de soutien (max 5) -->
+            <div>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Quels sont vos besoins prioritaires ? (5 max)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'support_types[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     @foreach(config('constants.TYPES_SOUTIEN') as $key => $value)
-                        <button type="button" 
-                                @click="toggleSupport('{{ $key }}')"
-                                :class="isSelected('{{ $key }}') ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-300 hover:border-gray-400'"
-                                :disabled="!isSelected('{{ $key }}') && selected.length >= 5"
-                                class="p-4 rounded-lg border-2 transition-all text-left font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                            {{ $value }}
-                        </button>
+                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="support_types[]" value="{{ $key }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
+                            <span class="text-sm font-medium">{{ $value }}</span>
+                        </label>
                     @endforeach
                 </div>
-                <p class="text-sm mt-3 flex items-center gap-2" style="color: var(--gray-600);">
-                    <span x-text="selected.length + '/5 besoins sélectionnés'"></span>
-                    <template x-if="selected.length === 5">
-                        <span class="text-orange-600 text-xs">(Maximum atteint)</span>
-                    </template>
-                </p>
-                
-                <!-- Inputs cachés pour le formulaire -->
-                <template x-for="item in selected">
-                    <input type="hidden" name="support_types[]" :value="item">
-                </template>
             </div>
 
             <!-- Détails des besoins -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Détails des besoins</label>
-                <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..."></textarea>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Détails des besoins</label>
+                <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..." maxlength="800"></textarea>
             </div>
         </form>
     </div>
@@ -144,6 +127,30 @@
 
 @push('scripts')
 <script>
+function checkboxLimit(max, nameAttr) {
+    return {
+        max: max,
+        nameAttr: nameAttr,
+        init() {
+            this.updateDisabled();
+        },
+        updateDisabled() {
+            const inputs = this.$el.querySelectorAll(`input[type="checkbox"][name="${this.nameAttr}"]`);
+            const checkedCount = Array.from(inputs).filter(i => i.checked).length;
+            const shouldDisableOthers = checkedCount >= this.max;
+            inputs.forEach(input => {
+                if (!input.checked) {
+                    input.disabled = shouldDisableOthers;
+                } else {
+                    input.disabled = false;
+                }
+            });
+        },
+        onChange() {
+            this.updateDisabled();
+        }
+    }
+}
 function supportSelection() {
     return {
         selected: [],

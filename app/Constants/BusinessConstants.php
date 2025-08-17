@@ -103,7 +103,7 @@ class BusinessConstants
     ];
 
     public const MODELES_REVENUS = [
-        'ABONNEMENT_SAAS' => 'Abonnement / SaaS',
+        'ABONNEMENT' => 'Abonnement',
         'PAIEMENT_USAGE' => 'Paiement à l\'usage',
         'COMMISSION_MARKETPLACE' => 'Commission & Marketplace',
         'PUBLICITE_SPONSORING' => 'Publicité & Sponsoring',
@@ -131,7 +131,8 @@ class BusinessConstants
         '26-35', 
         '36-45',
         '46-55',
-        '55+'
+        '55-65',
+        '65+'
     ];
 
     public const TEAM_SIZES = [

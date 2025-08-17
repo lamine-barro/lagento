@@ -33,11 +33,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nom du projet *</label>
-                    <input type="text" name="nom_projet" value="<?php echo e(old('nom_projet')); ?>" placeholder="Ex: Etudesk" class="input-field w-full" required />
+                    <input type="text" name="nom_projet" value="<?php echo e(old('nom_projet')); ?>" placeholder="Ex: Etudesk" class="input-field w-full" maxlength="100" required />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale</label>
-                    <input type="text" name="raison_sociale" value="<?php echo e(old('raison_sociale')); ?>" placeholder="Ex: Etudesk SAS" class="input-field w-full" />
+                    <input type="text" name="raison_sociale" value="<?php echo e(old('raison_sociale')); ?>" placeholder="Ex: Etudesk SAS" class="input-field w-full" maxlength="120" />
                     <?php $__errorArgs = ['raison_sociale'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

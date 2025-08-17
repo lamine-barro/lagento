@@ -25,24 +25,17 @@
 
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-medium mb-2" style="color: var(--gray-900);">
-                <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2 align-[-2px]"></i>
-                Activité & Développement
-            </h1>
-            <p style="color: var(--gray-700);">Votre offre, vos cibles et votre maturité</p>
-        </div>
 
-        <form id="step3-form" method="POST" action="<?php echo e(route('onboarding.step3')); ?>" class="space-y-6">
+        <form id="step3-form" method="POST" action="<?php echo e(route('onboarding.step3')); ?>" class="space-y-6 mt-4">
             <?php echo csrf_field(); ?>
         
             <!-- Secteurs d'activité (max 5) -->
             <div>
                 <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Secteurs d'activité (max 5)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-data="checkboxLimit(5, 'secteurs[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     <?php $__currentLoopData = config('constants.SECTEURS'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="secteurs[]" value="<?php echo e($key); ?>" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="secteurs[]" value="<?php echo e($key); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
                             <span class="text-sm font-medium"><?php echo e($value); ?></span>
                         </label>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -51,17 +44,17 @@
 
             <!-- Produits/Services (100 mots max) -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Produits/Services proposés (100 mots max)</label>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Produits/Services proposés</label>
                 <textarea name="produits_services" rows="3" class="input-field w-full resize-none" placeholder="Décrivez vos offres en 100 mots maximum"></textarea>
             </div>
 
             <!-- Clients cibles -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Clients cibles</label>
-                <div class="grid grid-cols-1 gap-3">
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Clients cibles</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     <?php $__currentLoopData = config('constants.CIBLES'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="cibles[]" value="<?php echo e($key); ?>" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="cibles[]" value="<?php echo e($key); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
                             <span class="text-sm font-medium"><?php echo e($value); ?></span>
                         </label>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -69,7 +62,7 @@
             </div>
 
             <!-- Maturité & Financement & Revenus -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Maturité du projet</label>
                     <select name="maturite" class="input-field w-full">
@@ -101,11 +94,11 @@
 
             <!-- Modèles de revenus (max 5) -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Modèles de revenus (max 5)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Modèles de revenus (max 5)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" x-data="checkboxLimit(5, 'modeles_revenus[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     <?php $__currentLoopData = config('constants.MODELES_REVENUS'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all hover:border-orange-300 hover:bg-orange-50 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="modeles_revenus[]" value="<?php echo e($key); ?>" class="w-4 h-4 mr-3 rounded" style="accent-color: var(--orange-primary);">
+                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
+                            <input type="checkbox" name="modeles_revenus[]" value="<?php echo e($key); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
                             <span class="text-sm font-medium"><?php echo e($value); ?></span>
                         </label>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -136,4 +129,33 @@
 <?php endif; ?>
 </div>
 <?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+function checkboxLimit(max, nameAttr) {
+    return {
+        max: max,
+        nameAttr: nameAttr,
+        init() {
+            this.updateDisabled();
+        },
+        updateDisabled() {
+            const inputs = this.$el.querySelectorAll(`input[type="checkbox"][name="${this.nameAttr}"]`);
+            const checkedCount = Array.from(inputs).filter(i => i.checked).length;
+            const shouldDisableOthers = checkedCount >= this.max;
+            inputs.forEach(input => {
+                if (!input.checked) {
+                    input.disabled = shouldDisableOthers;
+                } else {
+                    input.disabled = false;
+                }
+            });
+        },
+        onChange() {
+            this.updateDisabled();
+        }
+    }
+}
+</script>
+<?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.guest', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/onboarding/step3.blade.php ENDPATH**/ ?>

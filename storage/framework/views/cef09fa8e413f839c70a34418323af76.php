@@ -25,17 +25,8 @@
 
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-medium mb-2" style="color: var(--gray-900);">
-                <i data-lucide="user" class="w-5 h-5 mr-2 align-[-2px]"></i>
-                Contact
-            </h1>
-            <p style="color: var(--gray-700);">
-                Coordonnées de contact et représentant du projet
-            </p>
-        </div>
 
-        <form id="step2-form" method="POST" action="<?php echo e(route('onboarding.step2')); ?>" class="space-y-6">
+        <form id="step2-form" method="POST" action="<?php echo e(route('onboarding.step2')); ?>" class="space-y-6 mt-4">
             <?php echo csrf_field(); ?>
 
             <!-- Contact principal -->
@@ -44,36 +35,36 @@
                 <div>
                     <label class="flex items-center gap-2 text-sm font-medium mb-2" style="color: var(--gray-700);">
                         <i data-lucide="phone" class="w-4 h-4" style="stroke-width: 1.25;"></i>
-                        Téléphone
+                        Téléphone *
                     </label>
-                    <input type="tel" name="telephone" value="<?php echo e(old('telephone')); ?>" placeholder="Ex: +225 07 00 00 00" class="input-field w-full" />
+                    <input type="tel" name="telephone" value="<?php echo e(old('telephone')); ?>" placeholder="Ex: +225 07 00 00 00" class="input-field w-full" required />
                 </div>
                 
                 <!-- Email -->
                 <div>
                     <label class="flex items-center gap-2 text-sm font-medium mb-2" style="color: var(--gray-700);">
                         <i data-lucide="mail" class="w-4 h-4" style="stroke-width: 1.25;"></i>
-                        Email
+                        Email *
                     </label>
-                    <input type="email" name="email" value="<?php echo e(old('email', auth()->user()->email)); ?>" class="input-field w-full" />
+                    <input type="email" name="email" value="<?php echo e(old('email', auth()->user()->email)); ?>" class="input-field w-full" required />
                 </div>
                 
                 <!-- Nom & prénom du représentant -->
                 <div>
                     <label class="flex items-center gap-2 text-sm font-medium mb-2" style="color: var(--gray-700);">
                         <i data-lucide="user" class="w-4 h-4" style="stroke-width: 1.25;"></i>
-                        Nom & prénom du représentant
+                        Nom & prénom du représentant *
                     </label>
-                    <input type="text" name="nom_representant" value="<?php echo e(old('nom_representant')); ?>" placeholder="Ex: Jean Kouassi" class="input-field w-full" />
+                    <input type="text" name="nom_representant" value="<?php echo e(old('nom_representant')); ?>" placeholder="Ex: Jean Kouassi" class="input-field w-full" required />
                 </div>
                 
                 <!-- Position du représentant -->
                 <div>
                     <label class="flex items-center gap-2 text-sm font-medium mb-2" style="color: var(--gray-700);">
                         <i data-lucide="briefcase" class="w-4 h-4" style="stroke-width: 1.25;"></i>
-                        Position du représentant
+                        Position du représentant *
                     </label>
-                    <input type="text" name="role_representant" value="<?php echo e(old('role_representant')); ?>" placeholder="Ex: PDG, Directeur" class="input-field w-full" />
+                    <input type="text" name="role_representant" value="<?php echo e(old('role_representant')); ?>" placeholder="Ex: PDG, Directeur" class="input-field w-full" required />
                 </div>
                 
                 <!-- Site web -->
@@ -96,7 +87,7 @@
             </div>
 
             <!-- Réseaux sociaux -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                     <!-- LinkedIn -->
                     <div>
                         <label class="flex items-center gap-2 text-sm font-medium mb-2" style="color: var(--gray-700);">

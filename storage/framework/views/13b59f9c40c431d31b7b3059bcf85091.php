@@ -56,9 +56,28 @@
     <!-- Main Content -->
     <main class="flex-1 flex items-center justify-center p-4">
         <div class="w-full max-w-2xl text-center">
-            <!-- Logo Text Centered -->
-            <div class="mx-auto mb-6 text-3xl sm:text-4xl font-semibold" style="font-family: 'Poppins', sans-serif; color: var(--gray-900);">
-                Lagent<span style="color: var(--orange);">O</span>
+            <!-- Logo adaptive -->
+            <div class="mx-auto mb-6">
+                <?php if (isset($component)) { $__componentOriginal987d96ec78ed1cf75b349e2e5981978f = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.logo','data' => ['size' => '2xl','class' => 'mx-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('logo'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['size' => '2xl','class' => 'mx-auto']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal987d96ec78ed1cf75b349e2e5981978f)): ?>
+<?php $attributes = $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f; ?>
+<?php unset($__attributesOriginal987d96ec78ed1cf75b349e2e5981978f); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal987d96ec78ed1cf75b349e2e5981978f)): ?>
+<?php $component = $__componentOriginal987d96ec78ed1cf75b349e2e5981978f; ?>
+<?php unset($__componentOriginal987d96ec78ed1cf75b349e2e5981978f); ?>
+<?php endif; ?>
             </div>
             
             <!-- Subtitle -->
