@@ -103,9 +103,9 @@ class EmbeddingService
 
         try {
             return MorceauDocument::create([
-                'type_source' => $sourceType,
+                'source_type' => $sourceType,
                 'source_id' => $sourceId,
-                'contenu' => $content,
+                'content' => $content,
                 'embedding' => $embedding
             ]);
         } catch (\Exception $e) {

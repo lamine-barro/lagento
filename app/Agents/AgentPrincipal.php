@@ -9,7 +9,10 @@ use App\Models\Opportunite;
 use App\Models\Institution;
 use App\Models\TexteOfficiel;
 use Illuminate\Support\Facades\DB;
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
 
 class AgentPrincipal extends BaseAgent
 {
@@ -17,13 +20,11 @@ class AgentPrincipal extends BaseAgent
     {
         return [
             'model' => 'gpt-5-mini',
-            'strategy' => 'precision',
             'temperature' => 0.3,
             'max_tokens' => 1500,
             'tools' => [
                 'gestion_base_donnees',
                 'recherche_semantique', 
-                'recherche_web',
                 'generation_fichier',
                 'generation_image'
             ]
@@ -99,14 +100,20 @@ class AgentPrincipal extends BaseAgent
                 $messages,
                 $config['model'],
                 $config['temperature'],
-                $config['max_tokens']
+                $config['max_tokens'],
+                [
+                    'web_search' => (bool) preg_match('/(actualité|récent|nouveau|2024|2025|prix|taux)/i', $userMessage),
+                    'search_context_size' => 'medium',
+                    'user_location' => [
+                        'country' => 'CI',
+                        'city' => $userContext['region'] ?? 'Abidjan',
+                        'region' => $userContext['region'] ?? 'Abidjan'
+                    ]
+                ]
             );
 
             // Format response as markdown
             $formattedResponse = $this->formatMarkdownResponse($response, $toolResults);
-
-            // Update user analytics
-            $this->updateUserAnalytics($userId, $toolUsageLogs);
 
             return [
                 'success' => true,
@@ -167,6 +174,13 @@ CONTEXTE IVOIRIEN :
 - Familiarité avec les institutions (CEPICI, CGECI, etc.)
 - Compréhension des défis spécifiques aux entrepreneurs locaux
 
+OUTILS ET QUAND LES UTILISER :
+- gestion_base_donnees : lorsque l'utilisateur parle d'opportunités, financements, institutions, partenaires, ou de ses projets. Par défaut lecture; si l'utilisateur le demande explicitement, proposer la mise à jour du projet et/ou des analytics.
+- recherche_semantique : pour les lois, réglementations, procédures OHADA, textes officiels et références légales.
+- generation_fichier (docx, csv, txt, md) : quand un document est demandé (business plan, CV, rapport, plan, résumé). Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
+- generation_image : pour logos/visuels/maquettes. Utilise exclusivement gpt-image-1. Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
+- web search (intégré au modèle) : si besoin d'actualités/informations récentes (mots-clés : actualité, récent, 2024, 2025, prix, taux). Le modèle l'activera automatiquement.
+
 STYLE :
 - Bienveillant et encourageant
 - Pragmatique et actionnable
@@ -187,11 +201,6 @@ STYLE :
         // Base de données pour opportunités/institutions
         if (preg_match('/(opportunité|financement|subvention|incubateur|partenaire|institution)/i', $message)) {
             $tools[] = 'gestion_base_donnees';
-        }
-
-        // Recherche web pour informations récentes
-        if (preg_match('/(actualité|récent|nouveau|2024|2025|prix|taux)/i', $message)) {
-            $tools[] = 'recherche_web';
         }
 
         // Génération de fichier pour documents/plans
@@ -216,9 +225,6 @@ STYLE :
             case 'recherche_semantique':
                 return $this->executeSemanticSearch($message);
             
-            case 'recherche_web':
-                return $this->executeWebSearch($message);
-            
             case 'generation_fichier':
                 return $this->executeFileGeneration($message, $userId);
             
@@ -234,9 +240,10 @@ STYLE :
     {
         $results = [];
 
-        // Search opportunities
-        $opportunities = Opportunity::where('business_sector', 'like', '%' . $this->extractSector($message) . '%')
-            ->orWhere('description', 'like', '%' . $this->extractKeywords($message) . '%')
+        // Opportunités (filtre simple sur description/type)
+        $keyword = $this->extractKeywords($message);
+        $opportunities = Opportunite::where('description', 'like', '%' . $keyword . '%')
+            ->orWhere('type', 'like', '%' . $keyword . '%')
             ->limit(5)
             ->get();
 
@@ -244,14 +251,25 @@ STYLE :
             $results['opportunities'] = $opportunities->toArray();
         }
 
-        // Search institutions
-        $institutions = Institution::where('name', 'like', '%' . $this->extractKeywords($message) . '%')
-            ->orWhere('description', 'like', '%' . $this->extractKeywords($message) . '%')
+        // Institutions (filtre sur nom/description)
+        $institutions = Institution::where('nom', 'like', '%' . $keyword . '%')
+            ->orWhere('description', 'like', '%' . $keyword . '%')
             ->limit(3)
             ->get();
 
         if ($institutions->count() > 0) {
             $results['institutions'] = $institutions->toArray();
+        }
+
+        // Projets de l'utilisateur visibles (public + vérifiés)
+        $projets = Projet::where('user_id', $userId)
+            ->public()
+            ->verified()
+            ->limit(3)
+            ->get();
+
+        if ($projets->count() > 0) {
+            $results['projets'] = $projets->toArray();
         }
 
         return $results;
@@ -260,7 +278,7 @@ STYLE :
     protected function executeSemanticSearch(string $message): array
     {
         try {
-            $results = $this->search->searchSimilar($message, $this->embedding, 5);
+            $results = $this->search->searchSimilar($message, 5);
             return ['semantic_results' => $results];
         } catch (\Exception $e) {
             \Log::error('Semantic search error: ' . $e->getMessage());
@@ -268,49 +286,119 @@ STYLE :
         }
     }
 
-    protected function executeWebSearch(string $message): array
-    {
-        try {
-            $client = new Client();
-            $searchQuery = $this->extractKeywords($message) . ' Côte d\'Ivoire entrepreneur 2025';
-            
-            // This would integrate with a web search API
-            // For now, return placeholder
-            return [
-                'web_results' => [
-                    'query' => $searchQuery,
-                    'status' => 'simulated',
-                    'message' => 'Recherche web simulée pour: ' . $searchQuery
-                ]
-            ];
-        } catch (\Exception $e) {
-            \Log::error('Web search error: ' . $e->getMessage());
-            return [];
-        }
-    }
-
     protected function executeFileGeneration(string $message, int $userId): array
     {
-        // Placeholder for file generation logic
-        return [
-            'file_generation' => [
-                'type' => $this->detectFileType($message),
-                'status' => 'queued',
-                'message' => 'Génération de fichier planifiée'
-            ]
-        ];
+        $detected = $this->detectFileType($message);
+        $ext = 'md';
+        switch (true) {
+            case str_contains(strtolower($message), 'docx') || $detected === 'business_plan' || $detected === 'cv' || $detected === 'report':
+                $ext = 'docx';
+                break;
+            case str_contains(strtolower($message), 'csv'):
+                $ext = 'csv';
+                break;
+            case str_contains(strtolower($message), 'txt'):
+                $ext = 'txt';
+                break;
+            case str_contains(strtolower($message), 'md'):
+                $ext = 'md';
+                break;
+        }
+
+        $dir = 'chat-attachments';
+        $filename = 'doc_' . $userId . '_' . now()->format('Ymd_His') . '_' . Str::random(6) . '.' . $ext;
+        $path = $dir . '/' . $filename;
+
+        try {
+            if ($ext === 'docx') {
+                $phpWord = new PhpWord();
+                $section = $phpWord->addSection();
+                $section->addTitle('Document généré par Agent O', 1);
+                $section->addText('Date: ' . now()->toDateTimeString());
+                $section->addTextBreak(1);
+                $section->addText('Contexte utilisateur:', ['bold' => true]);
+                $section->addText($message);
+                $tempFile = tempnam(sys_get_temp_dir(), 'agento_docx_');
+                $writer = IOFactory::createWriter($phpWord, 'Word2007');
+                $writer->save($tempFile);
+                $stream = fopen($tempFile, 'r');
+                Storage::disk('public')->put($path, $stream);
+                if (is_resource($stream)) fclose($stream);
+                @unlink($tempFile);
+            } elseif ($ext === 'csv') {
+                $lines = [
+                    ['Titre', 'Valeur'],
+                    ['Date', now()->toDateTimeString()],
+                    ['Résumé', mb_substr(preg_replace('/\s+/', ' ', $message), 0, 200)],
+                ];
+                $csv = '';
+                foreach ($lines as $row) {
+                    $csv .= implode(',', array_map(fn($c) => '"' . str_replace('"', '""', (string)$c) . '"', $row)) . "\n";
+                }
+                Storage::disk('public')->put($path, $csv);
+            } else {
+                // txt or md
+                $content = ($ext === 'md')
+                    ? ("# Document généré\n\n- Date: " . now()->toDateTimeString() . "\n\n## Contexte\n\n" . $message)
+                    : ("Document généré le " . now()->toDateTimeString() . "\n\n" . $message);
+                Storage::disk('public')->put($path, $content);
+            }
+
+            $url = asset('storage/' . $path);
+            return [
+                'file_generation' => [
+                    'type' => $ext,
+                    'status' => 'completed',
+                    'download_url' => $url
+                ]
+            ];
+        } catch (\Throwable $e) {
+            \Log::error('File generation failed', ['error' => $e->getMessage()]);
+            return [
+                'file_generation' => [
+                    'type' => $ext,
+                    'status' => 'failed',
+                    'message' => 'Erreur lors de la génération du fichier'
+                ]
+            ];
+        }
     }
 
     protected function executeImageGeneration(string $message, int $userId): array
     {
-        // Placeholder for image generation logic
-        return [
-            'image_generation' => [
-                'prompt' => $this->extractImagePrompt($message),
-                'status' => 'queued',
-                'message' => 'Génération d\'image planifiée'
-            ]
-        ];
+        $prompt = $this->extractImagePrompt($message);
+        try {
+            $b64 = $this->llm->generateImage($prompt, '1024x1024');
+            if (!$b64) {
+                return [
+                    'image_generation' => [
+                        'status' => 'failed',
+                        'message' => 'Échec de génération d\'image'
+                    ]
+                ];
+            }
+            $dir = 'chat-attachments';
+            $filename = 'img_' . $userId . '_' . now()->format('Ymd_His') . '_' . Str::random(6) . '.png';
+            $path = $dir . '/' . $filename;
+            $binary = base64_decode($b64);
+            Storage::disk('public')->put($path, $binary);
+            $url = asset('storage/' . $path);
+            return [
+                'image_generation' => [
+                    'status' => 'completed',
+                    'prompt' => $prompt,
+                    'download_url' => $url
+                ]
+            ];
+        } catch (\Throwable $e) {
+            \Log::error('Image generation error', ['error' => $e->getMessage()]);
+            return [
+                'image_generation' => [
+                    'status' => 'failed',
+                    'message' => 'Erreur lors de la génération d\'image'
+                ]
+            ];
+        }
     }
 
     protected function updateUserAnalytics(int $userId, array $toolsUsed): void
@@ -397,39 +485,62 @@ STYLE :
             }
         }
 
+        // Add project cards
+        if (isset($data['projets'])) {
+            foreach ($data['projets'] as $projet) {
+                $cards .= $this->createProjectCard($projet);
+            }
+        }
+
         return $response . "\n\n" . $cards;
     }
 
     protected function createInstitutionCard(array $institution): string
     {
+        $nom = $institution['nom'] ?? ($institution['name'] ?? 'Institution');
+        $telephone = $institution['telephone'] ?? ($institution['phone'] ?? 'N/A');
+        $site = $institution['site_web'] ?? ($institution['website'] ?? '');
+        $region = $institution['region'] ?? '';
+        $ville = $institution['ville'] ?? '';
+
         return "\n\n:::institution\n" .
-               "**{$institution['name']}**\n\n" .
-               "{$institution['description']}\n\n" .
-               "📍 **Localisation:** {$institution['region']}, {$institution['ville']}\n" .
-               "📞 **Contact:** {$institution['phone']}\n" .
-               "🌐 **Site web:** {$institution['website']}\n" .
+               "**{$nom}**\n\n" .
+               ($institution['description'] ?? '') . "\n\n" .
+               "📍 **Localisation:** {$region}" . ($ville !== '' ? ", {$ville}" : '') . "\n" .
+               "📞 **Contact:** {$telephone}\n" .
+               ($site !== '' ? "🌐 **Site web:** {$site}\n" : '') .
                ":::\n";
     }
 
     protected function createOpportunityCard(array $opportunity): string
     {
+        $titre = $opportunity['titre'] ?? ($opportunity['title'] ?? 'Opportunité');
+        $dateLimite = $opportunity['date_limite'] ?? ($opportunity['application_deadline'] ?? null);
+        $regions = $opportunity['regions_cibles'] ?? [];
+
         return "\n\n:::opportunity\n" .
-               "**{$opportunity['title']}**\n\n" .
-               "{$opportunity['description']}\n\n" .
-               "💰 **Type:** {$opportunity['type']}\n" .
-               "📅 **Date limite:** {$opportunity['application_deadline']}\n" .
-               "🎯 **Secteurs:** " . implode(', ', $opportunity['target_sectors'] ?? []) . "\n" .
+               "**{$titre}**\n\n" .
+               ($opportunity['description'] ?? '') . "\n\n" .
+               (isset($opportunity['type']) ? "💰 **Type:** {$opportunity['type']}\n" : '') .
+               ($dateLimite ? "📅 **Date limite:** {$dateLimite}\n" : '') .
+               (!empty($regions) ? "📍 **Régions cibles:** " . implode(', ', $regions) . "\n" : '') .
                ":::\n";
     }
 
     protected function createOfficialTextCard(array $text): string
     {
+        $titre = $text['titre'] ?? ($text['title'] ?? 'Texte officiel');
+        $resume = $text['resume'] ?? ($text['summary'] ?? '');
+        $classification = $text['classification_juridique'] ?? ($text['legal_classification'] ?? '');
+        $publieLe = $text['publie_le'] ?? ($text['publication_date'] ?? '');
+        $statut = $text['statut'] ?? ($text['status'] ?? '');
+
         return "\n\n:::official-text\n" .
-               "**{$text['title']}**\n\n" .
-               "{$text['summary']}\n\n" .
-               "📜 **Type:** {$text['legal_classification']}\n" .
-               "📅 **Date publication:** {$text['publication_date']}\n" .
-               "⚖️ **Statut:** {$text['status']}\n" .
+               "**{$titre}**\n\n" .
+               $resume . "\n\n" .
+               ($classification !== '' ? "📜 **Type:** {$classification}\n" : '') .
+               ($publieLe !== '' ? "📅 **Date publication:** {$publieLe}\n" : '') .
+               ($statut !== '' ? "⚖️ **Statut:** {$statut}\n" : '') .
                ":::\n";
     }
 
@@ -441,6 +552,22 @@ STYLE :
                "🏢 **Secteur:** {$partner['sector']}\n" .
                "📍 **Région:** {$partner['region']}\n" .
                "🤝 **Synergie:** {$partner['synergy_type']}\n" .
+               ":::\n";
+    }
+
+    protected function createProjectCard(array $projet): string
+    {
+        $nom = $projet['nom_projet'] ?? 'Projet';
+        $maturite = $projet['maturite'] ?? '';
+        $region = $projet['region'] ?? '';
+        $site = $projet['site_web'] ?? '';
+
+        return "\n\n:::project\n" .
+               "**{$nom}**\n\n" .
+               ($projet['description'] ?? '') . "\n\n" .
+               ($maturite !== '' ? "🚀 **Maturité:** {$maturite}\n" : '') .
+               ($region !== '' ? "📍 **Région:** {$region}\n" : '') .
+               ($site !== '' ? "🌐 **Site:** {$site}\n" : '') .
                ":::\n";
     }
 

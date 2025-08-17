@@ -14,28 +14,49 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // Get matched opportunities
-        $opportunities = Opportunite::where('business_sector', $user->business_sector)
-            ->orWhere('business_sector', 'all')
-            ->where('deadline', '>=', now())
-            ->latest()
-            ->limit(5)
-            ->get();
-        
-        // Récupérer le projet utilisateur (unique)
-        $project = Projet::where('user_id', $user->id)->first();
-        
-        // Get user statistics
-        $analytics = UserAnalytics::where('user_id', $user->id)->first();
-        
-        $stats = [
-            'messages_sent' => $analytics->messages_sent ?? 0,
-            'documents_generated' => $analytics->documents_generated ?? 0,
-            'opportunities_matched' => $analytics->opportunities_matched ?? 0,
-            'time_saved' => $analytics->time_saved_hours ?? 0 . 'h'
-        ];
-        
-        return view('dashboard', compact('opportunities', 'project', 'stats'));
+        try {
+            // Get matched opportunities
+            $opportunities = collect(); // Empty collection by default
+            if ($user->business_sector) {
+                $opportunities = Opportunite::where('business_sector', $user->business_sector)
+                    ->orWhere('business_sector', 'all')
+                    ->where('deadline', '>=', now())
+                    ->latest()
+                    ->limit(5)
+                    ->get();
+            }
+            
+            // Récupérer les projets récents
+            $recentProjects = Projet::where('user_id', $user->id)
+                ->latest()
+                ->limit(3)
+                ->get();
+            
+            // Get user analytics
+            $userAnalytics = UserAnalytics::where('user_id', $user->id)->first();
+            
+            // Conversations récentes
+            $recentConversations = \App\Models\UserConversation::where('user_id', $user->id)
+                ->latest()
+                ->limit(3)
+                ->get();
+            
+            return view('dashboard', compact(
+                'opportunities', 
+                'recentProjects', 
+                'userAnalytics',
+                'recentConversations'
+            ));
+            
+        } catch (\Exception $e) {
+            // En cas d'erreur, retourner une vue avec des données vides
+            return view('dashboard', [
+                'opportunities' => collect(),
+                'recentProjects' => collect(),
+                'userAnalytics' => null,
+                'recentConversations' => collect()
+            ]);
+        }
     }
     
     public function profile()

@@ -1,7 +1,7 @@
 <?php $__env->startSection('title', 'Agent O'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="min-h-screen bg-white" x-data="chatInterface()">
+<div class="min-h-screen bg-white" x-data="chatInterface()" data-conversation-id="<?php echo e($conversation->id ?? ''); ?>">
     <!-- Chat Header -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
         <div class="flex items-center justify-between max-w-4xl mx-auto">
@@ -27,7 +27,7 @@
     <div class="max-w-4xl mx-auto p-4 space-y-4" x-ref="messagesArea">
         
         <!-- Welcome Message -->
-        <?php if(empty($messages)): ?>
+        <?php if(($messages ?? collect())->isEmpty()): ?>
             <div class="text-center py-8">
                 <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style="background: var(--orange-lightest);">
                     <i data-lucide="brain" class="w-8 h-8" style="color: var(--orange-primary);"></i>
@@ -109,7 +109,7 @@
                         <!-- Message Actions -->
                         <div class="flex items-center gap-2 mt-3">
                             <button 
-                                @click="copyMessage('<?php echo e(addslashes($message->content)); ?>')"
+                                @click="copyMessage('<?php echo e(addslashes($message->content)); ?>', $event)"
                                 class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                                 title="Copier"
                             >
@@ -153,7 +153,7 @@
 <script>
 function chatInterface() {
     return {
-        copyMessage(content) {
+        copyMessage(content, event) {
             navigator.clipboard.writeText(content).then(() => {
                 // Show temporary feedback
                 const button = event.target.closest('button');

@@ -11,10 +11,11 @@ class MorceauDocument extends Model
 
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $table = 'document_chunks';
     protected $fillable = [
-        'type_source',
+        'source_type',
         'source_id',
-        'contenu',
+        'content',
         'embedding'
     ];
 
@@ -27,7 +28,7 @@ class MorceauDocument extends Model
      */
     public function source()
     {
-        return $this->morphTo(__FUNCTION__, 'type_source', 'source_id');
+        return $this->morphTo(__FUNCTION__, 'source_type', 'source_id');
     }
 
     /**
@@ -35,7 +36,7 @@ class MorceauDocument extends Model
      */
     public function scopeOfType($query, string $sourceType)
     {
-        return $query->where('type_source', $sourceType);
+        return $query->where('source_type', $sourceType);
     }
 
     /**
@@ -43,7 +44,7 @@ class MorceauDocument extends Model
      */
     public function scopeFromSource($query, string $sourceType, string $sourceId)
     {
-        return $query->where('type_source', $sourceType)
+        return $query->where('source_type', $sourceType)
                      ->where('source_id', $sourceId);
     }
 

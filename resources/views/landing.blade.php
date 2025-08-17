@@ -60,7 +60,7 @@
         <div class="w-full max-w-xl text-center">
             <!-- Logo Text Centered -->
             <div class="mx-auto mb-6 text-3xl sm:text-4xl font-semibold" style="font-family: 'Poppins', sans-serif; color: var(--gray-900);">
-                Lagent<span style="color: var(--orange-primary);">O</span>
+                Lagent<span style="color: var(--orange);">O</span>
             </div>
             
             <!-- Subtitle -->
@@ -69,7 +69,7 @@
             </p>
 
             <!-- Email Form -->
-            <form method="POST" action="{{ route('auth.email') }}" class="space-y-4">
+            <form method="POST" action="{{ route('auth.email') }}" class="flex flex-col gap-4">
                 @csrf
                 
                 <div class="relative">
@@ -83,7 +83,7 @@
                         autofocus
                     />
                     @error('email')
-                        <p class="text-sm mt-1" style="color: var(--danger);">{{ $message }}</p>
+                        <p class="text-sm mt-1" style="color: var(--error);">{{ $message }}</p>
                     @enderror
                 </div>
 

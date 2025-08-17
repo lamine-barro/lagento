@@ -61,7 +61,7 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => env('AUTH_USER_PROVIDER', 'uuid-eloquent'),
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 

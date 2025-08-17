@@ -5,30 +5,24 @@
 @section('content')
 <div class="min-h-screen bg-white flex items-center justify-center p-4">
     <div class="w-full max-w-md">
-        <!-- Back Button -->
-        <button 
-            onclick="history.back()" 
-            class="btn btn-ghost mb-6 p-2"
-        >
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-        </button>
+        <!-- Logo -->
+        <div class="mx-auto mb-6 text-3xl sm:text-4xl font-semibold text-center" style="font-family: 'Poppins', sans-serif; color: var(--gray-900);">
+            Lagent<span style="color: var(--orange);">O</span>
+        </div>
 
         <!-- Header -->
         <div class="text-center mb-8">
-            <h1 class="text-2xl font-medium mb-2" style="color: var(--gray-900);">
-                Vérification
-            </h1>
             <p style="color: var(--gray-700);">
                 Code envoyé à <span class="font-medium">{{ session('email') ?? 'votre email' }}</span>
             </p>
         </div>
 
         <!-- OTP Form -->
-        <form method="POST" action="{{ route('auth.verify-otp') }}" x-data="otpForm()">
+        <form method="POST" action="{{ route('auth.verify-otp') }}" x-data="otpForm()" class="flex flex-col gap-4">
             @csrf
             
             <!-- OTP Inputs -->
-            <div class="flex justify-center gap-3 mb-6">
+            <div class="flex justify-center gap-3">
                 @for($i = 0; $i < 6; $i++)
                     <input 
                         type="text"
@@ -49,7 +43,7 @@
 
             <!-- Error Message -->
             @error('otp')
-                <div class="alert alert-danger mb-4">
+                <div class="alert alert-error">
                     <i data-lucide="x-circle" class="w-5 h-5"></i>
                     {{ $message }}
                 </div>
@@ -58,7 +52,7 @@
             <!-- Submit Button -->
             <button 
                 type="submit" 
-                class="btn btn-primary w-full mb-6"
+                class="btn btn-primary w-full"
                 :disabled="otpValue.length < 6"
             >
                 Vérifier le code
@@ -71,12 +65,17 @@
                 Vous n'avez pas reçu le code ?
             </p>
             
-            <form method="POST" action="{{ route('auth.resend-otp') }}">
+            <form method="POST" action="{{ route('auth.resend-otp') }}" class="mt-2">
                 @csrf
                 <button type="submit" class="btn btn-ghost">
                     Renvoyer le code
                 </button>
             </form>
+        </div>
+
+        <!-- Back link at bottom -->
+        <div class="text-center mt-6">
+            <a href="{{ route('landing') }}" class="btn btn-ghost">Retour</a>
         </div>
     </div>
 </div>

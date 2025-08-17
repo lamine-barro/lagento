@@ -36,6 +36,16 @@ class UserMessage extends Model
         'is_copied' => 'boolean',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(UserConversation::class, 'conversation_id');

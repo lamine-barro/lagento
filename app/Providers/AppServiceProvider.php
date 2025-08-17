@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\UserConversation;
 use App\Models\UserMessage;
 use App\Observers\UserActivityObserver;
+use Illuminate\Support\Facades\Auth;
+use App\Auth\UuidEloquentUserProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register custom UUID-safe user provider
+        Auth::provider('uuid-eloquent', function ($app, array $config) {
+            return new UuidEloquentUserProvider($app['hash'], $config['model']);
+        });
+
         // Bind observers for analytics
         $this->app->resolving(UserActivityObserver::class, function ($observer, $app) {
             // no-op; let container inject dependencies

@@ -58,7 +58,7 @@
         <div class="w-full max-w-xl text-center">
             <!-- Logo Text Centered -->
             <div class="mx-auto mb-6 text-3xl sm:text-4xl font-semibold" style="font-family: 'Poppins', sans-serif; color: var(--gray-900);">
-                Lagent<span style="color: var(--orange-primary);">O</span>
+                Lagent<span style="color: var(--orange);">O</span>
             </div>
             
             <!-- Subtitle -->
@@ -67,7 +67,7 @@
             </p>
 
             <!-- Email Form -->
-            <form method="POST" action="<?php echo e(route('auth.email')); ?>" class="space-y-4">
+            <form method="POST" action="<?php echo e(route('auth.email')); ?>" class="flex flex-col gap-4">
                 <?php echo csrf_field(); ?>
                 
                 <div class="relative">
@@ -85,7 +85,7 @@ $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                        <p class="text-sm mt-1" style="color: var(--danger);"><?php echo e($message); ?></p>
+                        <p class="text-sm mt-1" style="color: var(--error);"><?php echo e($message); ?></p>
                     <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
