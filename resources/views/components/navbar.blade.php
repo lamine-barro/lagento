@@ -5,12 +5,12 @@
             <a href="{{ route('diagnostic') }}" 
                class="touch-target rounded-md transition-colors {{ request()->routeIs('diagnostic') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600' }}"
                title="Diagnostic">
-                <i data-lucide="chart-network" class="w-4 h-4 pointer-events-none"></i>
+                <i data-lucide="chart-network" class="w-4 h-4"></i>
             </a>
             <a href="{{ route('chat') }}" 
                class="touch-target rounded-md transition-colors {{ request()->routeIs('chat') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600' }}"
                title="Agent">
-                <i data-lucide="brain" class="w-4 h-4 pointer-events-none"></i>
+                <i data-lucide="brain" class="w-4 h-4"></i>
             </a>
         </div>
         

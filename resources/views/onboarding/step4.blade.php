@@ -12,7 +12,7 @@
         <form id="step4-form" method="POST" action="{{ route('onboarding.step4') }}" class="space-y-6 mt-4">
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: {{ old('founders_count', 1) }}, female: {{ old('female_founders_count', 0) }}, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: {{ old('founders_count', $projet->nombre_fondateurs ?? 1) }}, female: {{ old('female_founders_count', $projet->nombre_fondatrices ?? 0) }}, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
                 <!-- Nombre de fondateurs -->
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nombre de fondateurs *</label>
@@ -59,7 +59,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'age_ranges[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     @foreach(config('constants.AGE_RANGES') as $a)
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="age_ranges[]" value="{{ $a }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);" @change="onChange($event)">
+                            <input type="checkbox" name="age_ranges[]" value="{{ $a }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);" @change="onChange($event)" {{ in_array($a, old('age_ranges', $projet->tranches_age_fondateurs ?? [])) ? 'checked' : '' }}>
                             <span class="text-sm font-medium">{{ $a }} ans</span>
                         </label>
                     @endforeach
@@ -72,7 +72,7 @@
                     <select name="founders_location" class="input-field w-full">
                         <option value="">Sélectionnez</option>
                         @foreach(config('constants.LOCALISATION_FONDATEURS') as $key => $label)
-                            <option value="{{ $key }}">{{ $label }}</option>
+                            <option value="{{ $key }}" {{ old('founders_location', $projet->localisation_fondateurs ?? '') == $key ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -81,7 +81,7 @@
                     <select name="team_size" class="input-field w-full">
                         <option value="">Sélectionnez</option>
                         @foreach(config('constants.TEAM_SIZES') as $size)
-                            <option value="{{ $size }}">{{ $size }} personnes</option>
+                            <option value="{{ $size }}" {{ old('team_size', $projet->taille_equipe ?? '') == $size ? 'selected' : '' }}>{{ $size }} personnes</option>
                         @endforeach
                     </select>
                 </div>
@@ -94,7 +94,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'support_structures[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     @foreach(config('constants.STRUCTURES_ACCOMPAGNEMENT') as $s)
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="support_structures[]" value="{{ $s }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
+                            <input type="checkbox" name="support_structures[]" value="{{ $s }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);" {{ in_array($s, old('support_structures', $projet->structures_accompagnement ?? [])) ? 'checked' : '' }}>
                             <span class="text-sm font-medium">{{ $s }}</span>
                         </label>
                     @endforeach
@@ -107,7 +107,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'support_types[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     @foreach(config('constants.TYPES_SOUTIEN') as $key => $value)
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="support_types[]" value="{{ $key }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
+                            <input type="checkbox" name="support_types[]" value="{{ $key }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);" {{ in_array($key, old('support_types', $projet->types_soutien ?? [])) ? 'checked' : '' }}>
                             <span class="text-sm font-medium">{{ $value }}</span>
                         </label>
                     @endforeach
@@ -117,7 +117,7 @@
             <!-- Détails des besoins -->
             <div>
                 <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Détails des besoins</label>
-                <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..." maxlength="800"></textarea>
+                <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..." maxlength="800">{{ old('additional_info', $projet->details_besoins ?? '') }}</textarea>
             </div>
         </form>
     </div>

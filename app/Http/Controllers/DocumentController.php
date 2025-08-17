@@ -19,12 +19,23 @@ class DocumentController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:10240', // 10MB max
+            'document' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:20480', // 20 Mo max
             'category' => 'nullable|string|in:business_plan,financial_docs,legal_docs,marketing,other'
         ]);
 
         $user = Auth::user();
-        $file = $request->file('file');
+        
+        // Vérifier le nombre de documents existants (max 10)
+        $path = 'documents/' . $user->id;
+        $existingFiles = Storage::disk('private')->exists($path) ? 
+            Storage::disk('private')->files($path) : [];
+        
+        if (count($existingFiles) >= 10) {
+            return response()->json([
+                'error' => 'Vous avez atteint la limite de 10 documents'
+            ], 422);
+        }
+        $file = $request->file('document');
         
         // Store file
         $filePath = $file->store('documents/' . $user->id, 'private');
@@ -51,7 +62,14 @@ class DocumentController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $documents = Storage::disk('private')->files('documents/' . $user->id);
+        $path = 'documents/' . $user->id;
+        
+        // Vérifier si le dossier existe, sinon retourner un tableau vide
+        if (Storage::disk('private')->exists($path)) {
+            $documents = Storage::disk('private')->files($path);
+        } else {
+            $documents = [];
+        }
         
         return view('documents.index', compact('documents'));
     }
@@ -66,5 +84,19 @@ class DocumentController extends Controller
         }
         
         return Storage::disk('private')->download($filePath);
+    }
+    
+    public function delete($filename)
+    {
+        $user = Auth::user();
+        $filePath = 'documents/' . $user->id . '/' . $filename;
+        
+        if (!Storage::disk('private')->exists($filePath)) {
+            abort(404, 'Document non trouvé');
+        }
+        
+        Storage::disk('private')->delete($filePath);
+        
+        return redirect()->route('documents.index')->with('success', 'Document supprimé avec succès');
     }
 }

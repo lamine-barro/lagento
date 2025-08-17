@@ -33,11 +33,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nom du projet *</label>
-                    <input type="text" name="nom_projet" value="<?php echo e(old('nom_projet')); ?>" placeholder="Ex: Etudesk" class="input-field w-full" maxlength="100" required />
+                    <input type="text" name="nom_projet" value="<?php echo e(old('nom_projet', $projet->nom_projet ?? '')); ?>" placeholder="Ex: Etudesk" class="input-field w-full" maxlength="100" required />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale</label>
-                    <input type="text" name="raison_sociale" value="<?php echo e(old('raison_sociale')); ?>" placeholder="Ex: Etudesk SAS" class="input-field w-full" maxlength="120" />
+                    <input type="text" name="raison_sociale" value="<?php echo e(old('raison_sociale', $projet->raison_sociale ?? '')); ?>" placeholder="Ex: Etudesk SAS" class="input-field w-full" maxlength="120" />
                     <?php $__errorArgs = ['raison_sociale'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -49,14 +49,14 @@ unset($__errorArgs, $__bag); ?>
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Description</label>
-                    <textarea name="description" rows="3" maxlength="600" placeholder="Présentez brièvement votre projet (600 caractères max)" class="input-field w-full resize-none"><?php echo e(old('description')); ?></textarea>
+                    <textarea name="description" rows="3" maxlength="600" placeholder="Présentez brièvement votre projet (600 caractères max)" class="input-field w-full resize-none"><?php echo e(old('description', $projet->description ?? '')); ?></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Année de création *</label>
                     <select name="annee_creation" class="input-field w-full" required>
                         <option value="">Sélectionnez</option>
                         <?php for($y = date('Y'); $y >= 2010; $y--): ?>
-                            <option value="<?php echo e($y); ?>" <?php echo e(old('annee_creation') == $y ? 'selected' : ''); ?>><?php echo e($y); ?></option>
+                            <option value="<?php echo e($y); ?>" <?php echo e(old('annee_creation', $projet->annee_creation ?? '') == $y ? 'selected' : ''); ?>><?php echo e($y); ?></option>
                         <?php endfor; ?>
                     </select>
                 </div>
@@ -65,7 +65,7 @@ unset($__errorArgs, $__bag); ?>
                     <select name="formalise" class="input-field w-full" required>
                         <option value="">Sélectionnez</option>
                         <?php $__currentLoopData = config('constants.FORMALISE_OPTIONS'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($key); ?>" <?php echo e(old('formalise')===$key ? 'selected' : ''); ?>><?php echo e($label); ?></option>
+                            <option value="<?php echo e($key); ?>" <?php echo e(old('formalise', $projet->formalise ?? '')===$key ? 'selected' : ''); ?>><?php echo e($label); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
@@ -132,7 +132,7 @@ unset($__errorArgs, $__bag); ?>
                     <select x-ref="regionSelect" name="region" class="input-field w-full" required @change="onRegionChange()">
                         <option value="">Sélectionnez votre région</option>
                         <?php $__currentLoopData = config('constants.REGIONS'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $region => $coords): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($region); ?>" data-lat="<?php echo e($coords['lat']); ?>" data-lng="<?php echo e($coords['lng']); ?>" <?php echo e(old('region') == $region ? 'selected' : ''); ?>><?php echo e($region); ?></option>
+                            <option value="<?php echo e($region); ?>" data-lat="<?php echo e($coords['lat']); ?>" data-lng="<?php echo e($coords['lng']); ?>" <?php echo e(old('region', $projet->region ?? '') == $region ? 'selected' : ''); ?>><?php echo e($region); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
@@ -140,11 +140,11 @@ unset($__errorArgs, $__bag); ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Latitude</label>
-                        <input x-ref="lat" type="text" name="latitude" value="<?php echo e(old('latitude')); ?>" placeholder="Latitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
+                        <input x-ref="lat" type="text" name="latitude" value="<?php echo e(old('latitude', $projet->latitude ?? '')); ?>" placeholder="Latitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Longitude</label>
-                        <input x-ref="lng" type="text" name="longitude" value="<?php echo e(old('longitude')); ?>" placeholder="Longitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
+                        <input x-ref="lng" type="text" name="longitude" value="<?php echo e(old('longitude', $projet->longitude ?? '')); ?>" placeholder="Longitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
                     </div>
                 </div>
             </div>
@@ -180,7 +180,7 @@ unset($__errorArgs, $__bag); ?>
 function logoUpload() {
     return {
         isDragging: false,
-        previewUrl: null,
+        previewUrl: <?php echo json_encode($projet->logo_url ?? null, 15, 512) ?>,
         fileName: '',
         
         handleDrop(event) {

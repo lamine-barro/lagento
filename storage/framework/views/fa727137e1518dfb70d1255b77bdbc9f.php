@@ -53,7 +53,7 @@
         <div class="flex items-center gap-2">
             <button 
                 @click="refreshDiagnostic()"
-                class="px-4 py-3 rounded-md border transition-colors flex items-center gap-2 text-sm font-medium"
+                class="px-4 py-3 rounded-md border transition-colors flex items-center gap-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
                 style="border-color: var(--gray-300); color: var(--gray-700);"
                 title="Rafraîchir le diagnostic"
             >
@@ -62,8 +62,8 @@
             </button>
             
             <a 
-                href="<?php echo e(route('onboarding.step3')); ?>"
-                class="px-4 py-3 rounded-md border transition-colors flex items-center gap-2 text-sm font-medium hover:bg-gray-50"
+                href="<?php echo e(route('onboarding.step1')); ?>"
+                class="px-4 py-3 rounded-md border transition-colors flex items-center gap-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
                 style="border-color: var(--gray-300); color: var(--gray-700);"
                 title="Éditer les informations du projet"
             >
@@ -73,7 +73,7 @@
             
             <a 
                 href="<?php echo e(route('documents.index')); ?>"
-                class="px-4 py-3 rounded-md border transition-colors flex items-center gap-2 text-sm font-medium hover:bg-gray-50"
+                class="px-4 py-3 rounded-md border transition-colors flex items-center gap-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
                 style="border-color: var(--gray-300); color: var(--gray-700);"
                 title="Gérer les documents"
             >
@@ -420,12 +420,9 @@
     <?php else: ?>
     <div class="card">
         <div class="card-body text-center py-12">
-            <i data-lucide="bar-chart-3" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
+            <i data-lucide="lightbulb" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
             <h3 class="text-lg font-medium text-primary mb-2">Analytics en cours de génération</h3>
-            <p class="text-muted mb-6">Vos données entrepreneuriales sont en cours d'analyse. Revenez dans quelques minutes.</p>
-            <a href="<?php echo e(route('chat')); ?>" class="btn btn-primary">
-                Démarrer une conversation
-            </a>
+            <p class="text-muted">Vos données entrepreneuriales sont en cours d'analyse. Revenez dans quelques minutes.</p>
         </div>
     </div>
     <?php endif; ?>

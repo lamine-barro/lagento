@@ -239,3 +239,9 @@ a:hover {
 @media (min-width: 768px) {
   .hidden-desktop { display: none; }
 }
+
+/* === ICÔNES === */
+i[data-lucide],
+svg {
+  pointer-events: none; /* Empêche les icônes d'intercepter les clics */
+}

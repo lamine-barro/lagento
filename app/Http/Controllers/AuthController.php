@@ -99,12 +99,31 @@ class AuthController extends Controller
         // Clear OTP session
         session()->forget(['email', 'otp', 'otp_expires_at']);
         
-        // Check if user needs onboarding
-        if (!$user->company_name || !$user->business_sector) {
+        // Check if user has a project and onboarding status
+        $projet = \App\Models\Projet::where('user_id', $user->id)->latest()->first();
+        
+        if (!$projet) {
+            // Pas de projet, commencer l'onboarding
             return redirect()->route('onboarding.step1');
         }
         
-        return redirect()->route('dashboard');
+        // Vérifier si l'onboarding est complet
+        if (!$projet->isOnboardingComplete()) {
+            // Déterminer quelle étape est incomplète
+            $progress = $projet->getOnboardingProgress();
+            
+            if (!$progress['steps']['step1']) {
+                return redirect()->route('onboarding.step1');
+            } elseif (!$progress['steps']['step2']) {
+                return redirect()->route('onboarding.step2');
+            } elseif (!$progress['steps']['step3']) {
+                return redirect()->route('onboarding.step3');
+            } elseif (!$progress['steps']['step4']) {
+                return redirect()->route('onboarding.step4');
+            }
+        }
+        
+        return redirect()->route('diagnostic');
     }
     
     public function resendOtp()

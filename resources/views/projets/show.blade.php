@@ -359,7 +359,7 @@
             @endif
 
             <!-- Formalisation -->
-            @if($projet->formalise === 'OUI')
+            @if($projet->formalise === 'oui')
                 <div class="bg-white rounded-lg shadow-sm border p-6">
                     <h3 class="font-semibold mb-4" style="color: var(--gray-900);">
                         Informations légales

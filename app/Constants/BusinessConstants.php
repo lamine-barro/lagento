@@ -308,8 +308,8 @@ class BusinessConstants
 
     // Constantes pour le modèle Projet
     public const FORMALISE_OPTIONS = [
-        'OUI' => 'Formalisé',
-        'NON' => 'Non formalisé'
+        'oui' => 'Formalisé',
+        'non' => 'Non formalisé'
     ];
 
     public const LOCALISATION_FONDATEURS = [

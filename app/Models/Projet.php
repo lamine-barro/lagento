@@ -188,7 +188,7 @@ class Projet extends Model
     public function isOnboardingComplete(): bool
     {
         // Step 1: Identité obligatoire
-        if (empty($this->nom_projet) || empty($this->raison_sociale) || empty($this->formalise) || empty($this->region)) {
+        if (empty($this->nom_projet) || empty($this->formalise) || empty($this->region)) {
             return false;
         }
 

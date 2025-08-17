@@ -11,7 +11,9 @@ class OnboardingController extends Controller
 {
     public function showStep1()
     {
-        return view('onboarding.step1');
+        $user = Auth::user();
+        $projet = Projet::where('user_id', $user->id)->latest()->first();
+        return view('onboarding.step1', compact('projet'));
     }
     
     public function processStep1(Request $request)
@@ -21,7 +23,7 @@ class OnboardingController extends Controller
             'raison_sociale' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'annee_creation' => 'nullable|integer|min:2010|max:' . date('Y'),
-            'formalise' => 'required|in:OUI,NON',
+            'formalise' => 'required|in:oui,non',
             'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:10240',
             'region' => 'required|string',
             'latitude' => 'nullable|numeric',
@@ -29,7 +31,11 @@ class OnboardingController extends Controller
         ]);
 
         $user = Auth::user();
-        $projet = Projet::firstOrCreate(['user_id' => $user->id, 'nom_projet' => $request->nom_projet]);
+        // Récupérer ou créer le projet de l'utilisateur
+        $projet = Projet::firstOrCreate(
+            ['user_id' => $user->id],
+            ['nom_projet' => $request->nom_projet]
+        );
 
         $logoUrl = $projet->logo_url;
         if ($request->hasFile('logo')) {
@@ -46,7 +52,7 @@ class OnboardingController extends Controller
             'raison_sociale' => $request->raison_sociale,
             'description' => $request->description,
             'annee_creation' => $request->annee_creation,
-            'formalise' => strtolower($request->formalise),
+            'formalise' => $request->formalise,
             'logo_url' => $logoUrl,
             'region' => $request->region,
             'latitude' => $request->latitude,
@@ -68,7 +74,7 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.step1')->with('warning', 'Veuillez d\'abord compléter l\'étape 1.');
         }
         
-        return view('onboarding.step2');
+        return view('onboarding.step2', compact('projet'));
     }
     
     public function processStep2(Request $request)
@@ -124,7 +130,7 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.step1')->with('warning', 'Veuillez d\'abord compléter l\'étape 1.');
         }
         
-        return view('onboarding.step3');
+        return view('onboarding.step3', compact('projet'));
     }
 
     public function processStep3(Request $request)
@@ -145,7 +151,7 @@ class OnboardingController extends Controller
         }
         $projet->update([
             'secteurs' => $request->secteurs ?: [],
-            'produits_services' => $request->produits_services ? [$request->produits_services] : [],
+            'produits_services' => $request->produits_services ? explode(',', $request->produits_services) : [],
             'cibles' => $request->cibles ?: [],
             'maturite' => $request->maturite,
             'stade_financement' => $request->stade_financement,
@@ -166,7 +172,7 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.step1')->with('warning', 'Veuillez d\'abord compléter l\'étape 1.');
         }
         
-        return view('onboarding.step4');
+        return view('onboarding.step4', compact('projet'));
     }
 
     public function processStep4(Request $request)
@@ -175,10 +181,10 @@ class OnboardingController extends Controller
             'founders_count' => 'required|integer|min:1',
             'female_founders_count' => 'required|integer|min:0',
             'age_ranges' => 'nullable|array',
-            'founders_location' => 'nullable|string',
+            'founders_location' => 'nullable|in:local,diaspora,mixte',
             'team_size' => 'nullable|string',
             'support_structures' => 'nullable|array',
-            'support_types' => 'nullable|array|max:3',
+            'support_types' => 'nullable|array|max:5',
             'additional_info' => 'nullable|string|max:1000'
         ]);
 
@@ -192,7 +198,7 @@ class OnboardingController extends Controller
             'nombre_fondateurs' => (int)$request->founders_count,
             'nombre_fondatrices' => (int)$request->female_founders_count,
             'tranches_age_fondateurs' => $request->age_ranges ?: [],
-            'localisation_fondateurs' => strtolower((string)$request->founders_location),
+            'localisation_fondateurs' => $request->founders_location ?: null,
             'structures_accompagnement' => $request->support_structures ?: [],
             'types_soutien' => $request->support_types ?: [],
             'details_besoins' => $request->additional_info,

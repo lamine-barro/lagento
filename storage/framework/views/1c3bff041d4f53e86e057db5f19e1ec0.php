@@ -29,7 +29,7 @@
         <form id="step4-form" method="POST" action="<?php echo e(route('onboarding.step4')); ?>" class="space-y-6 mt-4">
             <?php echo csrf_field(); ?>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: <?php echo e(old('founders_count', 1)); ?>, female: <?php echo e(old('female_founders_count', 0)); ?>, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: <?php echo e(old('founders_count', $projet->nombre_fondateurs ?? 1)); ?>, female: <?php echo e(old('female_founders_count', $projet->nombre_fondatrices ?? 0)); ?>, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
                 <!-- Nombre de fondateurs -->
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nombre de fondateurs *</label>
@@ -76,7 +76,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'age_ranges[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     <?php $__currentLoopData = config('constants.AGE_RANGES'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="age_ranges[]" value="<?php echo e($a); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);" @change="onChange($event)">
+                            <input type="checkbox" name="age_ranges[]" value="<?php echo e($a); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);" @change="onChange($event)" <?php echo e(in_array($a, old('age_ranges', $projet->tranches_age_fondateurs ?? [])) ? 'checked' : ''); ?>>
                             <span class="text-sm font-medium"><?php echo e($a); ?> ans</span>
                         </label>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -89,7 +89,7 @@
                     <select name="founders_location" class="input-field w-full">
                         <option value="">Sélectionnez</option>
                         <?php $__currentLoopData = config('constants.LOCALISATION_FONDATEURS'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($key); ?>"><?php echo e($label); ?></option>
+                            <option value="<?php echo e($key); ?>" <?php echo e(old('founders_location', $projet->localisation_fondateurs ?? '') == $key ? 'selected' : ''); ?>><?php echo e($label); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
@@ -98,7 +98,7 @@
                     <select name="team_size" class="input-field w-full">
                         <option value="">Sélectionnez</option>
                         <?php $__currentLoopData = config('constants.TEAM_SIZES'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $size): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($size); ?>"><?php echo e($size); ?> personnes</option>
+                            <option value="<?php echo e($size); ?>" <?php echo e(old('team_size', $projet->taille_equipe ?? '') == $size ? 'selected' : ''); ?>><?php echo e($size); ?> personnes</option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
@@ -111,7 +111,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'support_structures[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     <?php $__currentLoopData = config('constants.STRUCTURES_ACCOMPAGNEMENT'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="support_structures[]" value="<?php echo e($s); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
+                            <input type="checkbox" name="support_structures[]" value="<?php echo e($s); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);" <?php echo e(in_array($s, old('support_structures', $projet->structures_accompagnement ?? [])) ? 'checked' : ''); ?>>
                             <span class="text-sm font-medium"><?php echo e($s); ?></span>
                         </label>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -124,7 +124,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'support_types[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     <?php $__currentLoopData = config('constants.TYPES_SOUTIEN'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="support_types[]" value="<?php echo e($key); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);">
+                            <input type="checkbox" name="support_types[]" value="<?php echo e($key); ?>" class="w-4 h-4 rounded" style="accent-color: var(--orange);" <?php echo e(in_array($key, old('support_types', $projet->types_soutien ?? [])) ? 'checked' : ''); ?>>
                             <span class="text-sm font-medium"><?php echo e($value); ?></span>
                         </label>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -134,7 +134,7 @@
             <!-- Détails des besoins -->
             <div>
                 <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Détails des besoins</label>
-                <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..." maxlength="800"></textarea>
+                <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..." maxlength="800"><?php echo e(old('additional_info', $projet->details_besoins ?? '')); ?></textarea>
             </div>
         </form>
     </div>

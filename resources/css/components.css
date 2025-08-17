@@ -25,6 +25,12 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+  
+  /* Désactiver les pointer-events sur les icônes pour permettre le clic sur le bouton */
+  i[data-lucide],
+  svg {
+    pointer-events: none;
+  }
 }
 
 .btn-primary {

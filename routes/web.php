@@ -74,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [DocumentController::class, 'index'])->name('documents.index');
             Route::post('/upload', [DocumentController::class, 'upload'])->name('documents.upload');
             Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download');
+            Route::delete('/delete/{filename}', [DocumentController::class, 'delete'])->name('documents.delete');
         });
     });
     

@@ -16,23 +16,23 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nom du projet *</label>
-                    <input type="text" name="nom_projet" value="{{ old('nom_projet') }}" placeholder="Ex: Etudesk" class="input-field w-full" maxlength="100" required />
+                    <input type="text" name="nom_projet" value="{{ old('nom_projet', $projet->nom_projet ?? '') }}" placeholder="Ex: Etudesk" class="input-field w-full" maxlength="100" required />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale</label>
-                    <input type="text" name="raison_sociale" value="{{ old('raison_sociale') }}" placeholder="Ex: Etudesk SAS" class="input-field w-full" maxlength="120" />
+                    <input type="text" name="raison_sociale" value="{{ old('raison_sociale', $projet->raison_sociale ?? '') }}" placeholder="Ex: Etudesk SAS" class="input-field w-full" maxlength="120" />
                     @error('raison_sociale')<p class="text-sm mt-1" style="color: var(--danger);">{{ $message }}</p>@enderror
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Description</label>
-                    <textarea name="description" rows="3" maxlength="600" placeholder="Présentez brièvement votre projet (600 caractères max)" class="input-field w-full resize-none">{{ old('description') }}</textarea>
+                    <textarea name="description" rows="3" maxlength="600" placeholder="Présentez brièvement votre projet (600 caractères max)" class="input-field w-full resize-none">{{ old('description', $projet->description ?? '') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Année de création *</label>
                     <select name="annee_creation" class="input-field w-full" required>
                         <option value="">Sélectionnez</option>
                         @for ($y = date('Y'); $y >= 2010; $y--)
-                            <option value="{{ $y }}" {{ old('annee_creation') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                            <option value="{{ $y }}" {{ old('annee_creation', $projet->annee_creation ?? '') == $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endfor
                     </select>
                 </div>
@@ -41,7 +41,7 @@
                     <select name="formalise" class="input-field w-full" required>
                         <option value="">Sélectionnez</option>
                         @foreach(config('constants.FORMALISE_OPTIONS') as $key => $label)
-                            <option value="{{ $key }}" {{ old('formalise')===$key ? 'selected' : '' }}>{{ $label }}</option>
+                            <option value="{{ $key }}" {{ old('formalise', $projet->formalise ?? '')===$key ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -108,7 +108,7 @@
                     <select x-ref="regionSelect" name="region" class="input-field w-full" required @change="onRegionChange()">
                         <option value="">Sélectionnez votre région</option>
                         @foreach(config('constants.REGIONS') as $region => $coords)
-                            <option value="{{ $region }}" data-lat="{{ $coords['lat'] }}" data-lng="{{ $coords['lng'] }}" {{ old('region') == $region ? 'selected' : '' }}>{{ $region }}</option>
+                            <option value="{{ $region }}" data-lat="{{ $coords['lat'] }}" data-lng="{{ $coords['lng'] }}" {{ old('region', $projet->region ?? '') == $region ? 'selected' : '' }}>{{ $region }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -116,11 +116,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Latitude</label>
-                        <input x-ref="lat" type="text" name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
+                        <input x-ref="lat" type="text" name="latitude" value="{{ old('latitude', $projet->latitude ?? '') }}" placeholder="Latitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Longitude</label>
-                        <input x-ref="lng" type="text" name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
+                        <input x-ref="lng" type="text" name="longitude" value="{{ old('longitude', $projet->longitude ?? '') }}" placeholder="Longitude" class="input-field w-full" style="background-color: var(--gray-50); color: var(--gray-600);" readonly />
                     </div>
                 </div>
             </div>
@@ -137,7 +137,7 @@
 function logoUpload() {
     return {
         isDragging: false,
-        previewUrl: null,
+        previewUrl: @json($projet->logo_url ?? null),
         fileName: '',
         
         handleDrop(event) {
