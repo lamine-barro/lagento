@@ -20,8 +20,3 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-/* Onboarding nav tweaks */
-.onboarding-nav-item-active {
-    color: var(--black);
-    background: var(--gray-50);
-}

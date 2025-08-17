@@ -17,48 +17,6 @@
   transition: opacity var(--transition);
 }
 
-/* Skeleton loading */
-@keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
-}
-
-.skeleton {
-  background: var(--gray-200);
-  background-image: linear-gradient(
-    90deg,
-    var(--gray-200) 0%,
-    var(--gray-100) 50%,
-    var(--gray-200) 100%
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 2s infinite;
-  border-radius: var(--radius-sm);
-}
-
-.skeleton-text {
-  height: 1rem;
-  width: 100%;
-  margin-bottom: var(--space-2);
-}
-
-.skeleton-title {
-  height: 1.5rem;
-  width: 60%;
-  margin-bottom: var(--space-3);
-}
-
-.skeleton-avatar {
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--radius-full);
-}
-
-.skeleton-button {
-  height: 2.75rem;
-  width: 7.5rem;
-  border-radius: var(--radius-lg);
-}
 
 /* Indicateurs de chargement */
 @keyframes pulse {
@@ -70,134 +28,8 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.loading-dots {
-  display: inline-flex;
-  gap: var(--space-1);
-}
 
-.loading-dots span {
-  width: 0.5rem;
-  height: 0.5rem;
-  background: var(--orange);
-  border-radius: var(--radius-full);
-  animation: pulse 1.4s infinite;
-}
 
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-/* Indicateur de frappe */
-@keyframes typing {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-0.5rem); }
-}
-
-.typing-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-3);
-  background: var(--gray-100);
-  border-radius: var(--radius-lg);
-}
-
-.typing-indicator span {
-  width: 0.5rem;
-  height: 0.5rem;
-  background: var(--gray-500);
-  border-radius: var(--radius-full);
-  animation: typing 1.4s infinite;
-}
-
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-/* Animations d'entrée */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(1.25rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-1.25rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-1.25rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(1.25rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Classes d'animation */
-.animate-fade-in { animation: fadeIn 0.3s ease-out; }
-.animate-slide-up { animation: slideInUp 0.3s ease-out; }
-.animate-slide-down { animation: slideInDown 0.3s ease-out; }
-.animate-slide-left { animation: slideInLeft 0.3s ease-out; }
-.animate-slide-right { animation: slideInRight 0.3s ease-out; }
-.animate-scale-in { animation: scaleIn 0.2s ease-out; }
-
-/* Effets de hover */
-.hover-lift {
-  transition: transform var(--transition), box-shadow var(--transition);
-}
-
-.hover-lift:hover {
-  transform: translateY(-0.125rem);
-  box-shadow: var(--shadow-md);
-}
-
-.hover-scale {
-  transition: transform var(--transition);
-}
-
-.hover-scale:hover {
-  transform: scale(1.02);
-}
 
 /* Animation de rotation */
 @keyframes spin {
@@ -215,15 +47,6 @@
   pointer-events: none;
 }
 
-/* Feedback tactile */
-.touchable {
-  -webkit-tap-highlight-color: rgba(255, 107, 53, 0.1);
-  touch-action: manipulation;
-}
-
-.touchable:active {
-  transform: scale(0.98);
-}
 
 /* Préférences d'animation utilisateur */
 @media (prefers-reduced-motion: reduce) {
@@ -242,13 +65,3 @@
   }
 }
 
-/* Animations responsives */
-@media (max-width: 767px) {
-  .hover-lift:hover {
-    transform: none;
-  }
-  
-  .hover-scale:hover {
-    transform: none;
-  }
-}
