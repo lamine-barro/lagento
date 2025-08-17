@@ -94,9 +94,25 @@
                 </div>
             </div>
             
+            <!-- Déconnexion -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="font-medium mb-2" style="color: var(--gray-900);">Déconnexion</h3>
+                    <p class="text-sm mb-4" style="color: var(--gray-700);">
+                        Se déconnecter de votre compte sur cet appareil.
+                    </p>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-secondary text-sm">
+                            Se déconnecter
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
             <!-- Zone de danger -->
             <div class="card mb-60">
-                <div class="card-body" style="background: var(--danger-50); border: 1px solid var(--danger-200);">
+                <div class="card-body" style="background: var(--danger-50);">
                     <h3 class="font-medium mb-2" style="color: var(--danger);">Zone de danger</h3>
                     <p class="text-sm mb-4" style="color: var(--gray-700);">
                         Cette action est irréversible. Toutes vos données seront définitivement supprimées.

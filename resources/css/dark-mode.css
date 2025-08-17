@@ -115,3 +115,8 @@
     background-color: var(--surface-elevated);
     border-color: var(--border);
 }
+
+/* Danger colors in dark mode */
+[data-theme="dark"] [style*="background: var(--danger-50)"] {
+    background: rgba(220, 38, 38, 0.1) !important; /* Rouge très foncé avec transparence */
+}
