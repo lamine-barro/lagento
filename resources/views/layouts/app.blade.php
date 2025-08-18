@@ -233,10 +233,10 @@
                             <!-- Send button -->
                             <button 
                                 type="submit"
-                                :disabled="(!message.trim() || (attachedFile && !message.trim())) || isLoading"
+                                :disabled="!message.trim() || isLoading"
                                 class="p-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                :class="(!message.trim() || (attachedFile && !message.trim())) || isLoading ? 'cursor-not-allowed' : ''"
-                                :style="(!message.trim() || (attachedFile && !message.trim())) || isLoading ? 'background: var(--gray-300); color: var(--gray-500);' : 'background: var(--orange-primary); color: white;'"
+                                :class="!message.trim() || isLoading ? 'cursor-not-allowed' : ''"
+                                :style="!message.trim() || isLoading ? 'background: var(--gray-300); color: var(--gray-500);' : 'background: var(--orange-primary); color: white;'"
                                 onmouseover="if (!this.disabled) this.style.background='var(--orange-dark)'"
                                 onmouseout="if (!this.disabled) this.style.background='var(--orange-primary)'"
                             >
@@ -262,7 +262,7 @@
             attachedFile: null,
             
             sendMessage() {
-                if (!this.message.trim() || (this.attachedFile && !this.message.trim()) || this.isLoading) return;
+                if (!this.message.trim() || this.isLoading) return;
                 
                 const userMessage = this.message;
                 const file = this.attachedFile;
@@ -327,7 +327,7 @@
                     formData.append('file', file);
                 }
                 
-                fetch('{{ route("chat.send") }}', {
+                fetch('{{ route("chat.save-user-message") }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'

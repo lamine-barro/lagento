@@ -59,6 +59,13 @@ class ChatController extends Controller
                     $attachment = $message->attachments[0]; // Take the first attachment
                 }
                 
+                \Log::info('Loading message with attachment', [
+                    'message_id' => $message->id,
+                    'role' => $message->role,
+                    'has_attachment' => !is_null($attachment),
+                    'raw_attachments' => $message->attachments
+                ]);
+                
                 return [
                     'id' => $message->id,
                     'role' => $message->role,
@@ -152,6 +159,12 @@ class ChatController extends Controller
         $conversation->increment('message_count', 1);
         $conversation->update(['last_message_at' => now()]);
         
+        \Log::info('User message saved with attachment', [
+            'message_id' => $userMessage->id,
+            'has_attachment' => !is_null($attachmentData),
+            'attachment_data' => $attachmentData
+        ]);
+
         return response()->json([
             'success' => true,
             'user_message_id' => $userMessage->id,

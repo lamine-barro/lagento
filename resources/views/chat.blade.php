@@ -624,6 +624,7 @@ function chatInterface() {
                         attachment: saveData.attachment || null
                     };
                     
+                    console.log('Adding user message with attachment:', userMessage);
                     this.messages.push(userMessage);
                     
                     // Nettoyer le fichier attaché du chat fixe
