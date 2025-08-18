@@ -294,7 +294,9 @@
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
-                    alert('Erreur lors de l\'envoi du message');
+                    if (typeof window.showErrorToast === 'function') {
+                        window.showErrorToast('Erreur lors de l\'envoi du message');
+                    }
                 })
                 .finally(() => {
                     this.isLoading = false;
@@ -311,7 +313,9 @@
                 if (file && file.size <= 5 * 1024 * 1024) {
                     this.attachedFile = file;
                 } else if (file) {
-                    alert('Le fichier ne doit pas dépasser 5MB');
+                    if (typeof window.showWarningToast === 'function') {
+                        window.showWarningToast('Le fichier ne doit pas dépasser 5MB');
+                    }
                     event.target.value = '';
                 }
             },
@@ -521,5 +525,8 @@
     }
     </style>
     @endauth
+    
+    <!-- Global Toast Notifications -->
+    <x-toast />
 </body>
 </html>

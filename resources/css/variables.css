@@ -27,6 +27,21 @@
   --success: #059669;
   --success-100: #DCFCE7;
   --success-700: #15803D;
+  
+  --green-50: #F0FDF4;
+  --green-100: #DCFCE7;
+  --green-200: #BBF7D0;
+  --green-300: #86EFAC;
+  --green-400: #4ADE80;
+  --green-500: #22C55E;
+  --green-600: #16A34A;
+  --green-700: #15803D;
+  --green-800: #166534;
+  --green-900: #14532D;
+  
+  --red-50: #FEF2F2;
+  --red-600: #DC2626;
+  
   --error: #DC2626;
   --danger: #DC2626;
   --danger-text: #ffffff;  /* Texte blanc pour les boutons danger */

@@ -71,10 +71,11 @@
                         <div class="flex items-center gap-2 mt-3">
                             <button 
                                 @click="copyMessage(message.content, $event)"
-                                class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                class="copy-button p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 relative"
                                 title="Copier"
                             >
                                 <i data-lucide="copy" class="w-4 h-4" style="color: var(--gray-500);"></i>
+                                <span class="copy-feedback absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs rounded shadow-lg opacity-0 pointer-events-none transition-all duration-300" style="background: var(--gray-800); color: white; white-space: nowrap;">Copié!</span>
                             </button>
                             
                             <span class="text-xs ml-auto" style="color: var(--gray-500);" x-text="formatTime(message.created_at)">
@@ -184,6 +185,77 @@
 
 .prose em {
     font-style: italic;
+}
+
+/* Animation du bouton copier */
+.copy-button {
+    overflow: visible;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.copy-button i {
+    transition: all 0.2s ease-in-out;
+}
+
+.copy-button.copy-success {
+    animation: copyPulse 0.4s ease-out;
+    background: var(--green-100) !important;
+    border-color: var(--green-300) !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.copy-button.copy-error {
+    animation: shake 0.3s ease-in-out;
+    background: var(--red-50) !important;
+}
+
+@keyframes copyPulse {
+    0% {
+        transform: scale(1);
+    }
+    30% {
+        transform: scale(1.15);
+    }
+    60% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes iconSuccess {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3) rotate(10deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-4px);
+    }
+    75% {
+        transform: translateX(4px);
+    }
+}
+
+.copy-feedback {
+    font-size: 0.75rem;
+    z-index: 50;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /* Messages utilisateur - texte toujours en blanc */
@@ -446,11 +518,15 @@ function chatInterface() {
                     this.showDeleteModal = false;
                     this.conversationToDelete = { id: null, title: '' };
                 } else {
-                    alert('Erreur lors de la suppression de la conversation');
+                    if (typeof window.showErrorToast === 'function') {
+                        window.showErrorToast('Erreur lors de la suppression de la conversation');
+                    }
                 }
             } catch (error) {
                 console.error('Erreur lors de la suppression:', error);
-                alert('Erreur lors de la suppression de la conversation');
+                if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Erreur lors de la suppression de la conversation');
+                }
             } finally {
                 this.isDeleting = false;
             }
@@ -562,20 +638,51 @@ function chatInterface() {
         
         copyMessage(content, event) {
             navigator.clipboard.writeText(content).then(() => {
-                // Show temporary feedback
+                // Show temporary feedback with animation
                 const button = event.target.closest('button');
                 const icon = button.querySelector('i');
+                const feedback = button.querySelector('.copy-feedback');
                 const originalLucide = icon.getAttribute('data-lucide');
+                
+                // Add success animation with enhanced visual feedback
+                button.classList.add('copy-success');
                 icon.setAttribute('data-lucide', 'check');
+                icon.style.color = 'var(--green-600)';
+                icon.style.animation = 'iconSuccess 0.6s ease-out';
+                button.style.backgroundColor = 'var(--green-100)';
+                button.style.borderColor = 'var(--green-300)';
+                
+                // Show feedback tooltip
+                feedback.style.opacity = '1';
+                feedback.style.transform = 'translateX(-50%) translateY(-4px)';
+                
                 if (typeof window.renderIcons === 'function') {
-                    window.renderIcons(); // Refresh icons
+                    window.renderIcons();
                 }
+                
+                // Reset after animation
                 setTimeout(() => {
+                    button.classList.remove('copy-success');
                     icon.setAttribute('data-lucide', originalLucide);
+                    icon.style.color = 'var(--gray-500)';
+                    icon.style.animation = '';
+                    button.style.backgroundColor = '';
+                    button.style.borderColor = '';
+                    feedback.style.opacity = '0';
+                    feedback.style.transform = 'translateX(-50%) translateY(0)';
+                    
                     if (typeof window.renderIcons === 'function') {
-                        window.renderIcons(); // Refresh icons
+                        window.renderIcons();
                     }
-                }, 1000);
+                }, 1500);
+            }).catch(err => {
+                console.error('Erreur lors de la copie:', err);
+                // Show error feedback
+                const button = event.target.closest('button');
+                button.classList.add('copy-error');
+                setTimeout(() => {
+                    button.classList.remove('copy-error');
+                }, 500);
             });
         },
         

@@ -268,19 +268,27 @@ function profileManager() {
             .then(data => {
                 if (data.success) {
                     if (data.email_changed) {
-                        alert(data.message || 'Email mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse.');
+                        if (typeof window.showSuccessToast === 'function') {
+                            window.showSuccessToast(data.message || 'Email mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse.');
+                        }
                         // Optionnel: rediriger vers la page de vérification OTP
                         // window.location.href = '<?php echo e(route("auth.verify-otp-form")); ?>';
                     } else {
-                        alert(data.message || 'Profil mis à jour avec succès');
+                        if (typeof window.showSuccessToast === 'function') {
+                            window.showSuccessToast(data.message || 'Profil mis à jour avec succès');
+                        }
                     }
                 } else {
-                    alert('Erreur lors de la mise à jour du profil');
+                    if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Erreur lors de la mise à jour du profil');
+                }
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('Erreur lors de la mise à jour du profil');
+                if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Erreur lors de la mise à jour du profil');
+                }
             });
         },
         

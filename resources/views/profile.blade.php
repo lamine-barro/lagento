@@ -130,7 +130,24 @@
 </div>
 
 <!-- Delete Account Modal -->
-<div x-data="{ open: false }" 
+<div x-data="{ 
+        open: false, 
+        confirmText: '',
+        deleteAccount() {
+            if (this.confirmText === 'SUPPRIMER') {
+                fetch('{{ route(\"profile.delete\") }}', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(() => {
+                    window.location.href = '{{ route(\"landing\") }}';
+                });
+            }
+        }
+    }" 
      @open-delete-account-modal.window="open = true"
      x-show="open" 
      x-transition:enter="transition ease-out duration-300"
@@ -255,7 +272,6 @@ function profileManager() {
     return {
         profile: @json($user ?? []),
         project: @json($project ?? []),
-        confirmText: '',
         
         updateProfile() {
             fetch('{{ route("profile.update") }}', {
@@ -270,19 +286,27 @@ function profileManager() {
             .then(data => {
                 if (data.success) {
                     if (data.email_changed) {
-                        alert(data.message || 'Email mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse.');
+                        if (typeof window.showSuccessToast === 'function') {
+                            window.showSuccessToast(data.message || 'Email mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse.');
+                        }
                         // Optionnel: rediriger vers la page de vérification OTP
                         // window.location.href = '{{ route("auth.verify-otp-form") }}';
                     } else {
-                        alert(data.message || 'Profil mis à jour avec succès');
+                        if (typeof window.showSuccessToast === 'function') {
+                            window.showSuccessToast(data.message || 'Profil mis à jour avec succès');
+                        }
                     }
                 } else {
-                    alert('Erreur lors de la mise à jour du profil');
+                    if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Erreur lors de la mise à jour du profil');
+                }
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
-                alert('Erreur lors de la mise à jour du profil');
+                if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Erreur lors de la mise à jour du profil');
+                }
             });
         },
         
@@ -309,21 +333,6 @@ function profileManager() {
                     console.log('Préférences mises à jour');
                 }
             });
-        },
-        
-        deleteAccount() {
-            if (this.confirmText === 'SUPPRIMER') {
-                fetch('{{ route("profile.delete") }}', {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(() => {
-                    window.location.href = '{{ route("landing") }}';
-                });
-            }
         }
     }
 }

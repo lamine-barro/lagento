@@ -65,7 +65,7 @@
             
             <!-- Subtitle -->
             <p class="text-lg mb-8 mt-4" style="color: var(--gray-700);">
-                Conseils personnalisés, opportunités de financement et accompagnement 24/7 pour passer de l'idée à l'action.
+                LagentO a cartographié plus de 2000 milliards de Fcfa d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire a travers les initiatives gouvernementales et écosystèmes. Il est disposé 24h/7 pour vous accompagner à les saisir.
             </p>
 
             <!-- Email Form -->

@@ -94,7 +94,7 @@ class UserAnalyticsService
             ];
 
             $lm = app(\App\Services\LanguageModelService::class);
-            $raw = $lm->chat($messages, 'gpt-4.1-nano', 0.2, 20000, ['response_format' => ['type' => 'json_object']]);
+            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 20000, ['response_format' => ['type' => 'json_object']]);
             
             Log::info('UserAnalyticsService: LLM response received', ['raw_length' => strlen($raw), 'raw_preview' => substr($raw, 0, 200)]);
             

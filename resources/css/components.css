@@ -1,3 +1,61 @@
+/* === TOAST NOTIFICATIONS === */
+.toast-notification {
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast-notification:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Animation de pulsation pour les toasts de succès */
+@keyframes toastSuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.toast-notification.success-pulse {
+  animation: toastSuccess 0.6s ease-out;
+}
+
+/* Animation de secousse pour les toasts d'erreur */
+@keyframes toastError {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.toast-notification.error-shake {
+  animation: toastError 0.5s ease-in-out;
+}
+
+/* Effet de fondu pour la barre de progression */
+.toast-notification .progress-bar {
+  transition: width 0.1s linear;
+}
+
+/* Responsive design pour les toasts */
+@media (max-width: 640px) {
+  .toast-notification {
+    width: calc(100vw - 2rem);
+    max-width: 350px;
+  }
+}
+
 /* === BOUTONS === */
 .btn {
   display: inline-flex;
