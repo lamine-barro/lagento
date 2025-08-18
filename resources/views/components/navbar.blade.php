@@ -7,8 +7,8 @@
                title="Diagnostic">
                 <i data-lucide="chart-network" class="w-4 h-4"></i>
             </a>
-            <a href="{{ route('chat') }}" 
-               class="touch-target rounded-md transition-colors {{ request()->routeIs('chat') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600' }}"
+            <a href="{{ route('chat.index') }}" 
+               class="touch-target rounded-md transition-colors {{ request()->routeIs('chat.index') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600' }}"
                title="Agent">
                 <i data-lucide="brain" class="w-4 h-4"></i>
             </a>
@@ -16,7 +16,7 @@
         
         <!-- Logo -->
         <div class="flex items-center gap-2">
-            <a href="{{ route('chat') }}">
+            <a href="{{ route('chat.index') }}">
                 <x-logo size="lg" />
             </a>
         </div>
@@ -34,9 +34,9 @@
                 <span class="hidden lg:inline">Diagnostic ({{ auth()->user()->getRemainingDiagnostics() }}/3)</span>
             </a>
             <a 
-                href="{{ route('chat') }}"
+                href="{{ route('chat.index') }}"
                 class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors
-                       {{ request()->routeIs('chat') ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900' }}"
+                       {{ request()->routeIs('chat.index') ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900' }}"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>

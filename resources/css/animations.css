@@ -28,8 +28,55 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
 
+.skeleton {
+  background: var(--gray-200);
+  background-image: linear-gradient(
+    90deg,
+    var(--gray-200) 0%,
+    var(--gray-100) 50%,
+    var(--gray-200) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+  border-radius: var(--radius-sm);
+}
 
+/* Skeleton dark mode */
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background: var(--gray-700);
+    background-image: linear-gradient(
+      90deg,
+      var(--gray-700) 0%,
+      var(--gray-600) 50%,
+      var(--gray-700) 100%
+    );
+  }
+}
+
+.skeleton-text {
+  height: 1rem;
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-title {
+  height: 1.5rem;
+  width: 60%;
+  margin-bottom: var(--space-3);
+}
+
+.skeleton-card {
+  height: 8rem;
+  width: 100%;
+  margin-bottom: var(--space-4);
+}
 
 /* Animation de rotation */
 @keyframes spin {
@@ -39,6 +86,81 @@
 
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+/* Animation de rotation fluide pour les spinners */
+.smooth-spin {
+  animation: smoothSpin 1.2s linear infinite;
+}
+
+@keyframes smoothSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Effet shimmer pour les textes de loading */
+.shimmer-text {
+  background: linear-gradient(90deg, 
+    var(--gray-600) 25%, 
+    var(--gray-400) 50%, 
+    var(--gray-600) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerText 1.8s infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Shimmer adapté au mode sombre avec data-theme */
+[data-theme="dark"] .shimmer-text {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.4) 25%, 
+    rgba(255, 255, 255, 0.8) 50%, 
+    rgba(255, 255, 255, 0.4) 75%
+  );
+}
+
+/* Shimmer adapté au mode sombre avec prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  .shimmer-text {
+    background: linear-gradient(90deg, 
+      rgba(255, 255, 255, 0.4) 25%, 
+      rgba(255, 255, 255, 0.8) 50%, 
+      rgba(255, 255, 255, 0.4) 75%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+@keyframes shimmerText {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Animation de pulsation pour les icônes */
+.pulse-icon {
+  animation: pulseIcon 2s infinite ease-in-out;
+}
+
+@keyframes pulseIcon {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
 }
 
 /* États de chargement */

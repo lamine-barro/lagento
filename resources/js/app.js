@@ -25,6 +25,9 @@ function renderIcons() {
     }).catch(() => {});
 }
 
+// Expose renderIcons globally for use in Alpine components
+window.renderIcons = renderIcons;
+
 // Initialize icons on DOM ready (deferred)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

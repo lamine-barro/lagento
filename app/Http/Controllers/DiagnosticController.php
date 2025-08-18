@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Opportunite;
 use App\Models\Projet;
 use App\Models\UserAnalytics;
+use App\Services\UserAnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-class DashboardController extends Controller
+class DiagnosticController extends Controller
 {
     public function index()
     {
@@ -33,7 +35,7 @@ class DashboardController extends Controller
                 ->get();
             
             // Get user analytics
-            $userAnalytics = UserAnalytics::where('user_id', $user->id)->first();
+            $analytics = UserAnalytics::where('user_id', $user->id)->first();
             
             // Conversations récentes
             $recentConversations = \App\Models\UserConversation::where('user_id', $user->id)
@@ -41,19 +43,19 @@ class DashboardController extends Controller
                 ->limit(3)
                 ->get();
             
-            return view('dashboard', compact(
+            return view('diagnostic', compact(
                 'opportunities', 
                 'recentProjects', 
-                'userAnalytics',
+                'analytics',
                 'recentConversations'
             ));
             
         } catch (\Exception $e) {
             // En cas d'erreur, retourner une vue avec des données vides
-            return view('dashboard', [
+            return view('diagnostic', [
                 'opportunities' => collect(),
                 'recentProjects' => collect(),
-                'userAnalytics' => null,
+                'analytics' => null,
                 'recentConversations' => collect()
             ]);
         }
@@ -157,25 +159,80 @@ class DashboardController extends Controller
         if (!$user->canRunDiagnostic()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vous avez atteint la limite mensuelle de 3 diagnostics.'
+                'message' => 'Vous avez atteint la limite mensuelle de 50 diagnostics.'
             ], 429);
         }
 
-        // Utiliser un diagnostic
-        if (!$user->useDiagnostic()) {
+        // NE PAS comptabiliser le diagnostic ici - seulement en cas de succès
+
+        try {
+            // Récupérer les données du projet de l'utilisateur
+            $projet = Projet::where('user_id', $user->id)->first();
+            
+            if (!$projet || !$projet->isOnboardingComplete()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Veuillez d\'abord compléter votre profil entrepreneurial.',
+                    'redirect' => route('onboarding.step1')
+                ], 400);
+            }
+
+            // Préparer les données d'onboarding pour l'analyse
+            $onboardingData = [
+                'business_name' => $projet->nom_projet,
+                'business_sector' => $projet->secteurs[0] ?? null,
+                'business_stage' => $projet->maturite,
+                'description' => $projet->description,
+                'target_market' => $projet->cibles,
+                'revenue_model' => $projet->modeles_revenus,
+                'funding_stage' => $projet->stade_financement,
+                'team_size' => $projet->taille_equipe,
+                'location' => $projet->region,
+                'formalized' => $projet->formalise === 'oui',
+                'num_founders_male' => $projet->nombre_fondateurs,
+                'num_founders_female' => $projet->nombre_fondatrices,
+                'age_ranges' => $projet->tranches_age_fondateurs,
+                'support_needs' => $projet->types_soutien,
+                'created_at' => $projet->created_at->toISOString()
+            ];
+
+            // Lancer l'analyse avec le UserAnalyticsService
+            $analyticsService = app(UserAnalyticsService::class);
+            $analyticsService->updateEntrepreneurProfile($user, $onboardingData);
+            
+            // Générer la structure complète du dashboard
+            $analyticsService->generateDashboardAnalytics($user);
+            
+            // Générer les insights complets
+            $insights = $analyticsService->generateUserInsights($user);
+            
+            // MAINTENANT comptabiliser le diagnostic car génération réussie
+            if (!$user->useDiagnostic()) {
+                Log::warning("Could not use diagnostic for user {$user->id} after successful generation");
+            }
+            
+            Log::info("Diagnostic completed for user {$user->id}", [
+                'remaining_diagnostics' => $user->getRemainingDiagnostics()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Diagnostic généré avec succès.',
+                'remaining' => $user->getRemainingDiagnostics(),
+                'insights' => $insights
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error("Diagnostic failed for user {$user->id}: " . $e->getMessage());
+            
+            // PAS de comptabilisation en cas d'erreur
             return response()->json([
                 'success' => false,
-                'message' => 'Impossible de lancer le diagnostic.'
+                'message' => 'Erreur lors de la génération du diagnostic. Veuillez réessayer.',
+                'error_details' => config('app.debug') ? $e->getMessage() : null,
+                'can_retry' => true,
+                'remaining' => $user->getRemainingDiagnostics() // Pas décompté
             ], 500);
         }
-
-        // TODO: Ici on appellerait l'agent de diagnostic/analytics
-        // Pour l'instant, on simule juste le succès
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Diagnostic lancé avec succès.',
-            'remaining' => $user->getRemainingDiagnostics()
-        ]);
     }
 }

@@ -44,28 +44,80 @@
             @yield('content')
         </main>
 
+        <!-- Suggestions tooltip flottant (détaché du chat) -->
+        @auth
+        <div x-data="suggestions()" 
+                     x-show="showSuggestions" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 transform scale-100"
+                     x-transition:leave-end="opacity-0 transform scale-95"
+                     class="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-sm rounded-xl shadow-xl p-3" 
+                     style="background: var(--white); border: 1px solid var(--gray-200); display: none; z-index: 9999;"
+                     @click.away="showSuggestions = false">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium" style="color: var(--gray-600);">Suggestions</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button type="button" 
+                                    @click="refreshSuggestions()" 
+                                    :disabled="isRefreshing"
+                                    class="p-1 rounded transition-colors" 
+                                    style="color: var(--gray-600);" 
+                                    onmouseover="if (!this.disabled) this.style.background='var(--gray-100)'" 
+                                    onmouseout="this.style.background='transparent'" 
+                                    title="Rafraîchir">
+                                <i data-lucide="refresh-cw" class="w-3 h-3" :class="{ 'smooth-spin': isRefreshing }"></i>
+                            </button>
+                            <button type="button" 
+                                    @click="showSuggestions = false" 
+                                    class="p-1 rounded transition-colors" 
+                                    style="color: var(--gray-600);" 
+                                    onmouseover="this.style.background='var(--gray-100)'" 
+                                    onmouseout="this.style.background='transparent'" 
+                                    title="Fermer">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div x-show="isLoading" class="flex items-center justify-center py-4">
+                            <i data-lucide="loader-2" class="w-4 h-4 smooth-spin" style="color: var(--gray-500);"></i>
+                            <span class="ml-2 text-sm shimmer-text">Génération de suggestions...</span>
+                        </div>
+                        <template x-for="suggestion in suggestionsList" :key="suggestion">
+                            <button type="button" 
+                                    @click="selectSuggestion(suggestion)"
+                                    class="w-full text-left px-3 py-2 text-sm rounded-md transition-colors" 
+                                    style="color: var(--gray-900);" 
+                                    onmouseover="this.style.background='var(--gray-100)'" 
+                                    onmouseout="this.style.background='transparent'"
+                                    x-text="suggestion">
+                            </button>
+                        </template>
+                        <div x-show="!isLoading && suggestionsList.length === 0" class="text-center py-4">
+                            <p class="text-sm" style="color: var(--gray-500);">Aucune suggestion disponible</p>
+                            <button type="button" 
+                                    @click="refreshSuggestions()"
+                                    class="mt-2 text-xs px-3 py-1 rounded-md transition-colors"
+                                    style="background: var(--orange-100); color: var(--orange-700);"
+                                    onmouseover="this.style.background='var(--orange-200)'"
+                                    onmouseout="this.style.background='var(--orange-100)'">
+                                Générer des suggestions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        @endauth
+        
         <!-- Chat fixe -->
         @auth
         <div class="fixed bottom-0 left-0 right-0 z-sticky" 
              style="background: var(--white); border-top: 1px solid var(--gray-200);" x-data="fixedChat()">
             <div class="container max-w-4xl mx-auto p-4">
-                <!-- Suggestions tooltip (cachées par défaut) -->
-                <div id="suggestions-tooltip" class="mb-3 rounded-xl shadow-sm p-3 hidden" style="background: var(--white); border: 1px solid var(--gray-200);">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-medium" style="color: var(--gray-600);">Suggestions</span>
-                        <button type="button" id="refresh-suggestions" class="p-1 rounded transition-colors" style="color: var(--gray-600);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" title="Rafraîchir">
-                            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
-                        </button>
-                    </div>
-                    <div class="space-y-2">
-                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Aide-moi à créer un business plan détaillé pour ma startup">Aide-moi à créer un business plan détaillé pour ma startup</button>
-                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Quelles sont les opportunités de financement disponibles en Côte d'Ivoire ?">Quelles sont les opportunités de financement disponibles en Côte d'Ivoire ?</button>
-                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Comment valider mon idée d'entreprise avant de me lancer ?">Comment valider mon idée d'entreprise avant de me lancer ?</button>
-                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Crée-moi une stratégie marketing pour lancer ma startup en Afrique">Crée-moi une stratégie marketing pour lancer ma startup en Afrique</button>
-                        <button type="button" class="suggestion-item w-full text-left px-3 py-2 text-sm rounded-md transition-colors" style="color: var(--gray-900);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'" onclick="document.querySelector('textarea').value = this.dataset.text; document.querySelector('textarea').focus(); document.getElementById('suggestions-tooltip').classList.add('hidden');" data-text="Quelles sont les étapes légales pour créer une entreprise en Côte d'Ivoire ?">Quelles sont les étapes légales pour créer une entreprise en Côte d'Ivoire ?</button>
-                    </div>
-                </div>
-
                 <!-- Modern chat input container -->
                 <form @submit.prevent="sendMessage" class="relative">
                     <div class="relative rounded-2xl shadow-sm transition-all duration-200" style="background: var(--white); border: 1px solid var(--gray-200);" 
@@ -111,11 +163,11 @@
                                     <i data-lucide="paperclip" class="w-4 h-4"></i>
                                 </button>
                                 <button type="button" 
+                                        @click="toggleSuggestions()"
                                         class="p-1.5 rounded-lg transition-all" 
                                         style="color: var(--gray-600);" 
                                         onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'" 
                                         onmouseout="this.style.color='var(--gray-600)'; this.style.background='transparent'"
-                                        onclick="document.getElementById('suggestions-tooltip').classList.toggle('hidden')"
                                         title="Suggestions">
                                     <i data-lucide="lightbulb" class="w-4 h-4"></i>
                                 </button>
@@ -140,7 +192,7 @@
                                 onmouseout="if (!this.disabled) this.style.background='var(--orange-primary)'"
                             >
                                 <i data-lucide="send-horizontal" class="w-4 h-4" x-show="!isLoading"></i>
-                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin" x-show="isLoading"></i>
+                                <i data-lucide="loader-2" class="w-4 h-4 smooth-spin" x-show="isLoading"></i>
                             </button>
                         </div>
                     </div>
@@ -166,6 +218,51 @@
                 const userMessage = this.message;
                 const file = this.attachedFile;
                 
+                // Si on n'est pas sur la page chat, stocker le message et rediriger
+                const currentPath = window.location.pathname;
+                if (currentPath !== '/chat') {
+                    // Stocker le message dans sessionStorage
+                    sessionStorage.setItem('pendingMessage', userMessage);
+                    if (file) {
+                        // Pour les fichiers, on devra les gérer différemment
+                        sessionStorage.setItem('pendingFileAlert', 'true');
+                    }
+                    
+                    // Créer une nouvelle conversation et rediriger
+                    fetch('/chat/conversations/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Marquer qu'on vient de créer une nouvelle conversation avec un message en attente
+                            sessionStorage.setItem('autoSubmitMessage', 'true');
+                            window.location.href = data.redirect_url;
+                        }
+                    });
+                    return;
+                }
+                
+                // Code existant pour la page chat
+                // Utiliser la méthode du chat component pour éviter la duplication
+                const chatComponent = document.querySelector('[x-data*="chatInterface"]');
+                if (chatComponent && chatComponent._x_dataStack) {
+                    const chatData = chatComponent._x_dataStack[0];
+                    
+                    // Utiliser la méthode sendDirectMessage du chat component
+                    this.message = '';
+                    this.attachedFile = null;
+                    this.isLoading = false;
+                    
+                    // Déléguer au composant chat principal
+                    chatData.sendDirectMessage(userMessage);
+                    return; // Sortir tôt pour éviter la duplication
+                }
+                
                 this.message = '';
                 this.attachedFile = null;
                 this.isLoading = true;
@@ -189,8 +286,11 @@
                     body: formData
                 })
                 .then(response => response.json())
-                .then(() => {
-                    window.location.href = '{{ route("chat") }}';
+                .then(data => {
+                    if (data.success) {
+                        // Si on n'est pas sur la page chat ou si le composant chat n'existe pas, rediriger
+                        window.location.href = '{{ route("chat.index") }}?conversation=' + data.conversation_id;
+                    }
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
@@ -198,6 +298,11 @@
                 })
                 .finally(() => {
                     this.isLoading = false;
+                    // Arrêter le typing sur la page chat si présente
+                    const chatComponent = document.querySelector('[x-data*="chatInterface"]');
+                    if (chatComponent && chatComponent._x_dataStack) {
+                        chatComponent._x_dataStack[0].isTyping = false;
+                    }
                 });
             },
             
@@ -214,6 +319,167 @@
             removeAttachment() {
                 this.attachedFile = null;
                 this.$refs.fileInput.value = '';
+            },
+            
+            toggleSuggestions() {
+                // Déclencher l'affichage du composant suggestions
+                const suggestionsComponent = document.querySelector('[x-data*="suggestions"]');
+                if (suggestionsComponent && suggestionsComponent._x_dataStack) {
+                    const suggestionsData = suggestionsComponent._x_dataStack[0];
+                    if (!suggestionsData.showSuggestions) {
+                        suggestionsData.showSuggestions = true;
+                        // Charger les suggestions si pas encore chargées
+                        if (suggestionsData.suggestionsList.length === 0 && !suggestionsData.isLoading) {
+                            suggestionsData.loadSuggestions();
+                        }
+                    } else {
+                        suggestionsData.showSuggestions = false;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Composant Alpine.js pour les suggestions
+    function suggestions() {
+        return {
+            showSuggestions: false,
+            suggestionsList: [],
+            isLoading: false,
+            isRefreshing: false,
+            isCached: false,
+            isRefreshed: false,
+            refreshInterval: null,
+            
+            init() {
+                // Rafraîchissement automatique toutes les 5 minutes
+                this.refreshInterval = setInterval(() => {
+                    if (this.suggestionsList.length > 0 && !this.isLoading && !this.isRefreshing) {
+                        this.refreshSuggestions();
+                    }
+                }, 5 * 60 * 1000); // 5 minutes
+            },
+            
+            destroy() {
+                if (this.refreshInterval) {
+                    clearInterval(this.refreshInterval);
+                }
+            },
+            
+            async loadSuggestions() {
+                if (this.isLoading) return;
+                
+                this.isLoading = true;
+                this.isRefreshed = false;
+                
+                try {
+                    const response = await fetch('{{ route("chat.suggestions") }}?active_page=' + encodeURIComponent(window.location.pathname));
+                    const data = await response.json();
+                    
+                    if (data.success && Array.isArray(data.suggestions)) {
+                        this.suggestionsList = data.suggestions;
+                        this.isCached = data.cached || false;
+                        this.isRefreshed = false;
+                        
+                        // Afficher temporairement l'indicateur de cache/nouveau
+                        if (this.isCached) {
+                            setTimeout(() => {
+                                this.isCached = false;
+                            }, 3000);
+                        }
+                    } else {
+                        console.warn('Réponse inattendue pour les suggestions:', data);
+                        this.suggestionsList = [];
+                        this.isCached = false;
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du chargement des suggestions:', error);
+                    this.suggestionsList = [];
+                    this.isCached = false;
+                } finally {
+                    this.isLoading = false;
+                    // Réinitialiser les icônes après le chargement
+                    this.$nextTick(() => {
+                        if (typeof window.renderIcons === 'function') {
+                            window.renderIcons();
+                        }
+                    });
+                }
+            },
+            
+            async refreshSuggestions() {
+                if (this.isRefreshing) return;
+                
+                this.isRefreshing = true;
+                this.isCached = false;
+                this.isRefreshed = false;
+                
+                try {
+                    const response = await fetch('{{ route("chat.suggestions.refresh") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            active_page: window.location.pathname
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && Array.isArray(data.suggestions)) {
+                        this.suggestionsList = data.suggestions;
+                        this.isCached = false;
+                        this.isRefreshed = data.refreshed || true;
+                        
+                        // Afficher temporairement l'indicateur "Nouvelles"
+                        setTimeout(() => {
+                            this.isRefreshed = false;
+                        }, 5000);
+                    } else {
+                        console.warn('Réponse inattendue pour le rafraîchissement:', data);
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du rafraîchissement des suggestions:', error);
+                } finally {
+                    this.isRefreshing = false;
+                    // Réinitialiser les icônes après le rafraîchissement
+                    this.$nextTick(() => {
+                        if (typeof window.renderIcons === 'function') {
+                            window.renderIcons();
+                        }
+                    });
+                }
+            },
+            
+            selectSuggestion(suggestion) {
+                // Fermer les suggestions
+                this.showSuggestions = false;
+                
+                // Si on est sur la page chat, utiliser sendQuickMessage
+                const chatComponent = document.querySelector('[x-data*="chatInterface"]');
+                if (chatComponent && chatComponent._x_dataStack) {
+                    const chatData = chatComponent._x_dataStack[0];
+                    chatData.sendQuickMessage(suggestion);
+                    return;
+                }
+                
+                // Sinon, utiliser le chat fixe
+                const fixedChatComponent = document.querySelector('[x-data*="fixedChat"]');
+                if (fixedChatComponent && fixedChatComponent._x_dataStack) {
+                    const fixedData = fixedChatComponent._x_dataStack[0];
+                    fixedData.message = suggestion;
+                    fixedData.sendMessage();
+                } else {
+                    // Fallback: remplir le textarea
+                    const textarea = document.querySelector('textarea');
+                    if (textarea) {
+                        textarea.value = suggestion;
+                        textarea.focus();
+                        textarea.dispatchEvent(new Event('input'));
+                    }
+                }
             }
         }
     }
@@ -225,7 +491,22 @@
     }
     
     function createNewConversation() {
-        window.location.href = '{{ route("chat") }}';
+        // Marquer qu'on crée une nouvelle conversation
+        sessionStorage.setItem('newConversationCreated', 'true');
+        
+        // Activer les suggestions avant la redirection si on est déjà sur la page chat
+        const currentPath = window.location.pathname;
+        if (currentPath === '{{ route("chat.index") }}' || currentPath.includes('/chat')) {
+            const suggestionsComponent = document.querySelector('[x-data*="suggestions"]');
+            if (suggestionsComponent && suggestionsComponent._x_dataStack) {
+                const suggestionsData = suggestionsComponent._x_dataStack[0];
+                suggestionsData.showSuggestions = true;
+                if (suggestionsData.suggestionsList.length === 0 && !suggestionsData.isLoading) {
+                    suggestionsData.loadSuggestions();
+                }
+            }
+        }
+        window.location.href = '{{ route("chat.index") }}';
     }
     </script>
     

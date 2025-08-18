@@ -3,47 +3,37 @@
 @section('title', 'Agent O')
 
 @section('content')
-<div class="min-h-screen bg-white" x-data="chatInterface()" data-conversation-id="{{ $conversation->id ?? '' }}">
+<div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="{{ $conversation->id ?? '' }}">
     <!-- Chat Header with Tabs -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
         <div class="max-w-4xl mx-auto">
             <!-- Tabs conversations -->
-            <div class="flex items-center overflow-x-auto scrollbar-hidden" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
-                <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="flex items-center overflow-x-auto scrollbar-hidden" id="conversationTabs" x-ref="tabsContainer" style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                    <div class="flex items-center gap-2 flex-shrink-0">
                     <!-- Nouvelle conversation toujours en premier -->
-                    <button type="button" class="new-conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0" style="background: var(--gray-50); color: var(--gray-600); border: 1px solid var(--gray-200); border-style: dashed;" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='var(--gray-50)'" onclick="createNewConversation()">
+                    <button type="button" class="new-conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0" style="background: var(--gray-50); color: var(--gray-600); border: 1px solid var(--gray-200); border-style: dashed;" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='var(--gray-50)'" @click="createNewConversation()">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         <span>Nouvelle conversation</span>
-                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-gray-300 transition-colors" onclick="closeConversation(this)">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
                     </button>
                     
-                    @if(isset($conversation) && $conversation->title && $conversation->title !== 'Nouvelle conversation')
-                    <!-- Conversation active/récente -->
-                    <button type="button" class="conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap" style="background: var(--orange-100); color: var(--orange-700); border: 1px solid var(--orange-200);">
-                        <span class="max-w-48 truncate">{{ $conversation->title }}</span>
-                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-orange-200 transition-colors" onclick="closeConversation(this)">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
-                    </button>
-                    @endif
-                    
-                    <!-- Conversations par ordre chronologique (plus récent au moins récent) -->
-                    <button type="button" class="conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap" style="background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200);" onmouseover="this.style.background='var(--gray-200)'" onmouseout="this.style.background='var(--gray-100)'">
-                        <span class="max-w-48 truncate">Financement PME Côte d'Ivoire</span>
-                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-gray-300 transition-colors" onclick="closeConversation(this)">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
-                    </button>
-                    
-                    <button type="button" class="conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap" style="background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200);" onmouseover="this.style.background='var(--gray-200)'" onmouseout="this.style.background='var(--gray-100)'">
-                        <span class="max-w-48 truncate">Stratégie marketing digital</span>
-                        <button type="button" class="ml-2 p-0.5 rounded hover:bg-gray-300 transition-colors" onclick="closeConversation(this)">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
-                    </button>
-                </div>
+                    <!-- Conversations dynamiques -->
+                    <template x-for="conv in conversations" :key="conv.id">
+                        <div class="conversation-tab flex items-center gap-1 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap cursor-pointer" 
+                             :style="conv.id === currentConversationId ? 'background: var(--orange-100); color: var(--orange-700); border: 1px solid var(--orange-200);' : 'background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200);'"
+                             @mouseover="if(conv.id !== currentConversationId) $el.style.background='var(--gray-200)'"
+                             @mouseout="if(conv.id !== currentConversationId) $el.style.background='var(--gray-100)'"
+                             @click="switchToConversation(conv.id)">
+                            <span class="max-w-48 truncate" x-text="conv.title"></span>
+                            <button type="button" 
+                                    class="ml-2 p-0.5 rounded hover:bg-red-200 transition-colors" 
+                                    @click.stop="confirmDeleteConversation(conv.id, conv.title)"
+                                    x-show="conversations.length > 1"
+                                    title="Supprimer la conversation">
+                                <i data-lucide="x" class="w-3 h-3 text-red-600"></i>
+                            </button>
+                        </div>
+                    </template>
+                    </div>
             </div>
         </div>
     </div>
@@ -52,114 +42,74 @@
     <div class="max-w-4xl mx-auto p-4 space-y-4" x-ref="messagesArea">
         
         <!-- Welcome Message -->
-        @if(($messages ?? collect())->isEmpty())
-            <div class="text-center py-8">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style="background: var(--orange-lightest);">
-                    <i data-lucide="brain" class="w-8 h-8" style="color: var(--orange-primary);"></i>
-                </div>
-                <h2 class="text-lg font-medium mb-2" style="color: var(--gray-900);">
-                    Bonjour {{ auth()->user()->name ?? 'Entrepreneur' }} ! 👋
-                </h2>
-                <p class="text-sm mb-6" style="color: var(--gray-700);">
-                    Je suis LAgentO, votre assistant IA entrepreneurial. Comment puis-je vous aider aujourd'hui ?
-                </p>
-                
-                <!-- Quick Actions -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-md mx-auto">
-                    <button 
-                        @click="sendQuickMessage('Comment formaliser mon entreprise en Côte d\'Ivoire ?')"
-                        class="flex items-center gap-3 p-3 text-left border rounded-lg hover:shadow-sm transition-shadow"
-                        style="border-color: var(--gray-200);"
-                    >
-                        <i data-lucide="file-text" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                        <span class="text-sm" style="color: var(--gray-900);">Formaliser mon entreprise</span>
-                    </button>
-                    
-                    <button 
-                        @click="sendQuickMessage('Quels financements sont disponibles pour mon secteur ?')"
-                        class="flex items-center gap-3 p-3 text-left border rounded-lg hover:shadow-sm transition-shadow"
-                        style="border-color: var(--gray-200);"
-                    >
-                        <i data-lucide="banknote" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                        <span class="text-sm" style="color: var(--gray-900);">Trouver des financements</span>
-                    </button>
-                    
-                    
-                    <button 
-                        @click="sendQuickMessage('Quelles sont mes obligations légales ?')"
-                        class="flex items-center gap-3 p-3 text-left border rounded-lg hover:shadow-sm transition-shadow"
-                        style="border-color: var(--gray-200);"
-                    >
-                        <i data-lucide="shield" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                        <span class="text-sm" style="color: var(--gray-900);">Obligations légales</span>
-                    </button>
-                </div>
-            </div>
-        @endif
+        <div x-show="messages.length === 0">
+            <p class="text-sm" style="color: var(--gray-700);">Je suis LAgentO, votre assistant IA entrepreneurial. Comment puis-je vous aider aujourd'hui ?</p>
+        </div>
         
-        <!-- Messages -->
-        @foreach($messages ?? [] as $message)
-            <!-- User Message -->
-            @if($message->role === 'user')
-                <div class="flex justify-end">
-                    <div class="max-w-xs lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-lg" style="color: var(--gray-900);">
-                        <p class="text-sm">{{ $message->content }}</p>
-                        <div class="text-xs mt-1" style="color: var(--gray-500);">
-                            {{ $message->created_at->format('H:i') }}
+        <!-- Messages dynamiques -->
+        <template x-for="message in messages" :key="message.id">
+            <div>
+                <!-- User Message -->
+                <div x-show="message.role === 'user'" class="flex justify-end">
+                    <div class="max-w-xs lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-lg user-message" style="background: var(--orange-primary); color: white !important;">
+                        <p class="text-sm" style="color: white !important;" x-text="message.content"></p>
+                        <div class="text-xs mt-1" style="color: rgba(255, 255, 255, 0.8) !important;" x-text="formatTime(message.created_at)">
                         </div>
                     </div>
                 </div>
-            @endif
-            
-            <!-- Assistant Message -->
-            @if($message->role === 'assistant')
-                <div class="flex items-start gap-3">
+                
+                <!-- Assistant Message -->
+                <div x-show="message.role === 'assistant'" class="flex items-start gap-3">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background: var(--orange-lightest);">
                         <i data-lucide="brain" class="w-4 h-4" style="color: var(--orange-primary);"></i>
                     </div>
                     
                     <div class="flex-1">
-                        {!! app(\App\Services\MarkdownProcessor::class)->process($message->content) !!}
+                        <div class="prose prose-sm max-w-none" x-html="processMarkdown(message.content)"></div>
                         
                         <!-- Message Actions -->
                         <div class="flex items-center gap-2 mt-3">
                             <button 
-                                @click="copyMessage('{{ addslashes($message->content) }}', $event)"
+                                @click="copyMessage(message.content, $event)"
                                 class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                                 title="Copier"
                             >
                                 <i data-lucide="copy" class="w-4 h-4" style="color: var(--gray-500);"></i>
                             </button>
                             
-                            <button 
-                                @click="retryMessage('{{ addslashes($message->content) }}')"
-                                class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                title="Régénérer"
-                            >
-                                <i data-lucide="refresh-cw" class="w-4 h-4" style="color: var(--gray-500);"></i>
-                            </button>
-                            
-                            <span class="text-xs ml-auto" style="color: var(--gray-500);">
-                                {{ $message->created_at->format('H:i') }}
+                            <span class="text-xs ml-auto" style="color: var(--gray-500);" x-text="formatTime(message.created_at)">
                             </span>
                         </div>
                     </div>
                 </div>
-            @endif
-        @endforeach
+            </div>
+        </template>
         
         <!-- Typing Indicator -->
         <div x-show="isTyping" class="flex items-start gap-3" style="display: none;">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: var(--orange-lightest);">
-                <i data-lucide="brain" class="w-4 h-4" style="color: var(--orange-primary);"></i>
+            <div class="w-8 h-8 rounded-full flex items-center justify-center">
+                <i data-lucide="brain" class="w-4 h-4 pulse-icon" style="color: var(--orange-primary);"></i>
             </div>
-            <div class="flex items-center gap-1 p-3 rounded-lg" style="background: var(--gray-100);">
-                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--gray-500);"></div>
-                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--gray-500); animation-delay: 0.2s;"></div>
-                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--gray-500); animation-delay: 0.4s;"></div>
+            <div class="flex items-center gap-2 py-2">
+                <span class="text-sm shimmer-text font-medium">LagentO réfléchit...</span>
             </div>
         </div>
     </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <x-modal.confirm 
+        show="showDeleteModal"
+        title="Supprimer la conversation"
+        confirm-text="Supprimer"
+        cancel-text="Annuler"
+        on-confirm="deleteConversation()"
+        on-cancel="showDeleteModal = false"
+        :danger="true"
+        loading="isDeleting"
+        loading-text="Suppression...">
+        Êtes-vous sûr de vouloir supprimer la conversation "<span x-text="conversationToDelete.title" style="font-weight: var(--font-weight-medium);"></span>" ? 
+        Cette action est irréversible et supprimera tous les messages de cette conversation.
+    </x-modal.confirm>
 
 </div>
 
@@ -173,77 +123,635 @@
 .scrollbar-hidden::-webkit-scrollbar {
     display: none;
 }
+
+/* Smooth scroll for conversation tabs */
+#conversationTabs {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Markdown prose styling */
+.prose {
+    max-width: none;
+    color: var(--gray-700);
+    line-height: 1.6;
+}
+
+.prose h1, .prose h2, .prose h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.prose h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.prose h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.prose h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.prose ul, .prose ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.prose li {
+    margin: 0.25rem 0;
+}
+
+.prose hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--gray-200);
+}
+
+.prose p {
+    margin: 1rem 0;
+}
+
+.prose strong {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.prose em {
+    font-style: italic;
+}
+
+/* Messages utilisateur - texte toujours en blanc */
+.user-message {
+    background: var(--orange-primary) !important;
+    color: white !important;
+}
+
+.user-message * {
+    color: white !important;
+}
+
+.user-message p {
+    color: white !important;
+}
+
+.user-message div {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Forcer les alertes en blanc dans les outputs de l'agent (dark mode) */
+@media (prefers-color-scheme: dark) {
+    .prose .alert-success,
+    .prose .alert-error,
+    .prose .alert-warning,
+    .prose .alert-info {
+        color: white !important;
+    }
+    
+    .prose .alert-success *,
+    .prose .alert-error *,
+    .prose .alert-warning *,
+    .prose .alert-info * {
+        color: white !important;
+    }
+    
+    .prose .alert-success div,
+    .prose .alert-error div,
+    .prose .alert-warning div,
+    .prose .alert-info div {
+        color: white !important;
+    }
+    
+    /* Sélecteur ultra-spécifique pour x-html */
+    [x-html] .alert-success,
+    [x-html] .alert-error,
+    [x-html] .alert-warning,
+    [x-html] .alert-info {
+        color: white !important;
+    }
+    
+    [x-html] .alert-success *,
+    [x-html] .alert-error *,
+    [x-html] .alert-warning *,
+    [x-html] .alert-info * {
+        color: white !important;
+    }
+}
 </style>
 
 <script>
 function chatInterface() {
     return {
         isTyping: false,
+        conversations: @json($conversations ?? []),
+        messages: @json($messages ?? []),
+        currentConversationId: '{{ $conversation->id ?? '' }}',
+        showDeleteModal: false,
+        isDeleting: false,
+        conversationToDelete: { id: null, title: '' },
+        
+        init() {
+            // Ensure messages have proper format and content field
+            this.messages = this.messages.map(msg => ({
+                ...msg,
+                content: msg.content || msg.text_content || '', // Fallback for content field
+                created_at: msg.created_at || new Date().toISOString()
+            }));
+            
+            console.log('Messages loaded on init:', this.messages.length);
+            console.log('Current conversation ID:', this.currentConversationId);
+            
+            this.loadConversations();
+            this.scrollToBottom();
+            
+            // Scroll automatique avec délai pour s'assurer que le contenu est rendu
+            setTimeout(() => {
+                this.scrollToBottom();
+            }, 100);
+            
+            // Vérifier si on doit soumettre automatiquement un message
+            if (sessionStorage.getItem('autoSubmitMessage') === 'true') {
+                sessionStorage.removeItem('autoSubmitMessage');
+                const pendingMessage = sessionStorage.getItem('pendingMessage');
+                
+                if (pendingMessage) {
+                    sessionStorage.removeItem('pendingMessage');
+                    
+                    // Vérifier si le message n'est pas déjà dans la conversation
+                    const isDuplicate = this.messages.some(msg => 
+                        msg.role === 'user' && 
+                        msg.content.trim() === pendingMessage.trim()
+                    );
+                    
+                    if (!isDuplicate) {
+                        // Soumettre automatiquement le message après un court délai
+                        setTimeout(() => {
+                            this.sendDirectMessage(pendingMessage);
+                        }, 100);
+                    } else {
+                        console.log('Message déjà présent, éviter la duplication');
+                    }
+                }
+                
+                // Vérifier si un fichier était attaché (pour informer l'utilisateur)
+                if (sessionStorage.getItem('pendingFileAlert') === 'true') {
+                    sessionStorage.removeItem('pendingFileAlert');
+                    // On pourrait ajouter une notification ici si nécessaire
+                }
+                
+                // Ne pas afficher les suggestions car un message va être soumis
+                return;
+            }
+            // Vérifier si une nouvelle conversation vient d'être créée
+            else if (sessionStorage.getItem('newConversationCreated') === 'true') {
+                sessionStorage.removeItem('newConversationCreated');
+                // Activer les suggestions après un court délai
+                setTimeout(() => {
+                    this.showSuggestionsAutomatically();
+                }, 500);
+            }
+            // Activer automatiquement les suggestions si la conversation est vide
+            else if (this.messages.length === 0) {
+                setTimeout(() => {
+                    this.showSuggestionsAutomatically();
+                }, 1000);
+            }
+            
+            // Initialiser les icônes Lucide
+            this.$nextTick(() => {
+                if (typeof window.renderIcons === 'function') {
+                    window.renderIcons();
+                }
+            });
+            
+            // Refresh conversations periodically
+            setInterval(() => {
+                this.loadConversations();
+            }, 30000);
+        },
+        
+        async loadConversations() {
+            try {
+                const response = await fetch('/chat/conversations');
+                const data = await response.json();
+                if (data.success) {
+                    this.conversations = data.conversations;
+                    this.$nextTick(() => {
+                        // Réinitialiser les icônes Lucide
+                        if (typeof window.renderIcons === 'function') {
+                            window.renderIcons();
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des conversations:', error);
+            }
+        },
+        
+        async createNewConversation() {
+            try {
+                const response = await fetch('/chat/conversations/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Stocker l'information qu'on vient de créer une nouvelle conversation
+                    sessionStorage.setItem('newConversationCreated', 'true');
+                    window.location.href = data.redirect_url;
+                }
+            } catch (error) {
+                console.error('Erreur lors de la création de la conversation:', error);
+            }
+        },
+        
+        async switchToConversation(conversationId) {
+            if (conversationId !== this.currentConversationId) {
+                // Option 1: Navigation classique (garantit le rechargement des messages)
+                window.location.href = `/chat?conversation=${conversationId}`;
+                
+                // Option 2: Navigation AJAX (plus rapide mais nécessite de recharger les messages)
+                // await this.loadMessagesForConversation(conversationId);
+                // this.currentConversationId = conversationId;
+                // this.scrollToBottom();
+            }
+        },
+        
+        async loadMessagesForConversation(conversationId) {
+            try {
+                const response = await fetch(`/chat/conversations/${conversationId}/messages`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.messages = data.messages.map(msg => ({
+                        ...msg,
+                        content: msg.content || msg.text_content || '',
+                        created_at: msg.created_at || new Date().toISOString()
+                    }));
+                    
+                    console.log('Messages loaded for conversation:', conversationId, this.messages.length);
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des messages:', error);
+            }
+        },
+        
+        confirmDeleteConversation(conversationId, conversationTitle) {
+            this.conversationToDelete = {
+                id: conversationId,
+                title: conversationTitle
+            };
+            this.showDeleteModal = true;
+        },
+        
+        async deleteConversation() {
+            if (!this.conversationToDelete.id) return;
+            
+            this.isDeleting = true;
+            
+            try {
+                const response = await fetch(`/chat/conversations/${this.conversationToDelete.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Supprimer de la liste locale
+                    this.conversations = this.conversations.filter(c => c.id !== this.conversationToDelete.id);
+                    
+                    // Si c'était la conversation active, rediriger vers une autre ou créer une nouvelle
+                    if (this.conversationToDelete.id === this.currentConversationId) {
+                        if (this.conversations.length > 0) {
+                            // Rediriger vers la première conversation restante
+                            window.location.href = `/chat?conversation=${this.conversations[0].id}`;
+                        } else {
+                            // Créer une nouvelle conversation
+                            await this.createNewConversation();
+                        }
+                    }
+                    
+                    this.showDeleteModal = false;
+                    this.conversationToDelete = { id: null, title: '' };
+                } else {
+                    alert('Erreur lors de la suppression de la conversation');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                alert('Erreur lors de la suppression de la conversation');
+            } finally {
+                this.isDeleting = false;
+            }
+        },
+        
+        async sendQuickMessage(text) {
+            // Utiliser directement la méthode sendDirectMessage pour éviter les doublons
+            await this.sendDirectMessage(text);
+        },
+        
+        async sendDirectMessage(message) {
+            if (!message.trim()) return;
+            
+            try {
+                // Étape 1: Sauver le message utilisateur d'abord
+                const saveResponse = await fetch('/chat/save-user-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        message: message.trim(),
+                        conversation_id: this.currentConversationId
+                    })
+                });
+                
+                const saveData = await saveResponse.json();
+                
+                if (saveData.success) {
+                    console.log('User message saved successfully:', saveData);
+                    
+                    // Ajouter le message utilisateur immédiatement
+                    const userMessage = {
+                        id: saveData.user_message_id,
+                        role: 'user',
+                        content: message.trim(),
+                        created_at: new Date().toISOString()
+                    };
+                    
+                    this.messages.push(userMessage);
+                    this.scrollToBottom();
+                    
+                    // Mettre à jour l'ID de conversation si nécessaire
+                    if (saveData.conversation_id !== this.currentConversationId) {
+                        this.currentConversationId = saveData.conversation_id;
+                        const mainContainer = document.querySelector('[data-conversation-id]');
+                        if (mainContainer) {
+                            mainContainer.setAttribute('data-conversation-id', saveData.conversation_id);
+                        }
+                    }
+                    
+                    // Activer le typing
+                    this.isTyping = true;
+                    this.$nextTick(() => {
+                        if (typeof window.renderIcons === 'function') {
+                            window.renderIcons();
+                        }
+                    });
+                    
+                    // Étape 2: Traiter la réponse de l'agent
+                    const formData = new FormData();
+                    formData.append('message', message.trim());
+                    formData.append('conversation_id', this.currentConversationId);
+                    
+                    const response = await fetch('/chat/send', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        console.log('AI response received:', data);
+                        
+                        // Ajouter la réponse AI
+                        const aiMessage = {
+                            id: data.message_id,
+                            role: 'assistant',
+                            content: data.response,
+                            created_at: new Date().toISOString()
+                        };
+                        
+                        this.messages.push(aiMessage);
+                        await this.loadConversations();
+                    } else {
+                        console.error('Erreur API:', data.error);
+                    }
+                } else {
+                    console.error('Erreur sauvegarde:', saveData.error);
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'envoi:', error);
+            } finally {
+                this.isTyping = false;
+                this.scrollToBottom();
+                
+                this.$nextTick(() => {
+                    if (typeof window.renderIcons === 'function') {
+                        window.renderIcons();
+                    }
+                });
+            }
+        },
         
         copyMessage(content, event) {
             navigator.clipboard.writeText(content).then(() => {
                 // Show temporary feedback
                 const button = event.target.closest('button');
                 const icon = button.querySelector('i');
+                const originalLucide = icon.getAttribute('data-lucide');
                 icon.setAttribute('data-lucide', 'check');
+                if (typeof window.renderIcons === 'function') {
+                    window.renderIcons(); // Refresh icons
+                }
                 setTimeout(() => {
-                    icon.setAttribute('data-lucide', 'copy');
+                    icon.setAttribute('data-lucide', originalLucide);
+                    if (typeof window.renderIcons === 'function') {
+                        window.renderIcons(); // Refresh icons
+                    }
                 }, 1000);
             });
         },
         
-        sendQuickMessage(text) {
-            // Use the fixed chat form
-            const fixedChatComponent = document.querySelector('[x-data*="fixedChat"]');
-            if (fixedChatComponent && fixedChatComponent._x_dataStack) {
-                fixedChatComponent._x_dataStack[0].message = text;
-                fixedChatComponent._x_dataStack[0].sendMessage();
+        formatTime(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return '';
+                return date.toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                console.error('Erreur de formatage de la date:', error);
+                return '';
             }
+        },
+        
+        scrollToBottom() {
+            this.$nextTick(() => {
+                const messagesArea = this.$refs.messagesArea;
+                if (messagesArea) {
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                }
+            });
+        },
+        
+        showSuggestionsAutomatically() {
+            // Trouver le composant de suggestions et l'activer
+            const suggestionsComponent = document.querySelector('[x-data*="suggestions"]');
+            if (suggestionsComponent && suggestionsComponent._x_dataStack) {
+                const suggestionsData = suggestionsComponent._x_dataStack[0];
+                suggestionsData.showSuggestions = true;
+                
+                // Charger les suggestions si pas encore chargées
+                if (suggestionsData.suggestionsList.length === 0 && !suggestionsData.isLoading) {
+                    suggestionsData.loadSuggestions();
+                }
+            }
+        },
+        
+        processMarkdown(content) {
+            if (!content) return '';
+            
+            let html = content
+                // Custom components - Alertes (spacing ultra-compacte)
+                .replace(/:::info\s*([\s\S]*?):::/g, '<div class="alert alert-info my-2"><i data-lucide="info" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
+                .replace(/:::success\s*([\s\S]*?):::/g, '<div class="alert alert-success my-2"><i data-lucide="check-circle" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
+                .replace(/:::warning\s*([\s\S]*?):::/g, '<div class="alert alert-warning my-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
+                .replace(/:::danger\s*([\s\S]*?):::/g, '<div class="alert alert-danger my-2"><i data-lucide="x-circle" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
+                
+                // Custom components - Cartes avec bouton détail (alignement horizontal coordonnées + bouton)
+                .replace(/\[carte-institution:(.*?)\|(.*?)\|(.*?)\|(.*?)\]/g, '<div class="card my-2"><div class="card-header"><h4 class="card-title flex items-center gap-2"><i data-lucide="building" class="w-4 h-4"></i>$1</h4></div><div class="card-body"><p class="text-sm text-gray-600 mb-2">$2</p><div class="flex items-center justify-between"><div class="flex items-center gap-1 text-xs text-gray-500"><i data-lucide="phone" class="w-3 h-3"></i>$3</div><a href="$4" target="_blank" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-md transition-colors" style="border: 1px solid var(--orange-primary); color: var(--orange-primary);" onmouseover="this.style.backgroundColor=\'var(--orange-primary)\'; this.style.color=\'white\'" onmouseout="this.style.backgroundColor=\'transparent\'; this.style.color=\'var(--orange-primary)\'">Détails</a></div></div></div>')
+                .replace(/\[carte-opportunite:(.*?)\|(.*?)\|(.*?)\|(.*?)\]/g, '<div class="card my-2"><div class="card-header"><h4 class="card-title flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i>$1</h4></div><div class="card-body"><p class="text-sm text-gray-600 mb-2">$2</p><div class="flex items-center justify-between"><p class="text-xs font-medium" style="color: var(--orange-primary);">$3</p><a href="$4" target="_blank" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-md transition-colors" style="border: 1px solid var(--orange-primary); color: var(--orange-primary);" onmouseover="this.style.backgroundColor=\'var(--orange-primary)\'; this.style.color=\'white\'" onmouseout="this.style.backgroundColor=\'transparent\'; this.style.color=\'var(--orange-primary)\'">Détails</a></div></div></div>')
+                .replace(/\[carte-texte-officiel:(.*?)\|(.*?)\|(.*?)\|(.*?)\]/g, '<div class="card my-2"><div class="card-header"><h4 class="card-title flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i>$1</h4></div><div class="card-body"><p class="text-sm text-gray-600 mb-2">$2</p><div class="flex items-center justify-between"><p class="text-xs text-blue-600 font-medium">$3</p><a href="$4" target="_blank" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-md transition-colors" style="border: 1px solid var(--orange-primary); color: var(--orange-primary);" onmouseover="this.style.backgroundColor=\'var(--orange-primary)\'; this.style.color=\'white\'" onmouseout="this.style.backgroundColor=\'transparent\'; this.style.color=\'var(--orange-primary)\'">Détails</a></div></div></div>')
+                .replace(/\[carte-partenaire:(.*?)\|(.*?)\|(.*?)\|(.*?)\]/g, '<div class="card my-2"><div class="card-header"><h4 class="card-title flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i>$1</h4></div><div class="card-body"><p class="text-sm text-gray-600 mb-2">$2</p><div class="flex items-center justify-between"><p class="text-xs text-green-600 font-medium">$3</p><a href="$4" target="_blank" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-md transition-colors" style="border: 1px solid var(--orange-primary); color: var(--orange-primary);" onmouseover="this.style.backgroundColor=\'var(--orange-primary)\'; this.style.color=\'white\'" onmouseout="this.style.backgroundColor=\'transparent\'; this.style.color=\'var(--orange-primary)\'">Détails</a></div></div></div>')
+                
+                // Headers (espacement ultra-réduit)
+                .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold mt-2 mb-1" style="color: var(--gray-900);">$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-3 mb-1" style="color: var(--gray-900);">$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-3 mb-2" style="color: var(--gray-900);">$1</h1>')
+                
+                // Bold and italic
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold" style="color: var(--gray-900);">$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+                
+                // Links (target blank + orange style)
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-orange-600 hover:text-orange-700 underline">$1</a>');
+            
+            // Process lists with proper numbering and compact spacing
+            html = this.processLists(html);
+            
+            // Horizontal rules
+            html = html.replace(/^---$/gm, '<hr class="my-4 border-gray-200">');
+            
+            // Process paragraphs with compact spacing
+            html = this.processParagraphs(html);
+            
+            // Trigger icon rendering after content update
+            setTimeout(() => {
+                if (typeof window.renderIcons === 'function') {
+                    window.renderIcons();
+                }
+            }, 100);
+            
+            return html;
+        },
+        
+        processLists(html) {
+            // Split into lines for processing
+            let lines = html.split('\n');
+            let result = [];
+            let currentList = null;
+            let listItems = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                
+                // Check for unordered list items
+                if (line.match(/^[-*+]\s+(.+)/)) {
+                    let content = line.replace(/^[-*+]\s+/, '');
+                    if (currentList !== 'ul') {
+                        if (currentList) {
+                            result.push(this.closePreviousList(currentList, listItems));
+                            listItems = [];
+                        }
+                        currentList = 'ul';
+                    }
+                    listItems.push(`<li class="mb-0">${content}</li>`);
+                }
+                // Check for ordered list items
+                else if (line.match(/^\d+\.\s+(.+)/)) {
+                    let content = line.replace(/^\d+\.\s+/, '');
+                    if (currentList !== 'ol') {
+                        if (currentList) {
+                            result.push(this.closePreviousList(currentList, listItems));
+                            listItems = [];
+                        }
+                        currentList = 'ol';
+                    }
+                    listItems.push(`<li class="mb-0">${content}</li>`);
+                }
+                // Not a list item
+                else {
+                    if (currentList) {
+                        result.push(this.closePreviousList(currentList, listItems));
+                        currentList = null;
+                        listItems = [];
+                    }
+                    if (line.trim()) {
+                        result.push(line);
+                    }
+                }
+            }
+            
+            // Close any remaining list
+            if (currentList) {
+                result.push(this.closePreviousList(currentList, listItems));
+            }
+            
+            return result.join('\n');
+        },
+        
+        closePreviousList(listType, items) {
+            if (listType === 'ul') {
+                return `<ul class="list-disc pl-6 mb-2 space-y-0">${items.join('')}</ul>`;
+            } else if (listType === 'ol') {
+                return `<ol class="list-decimal pl-6 mb-2 space-y-0">${items.join('')}</ol>`;
+            }
+            return '';
+        },
+        
+        processParagraphs(html) {
+            // Split by double line breaks for paragraphs
+            let paragraphs = html.split(/\n\s*\n/);
+            
+            return paragraphs.map(paragraph => {
+                paragraph = paragraph.trim();
+                if (!paragraph) return '';
+                
+                // Skip if already wrapped in block elements
+                if (paragraph.match(/^<(h[1-6]|ul|ol|div|hr)/)) {
+                    return paragraph;
+                }
+                
+                // Replace single line breaks with <br> within paragraphs
+                paragraph = paragraph.replace(/\n/g, '<br>');
+                
+                // Wrap in paragraph tag with ultra-compact spacing
+                return `<p class="mb-1 leading-relaxed">${paragraph}</p>`;
+            }).join('\n');
         }
     }
 }
 
-
-// Custom card interactions
-function contactInstitution() {
-    // TODO: Implement contact functionality
-    console.log('Contact institution clicked');
-}
-
-function viewMore() {
-    // TODO: Implement view more functionality
-    console.log('View more clicked');
-}
-
-function applyOpportunity() {
-    // TODO: Implement apply functionality
-    console.log('Apply opportunity clicked');
-}
-
-function saveOpportunity() {
-    // TODO: Implement save functionality
-    console.log('Save opportunity clicked');
-}
-
-function downloadText() {
-    // TODO: Implement download functionality
-    console.log('Download text clicked');
-}
-
-function viewFullText() {
-    // TODO: Implement view full text functionality
-    console.log('View full text clicked');
-}
-
-function connectPartner() {
-    // TODO: Implement connect partner functionality
-    console.log('Connect partner clicked');
-}
-
-function viewProfile() {
-    // TODO: Implement view profile functionality
-    console.log('View profile clicked');
-}
+// Icons are already initialized by app.js, no need to do it here
 </script>
 @endpush
 @endsection

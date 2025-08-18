@@ -52,7 +52,7 @@ class EmbeddingService
         try {
             $res = $this->client->post('embeddings', [
                 'headers' => [
-                    'Authorization' => 'Bearer '.env('VOYAGE_API_KEY'),
+                    'Authorization' => 'Bearer '.config('services.voyage.api_key'),
                     'Content-Type' => 'application/json',
                 ],
                 'json' => [

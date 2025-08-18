@@ -64,6 +64,19 @@
   }
 }
 
+.btn-danger {
+  background-color: var(--danger);
+  color: var(--danger-text);
+  
+  &:hover:not(:disabled) {
+    background-color: var(--danger);
+    color: var(--danger-text);
+    filter: brightness(0.9);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
 .btn-sm {
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-xs);
@@ -157,8 +170,74 @@
 
 .card-footer {
   padding: var(--space-4) var(--space-6);
-  border-top: 1px solid var(--gray-200);
-  background-color: var(--gray-50);
+}
+
+/* Espacement spécifique pour les cartes de diagnostic */
+.diagnostic-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* 32px */
+}
+
+.diagnostic-cards .card {
+  margin-bottom: 2rem !important; /* 32px de marge bottom explicite */
+}
+
+.diagnostic-cards .card:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Espacement pour les sous-cartes à l'intérieur des sections */
+.card-body .space-y-4 > * + *,
+.card-body .space-y-5 > * + * {
+  margin-top: 1.5rem !important; /* 24px */
+}
+
+.card-body .space-y-3 > * + * {
+  margin-top: 1rem !important; /* 16px */
+}
+
+/* Espacement spécifique pour les éléments dans les cartes */
+.card-body .p-4,
+.card-body .p-5 {
+  margin-bottom: 1rem !important;
+}
+
+.card-body .p-4:last-child,
+.card-body .p-5:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Grilles avec gap amélioré */
+.card-body .grid.gap-8 {
+  gap: 2rem !important; /* 32px */
+}
+
+/* Padding amélioré pour les sous-cartes */
+.card-body .p-4 {
+  padding: 1.5rem !important; /* 24px au lieu de 16px */
+}
+
+.card-body .p-5 {
+  padding: 2rem !important; /* 32px au lieu de 20px */
+}
+
+/* Espacement interne pour les éléments de contenu */
+.card-body .p-4 h5,
+.card-body .p-5 h4,
+.card-body .p-4 .font-medium,
+.card-body .p-5 .font-semibold {
+  margin-bottom: 0.75rem !important; /* 12px */
+}
+
+.card-body .p-4 p,
+.card-body .p-5 p {
+  margin-bottom: 0.5rem !important; /* 8px */
+}
+
+.card-body .p-4 p:last-child,
+.card-body .p-5 p:last-child {
+  margin-bottom: 0 !important;
 }
 
 .card-title {
@@ -181,14 +260,74 @@
     box-shadow: var(--shadow-md);
   }
 }
-
 /* === ALERTES === */
 .alert {
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   border-left: 4px solid;
   margin-bottom: var(--space-4);
+  margin-top: var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
 }
+
+
+/* Dark mode pour les alertes */
+@media (prefers-color-scheme: dark) {
+  .alert-success,
+  .prose .alert-success,
+  [x-html] .alert-success {
+    background-color: rgba(16, 185, 129, 0.05);
+    color: white !important;
+  }
+
+  .alert-success *,
+  .prose .alert-success *,
+  [x-html] .alert-success * {
+    color: white !important;
+  }
+
+  .alert-error,
+  .prose .alert-error,
+  [x-html] .alert-error {
+    background-color: rgba(239, 68, 68, 0.05);
+    color: white !important;
+  }
+
+  .alert-error *,
+  .prose .alert-error *,
+  [x-html] .alert-error * {
+    color: white !important;
+  }
+
+  .alert-warning,
+  .prose .alert-warning,
+  [x-html] .alert-warning {
+    background-color: rgba(245, 158, 11, 0.05);
+    color: white !important;
+  }
+
+  .alert-warning *,
+  .prose .alert-warning *,
+  [x-html] .alert-warning * {
+    color: white !important;
+  }
+
+  .alert-info,
+  .prose .alert-info,
+  [x-html] .alert-info {
+    background-color: rgba(59, 130, 246, 0.05);
+    color: white !important;
+  }
+
+  .alert-info *,
+  .prose .alert-info *,
+  [x-html] .alert-info * {
+    color: white !important;
+  }
+}
+
 
 .alert-success {
   background-color: #ECFDF5;
@@ -213,6 +352,7 @@
   border-left-color: var(--info);
   color: #1E40AF;
 }
+
 
 /* === BADGES === */
 .badge {

@@ -9,7 +9,7 @@ class AgentTitreConversation extends BaseAgent
         return [
             'model' => 'gpt-5-nano',
             'strategy' => 'fast',
-            'temperature' => 0.5,
+            'reasoning_effort' => 'minimal',
             'max_tokens' => 50,
             'tools' => []
         ];
@@ -17,6 +17,9 @@ class AgentTitreConversation extends BaseAgent
 
     public function execute(array $inputs): array
     {
+        $startTime = microtime(true);
+        $sessionId = $this->logExecutionStart($inputs);
+        
         $userFirstMessage = $inputs['user_first_message'] ?? '';
         $activePage = $inputs['active_page'] ?? '';
         $conversationId = $inputs['conversation_id'] ?? null;
@@ -24,15 +27,25 @@ class AgentTitreConversation extends BaseAgent
         $recentMessages = $inputs['recent_messages'] ?? [];
 
         if (!$userFirstMessage && empty($recentMessages)) {
-            return [
+            $result = [
                 'success' => false,
                 'error' => 'Premier message utilisateur ou messages récents requis'
             ];
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
         }
 
         try {
             // Determine if this is initial title generation or update
             $isUpdate = $messageCount >= 10 && !empty($recentMessages);
+            
+            $this->logDebug('Title generation mode', [
+                'is_update' => $isUpdate,
+                'message_count' => $messageCount,
+                'active_page' => $activePage,
+                'first_message_length' => strlen($userFirstMessage),
+                'recent_messages_count' => count($recentMessages)
+            ]);
             
             // Prepare system instructions
             $instructions = $this->getSystemInstructions($isUpdate);
@@ -47,16 +60,26 @@ class AgentTitreConversation extends BaseAgent
                 ? $this->buildUpdatePrompt($recentMessages, $activePage)
                 : $this->buildInitialPrompt($userFirstMessage, $activePage);
 
+            $this->logDebug('Prompt built', [
+                'prompt_type' => $isUpdate ? 'update' : 'initial',
+                'prompt_length' => strlen($userMessage)
+            ]);
+
             // Generate title using nano model for speed
             $config = $this->getConfig();
             $messages = $this->formatMessages($systemPrompt, $userMessage);
             
+            $llmStartTime = microtime(true);
             $response = $this->llm->chat(
                 $messages,
                 $config['model'],
-                $config['temperature'],
-                $config['max_tokens']
+                null,
+                $config['max_tokens'],
+                ['reasoning_effort' => $config['reasoning_effort']]
             );
+            $this->logLLMCall($messages, $config, $llmStartTime);
+
+            $this->logDebug('Raw title response', ['raw_response' => $response]);
 
             // Clean and validate title
             $title = $this->cleanTitle($response);
@@ -64,28 +87,34 @@ class AgentTitreConversation extends BaseAgent
             // Ensure title meets requirements (max 7 words)
             $title = $this->validateTitle($title, $userFirstMessage);
 
-            return [
+            $result = [
                 'success' => true,
                 'title' => $title,
                 'metadata' => [
                     'model' => $config['model'],
                     'is_update' => $isUpdate,
                     'message_count' => $messageCount,
-                    'word_count' => str_word_count($title)
+                    'word_count' => str_word_count($title),
+                    'final_title' => $title
                 ]
             ];
 
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
+
         } catch (\Exception $e) {
-            \Log::error('AgentTitreConversation execution error', [
-                'error' => $e->getMessage(),
+            $this->logError($e->getMessage(), [
+                'session_id' => $sessionId,
                 'conversation_id' => $conversationId,
-                'message_count' => $messageCount
+                'message_count' => $messageCount,
+                'active_page' => $activePage,
+                'trace' => $e->getTraceAsString()
             ]);
 
             // Return fallback title
             $fallbackTitle = $this->generateFallbackTitle($userFirstMessage, $activePage);
             
-            return [
+            $result = [
                 'success' => true,
                 'title' => $fallbackTitle,
                 'metadata' => [
@@ -93,6 +122,9 @@ class AgentTitreConversation extends BaseAgent
                     'error' => app()->environment('local') ? $e->getMessage() : null
                 ]
             ];
+            
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
         }
     }
 
@@ -291,8 +323,8 @@ La conversation a évolué avec plus de contexte. Génère un titre plus précis
     {
         // Quick fallback based on page context
         switch ($activePage) {
-            case 'dashboard':
-                return 'Analyse tableau bord';
+            case 'diagnostic':
+                return 'Analyse diagnostic';
             case 'opportunities':
                 return 'Recherche opportunités financement';
             case 'profile':

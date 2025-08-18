@@ -9,7 +9,7 @@ class AgentSuggestionsConversation extends BaseAgent
         return [
             'model' => 'gpt-5-nano',
             'strategy' => 'fast',
-            'temperature' => 0.7,
+            'reasoning_effort' => 'minimal',
             'max_tokens' => 200,
             'tools' => []
         ];
@@ -17,20 +17,33 @@ class AgentSuggestionsConversation extends BaseAgent
 
     public function execute(array $inputs): array
     {
+        $startTime = microtime(true);
+        $sessionId = $this->logExecutionStart($inputs);
+        
         $previousPage = $inputs['previous_page'] ?? '';
         $activePage = $inputs['active_page'] ?? '';
         $userId = $inputs['user_id'] ?? null;
 
         if (!$userId) {
-            return [
+            $result = [
                 'success' => false,
                 'error' => 'ID utilisateur requis'
             ];
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
         }
 
         try {
+            $this->logDebug('Getting user context for suggestions', ['user_id' => $userId]);
+            
             // Get user context for personalization
             $userContext = $this->getUserAnalyticsContext($userId);
+            
+            $this->logDebug('Building suggestions prompt', [
+                'previous_page' => $previousPage,
+                'active_page' => $activePage,
+                'user_business_sector' => $userContext['business_sector'] ?? 'N/A'
+            ]);
             
             // Prepare system instructions
             $instructions = $this->getSystemInstructions();
@@ -47,12 +60,17 @@ class AgentSuggestionsConversation extends BaseAgent
             $config = $this->getConfig();
             $messages = $this->formatMessages($systemPrompt, $userMessage);
             
+            $llmStartTime = microtime(true);
             $response = $this->llm->chat(
                 $messages,
                 $config['model'],
-                $config['temperature'],
-                $config['max_tokens']
+                null,
+                $config['max_tokens'],
+                ['reasoning_effort' => $config['reasoning_effort']]
             );
+            $this->logLLMCall($messages, $config, $llmStartTime);
+
+            $this->logDebug('Parsing suggestions from response', ['response_length' => strlen($response)]);
 
             // Parse suggestions from response
             $suggestions = $this->parseSuggestions($response);
@@ -60,7 +78,7 @@ class AgentSuggestionsConversation extends BaseAgent
             // Ensure we have exactly 5 suggestions
             $suggestions = $this->normalizeSuggestions($suggestions, $userContext);
 
-            return [
+            $result = [
                 'success' => true,
                 'suggestions' => $suggestions,
                 'metadata' => [
@@ -68,20 +86,26 @@ class AgentSuggestionsConversation extends BaseAgent
                     'context' => [
                         'previous_page' => $previousPage,
                         'active_page' => $activePage
-                    ]
+                    ],
+                    'suggestions_count' => count($suggestions)
                 ]
             ];
 
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
+
         } catch (\Exception $e) {
-            \Log::error('AgentSuggestionsConversation execution error', [
-                'error' => $e->getMessage(),
+            $this->logError($e->getMessage(), [
+                'session_id' => $sessionId,
                 'user_id' => $userId,
                 'previous_page' => $previousPage,
-                'active_page' => $activePage
+                'active_page' => $activePage,
+                'trace' => $e->getTraceAsString()
             ]);
 
             // Return fallback suggestions
-            return [
+            $userContext = $userContext ?? [];
+            $result = [
                 'success' => true,
                 'suggestions' => $this->getFallbackSuggestions($userContext),
                 'metadata' => [
@@ -89,6 +113,9 @@ class AgentSuggestionsConversation extends BaseAgent
                     'error' => app()->environment('local') ? $e->getMessage() : null
                 ]
             ];
+            
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
         }
     }
 
@@ -158,8 +185,8 @@ STYLE :
     protected function getPageSpecificContext(string $activePage): string
     {
         switch ($activePage) {
-            case 'dashboard':
-                return "\nContexte : L'utilisateur consulte son tableau de bord. Suggestions sur l'analyse des données, optimisation, opportunités.";
+            case 'diagnostic':
+                return "\nContexte : L'utilisateur consulte son diagnostic entrepreneurial. Suggestions sur l'analyse des données, optimisation, opportunités.";
             
             case 'chat':
                 return "\nContexte : L'utilisateur est dans l'interface de chat. Suggestions variées sur tous les sujets entrepreneuriaux.";

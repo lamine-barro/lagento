@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProjetController;
@@ -46,18 +46,23 @@ Route::middleware(['auth'])->group(function () {
     
     // Routes protégées qui nécessitent un onboarding complet
     Route::middleware(['onboarding.complete'])->group(function () {
-        Route::get('/diagnostic', [DashboardController::class, 'index'])->name('diagnostic');
-        Route::post('/diagnostic/run', [DashboardController::class, 'runDiagnostic'])->name('diagnostic.run');
-        Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
-        Route::post('/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
-        Route::post('/profile/project', [DashboardController::class, 'updateProject'])->name('profile.project.update');
-        Route::delete('/profile', [DashboardController::class, 'deleteProfile'])->name('profile.delete');
+        Route::get('/diagnostic', [DiagnosticController::class, 'index'])->name('diagnostic');
+        Route::post('/diagnostic/run', [DiagnosticController::class, 'runDiagnostic'])->name('diagnostic.run');
+        Route::get('/profile', [DiagnosticController::class, 'profile'])->name('profile');
+        Route::post('/profile', [DiagnosticController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/profile/project', [DiagnosticController::class, 'updateProject'])->name('profile.project.update');
+        Route::delete('/profile', [DiagnosticController::class, 'deleteProfile'])->name('profile.delete');
         
         // Chat
-        Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+        Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+        Route::post('/chat/save-user-message', [ChatController::class, 'saveUserMessage'])->name('chat.save-user-message');
         Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
         Route::get('/chat/suggestions', [ChatController::class, 'getSuggestions'])->name('chat.suggestions');
         Route::post('/chat/suggestions/refresh', [ChatController::class, 'refreshSuggestions'])->name('chat.suggestions.refresh');
+        Route::post('/chat/conversations/create', [ChatController::class, 'createConversation'])->name('chat.conversations.create');
+        Route::get('/chat/conversations', [ChatController::class, 'getConversations'])->name('chat.conversations.get');
+        Route::get('/chat/conversations/{conversationId}/messages', [ChatController::class, 'getConversationMessages'])->name('chat.conversations.messages');
+        Route::delete('/chat/conversations/{conversationId}', [ChatController::class, 'deleteConversation'])->name('chat.conversations.delete');
         
         // Conversations
         Route::get('/conversations', function () {

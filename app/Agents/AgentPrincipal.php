@@ -19,7 +19,7 @@ class AgentPrincipal extends BaseAgent
     protected function getConfig(): array
     {
         return [
-            'model' => 'gpt-5-mini',
+            'model' => 'gpt-4.1-mini',
             'temperature' => 0.3,
             'max_tokens' => 1500,
             'tools' => [
@@ -33,17 +33,24 @@ class AgentPrincipal extends BaseAgent
 
     public function execute(array $inputs): array
     {
+        $startTime = microtime(true);
+        $sessionId = $this->logExecutionStart($inputs);
+        
         $userMessage = $inputs['user_message'] ?? '';
         $userId = $inputs['user_id'] ?? null;
         $conversationId = $inputs['conversation_id'] ?? null;
 
         if (!$userMessage || !$userId) {
-            return [
+            $result = [
                 'success' => false,
                 'error' => 'Message utilisateur et ID utilisateur requis'
             ];
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
         }
 
+        $this->logDebug('Getting user context', ['user_id' => $userId]);
+        
         // Get user context
         $userContext = $this->getUserAnalyticsContext($userId);
         
@@ -52,19 +59,35 @@ class AgentPrincipal extends BaseAgent
         $systemPrompt = $this->prepareSystemPrompt($instructions, $userContext);
 
         try {
+            $this->logDebug('Analyzing message for tools', ['message_length' => strlen($userMessage)]);
+            
             // Analyze user message to determine if tools are needed
             $toolsNeeded = $this->analyzeMessageForTools($userMessage);
+            
+            $this->logDebug('Tools analysis completed', ['tools_needed' => $toolsNeeded]);
             
             $toolResults = [];
             $toolUsageLogs = [];
 
             // Execute tools if needed
             foreach ($toolsNeeded as $tool) {
+                $toolStartTime = microtime(true);
+                $this->logDebug("Executing tool: {$tool}");
+                
                 $result = $this->executeTool($tool, $userMessage, $userId);
+                
+                $toolDuration = (microtime(true) - $toolStartTime) * 1000;
+                
                 if ($result) {
                     $toolResults[$tool] = $result;
                     $toolUsageLogs[] = $tool;
-                    $this->logToolUsage($tool, ['user_id' => $userId]);
+                    $this->logToolUsage($tool, [
+                        'user_id' => $userId,
+                        'duration_ms' => round($toolDuration, 2),
+                        'result_size' => strlen(json_encode($result))
+                    ]);
+                } else {
+                    $this->logDebug("Tool {$tool} returned no results", ['duration_ms' => round($toolDuration, 2)]);
                 }
             }
 
@@ -78,6 +101,12 @@ class AgentPrincipal extends BaseAgent
 
             // Generate response using LLM
             $config = $this->getConfig();
+            
+            $this->logDebug('Preparing LLM call', [
+                'config' => $config,
+                'system_prompt_length' => strlen($systemPrompt)
+            ]);
+            
             // Injecter contexte conversationnel
             $recent = $inputs['recent_messages'] ?? [];
             $summary = trim((string)($inputs['conversation_summary'] ?? ''));
@@ -89,12 +118,23 @@ class AgentPrincipal extends BaseAgent
                     $prefix = $r['role'] === 'user' ? 'Utilisateur' : 'Assistant';
                     $contextBlock .= "- {$prefix}: " . $r['content'] . "\n";
                 }
+                $this->logDebug('Added recent messages context', ['recent_count' => count($recent)]);
             }
             if ($summary !== '') {
                 $contextBlock .= "\nRésumé de la conversation:\n" . $summary . "\n";
+                $this->logDebug('Added conversation summary', ['summary_length' => strlen($summary)]);
             }
 
             $messages = $this->formatMessages($systemPrompt . $contextBlock, $userMessage);
+            
+            $llmStartTime = microtime(true);
+            $webSearchNeeded = (bool) preg_match('/(actualité|récent|nouveau|2024|2025|prix|taux)/i', $userMessage);
+            
+            $this->logDebug('LLM call parameters', [
+                'web_search_needed' => $webSearchNeeded,
+                'user_region' => $userContext['region'] ?? 'Abidjan',
+                'final_prompt_length' => strlen($systemPrompt . $contextBlock)
+            ]);
             
             $response = $this->llm->chat(
                 $messages,
@@ -102,7 +142,7 @@ class AgentPrincipal extends BaseAgent
                 $config['temperature'],
                 $config['max_tokens'],
                 [
-                    'web_search' => (bool) preg_match('/(actualité|récent|nouveau|2024|2025|prix|taux)/i', $userMessage),
+                    'web_search' => $webSearchNeeded,
                     'search_context_size' => 'medium',
                     'user_location' => [
                         'country' => 'CI',
@@ -111,33 +151,45 @@ class AgentPrincipal extends BaseAgent
                     ]
                 ]
             );
+            
+            $this->logLLMCall($messages, $config, $llmStartTime);
 
             // Format response as markdown
             $formattedResponse = $this->formatMarkdownResponse($response, $toolResults);
 
-            return [
+            $result = [
                 'success' => true,
                 'response' => $formattedResponse,
                 'tools_used' => $toolUsageLogs,
                 'metadata' => [
                     'model' => $config['model'],
                     'tokens_estimated' => strlen($response) / 4, // Rough estimation
-                    'tools_executed' => count($toolUsageLogs)
+                    'tools_executed' => count($toolUsageLogs),
+                    'web_search_used' => $webSearchNeeded,
+                    'context_added' => !empty($recent) || !empty($summary)
                 ]
             ];
 
-        } catch (\Exception $e) {
-            \Log::error('AgentPrincipal execution error', [
-                'error' => $e->getMessage(),
-                'user_id' => $userId,
-                'message' => $userMessage
-            ]);
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
 
-            return [
+        } catch (\Exception $e) {
+            $result = [
                 'success' => false,
                 'error' => 'Erreur lors du traitement de votre demande',
                 'debug' => app()->environment('local') ? $e->getMessage() : null
             ];
+            
+            $this->logError($e->getMessage(), [
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+                'conversation_id' => $conversationId,
+                'user_message' => $userMessage,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
         }
     }
 
@@ -156,17 +208,46 @@ Entrepreneurs ivoiriens digitalement connectés de 18-35 ans : startups tech, PM
 
 LANGUE : Exclusivement français
 
-FORMAT DE SORTIE : Markdown structuré avec :
-- Titres : h2, h3
-- Formatage : gras, italique
-- Listes : ordonnées et non-ordonnées
-- Alertes contextuelles
+STYLE DE RÉPONSE :
+- PRIVILÉGIER la simplicité et la clarté
+- Commencer TOUJOURS par une réponse directe et concise
+- Utiliser un français naturel et bien formulé
+- Éviter l'abus de composants visuels
+- Maximiser l'impact avec un minimum d'éléments
 
-CARTES PERSONNALISÉES à utiliser quand approprié :
-- Carte institution (pour recommander des organismes)
-- Carte opportunité (pour présenter des financements/programmes)
-- Carte texte officiel (pour références légales)
-- Carte partenaire (pour networking)
+FORMAT DE SORTIE : Markdown structuré avec composants personnalisés :
+
+ÉLÉMENTS DE BASE (à privilégier) :
+- Titres : ## (h2), ### (h3) - seulement si nécessaire
+- Formatage : **gras** pour les points clés, *italique* pour l'emphase légère
+- Listes : ordonnées (1.) et non-ordonnées (-) - concises
+- Paragraphes courts et lisibles
+
+RÈGLES D'USAGE DES COMPOSANTS :
+
+ALERTES (MAXIMUM 1 par réponse) :
+- :::info → Informations complémentaires importantes
+- :::success → Validation d'une démarche réussie
+- :::warning → Attention requise, points de vigilance
+- :::danger → Risques majeurs, erreurs à éviter
+
+CARTES PERSONNALISÉES (utiliser avec parcimonie) :
+- [carte-institution:Nom|Description|Téléphone|URL] → Institutions officielles uniquement
+- [carte-opportunite:Titre|Description|Échéance|URL] → Opportunités concrètes avec deadline
+- [carte-texte-officiel:Référence|Description|Source|URL] → Lois, décrets, textes légaux
+- [carte-partenaire:Nom projet|Description|Synergie|URL] → Partenaires stratégiques identifiés
+
+QUAND UTILISER LES COMPOSANTS :
+- Questions simples → Réponse textuelle uniquement
+- Conseils généraux → Texte + 1 alerte si critique
+- Opportunités spécifiques → Texte + cartes opportunités/institutions
+- Aspects légaux → Texte + cartes textes officiels
+- Recherche de partenaires → Texte + cartes partenaires
+
+ÉVITER :
+- Multiplication des alertes et cartes
+- Composants pour des informations basiques
+- Sur-structuration des réponses simples
 
 CONTEXTE IVOIRIEN :
 - Connaissance approfondie de l'écosystème entrepreneurial ivoirien
@@ -216,7 +297,7 @@ STYLE :
         return array_unique($tools);
     }
 
-    protected function executeTool(string $tool, string $message, int $userId): ?array
+    protected function executeTool(string $tool, string $message, string $userId): ?array
     {
         switch ($tool) {
             case 'gestion_base_donnees':
@@ -236,7 +317,7 @@ STYLE :
         }
     }
 
-    protected function executeDatabase(string $message, int $userId): array
+    protected function executeDatabase(string $message, string $userId): array
     {
         $results = [];
 
@@ -286,7 +367,7 @@ STYLE :
         }
     }
 
-    protected function executeFileGeneration(string $message, int $userId): array
+    protected function executeFileGeneration(string $message, string $userId): array
     {
         $detected = $this->detectFileType($message);
         $ext = 'md';
@@ -364,7 +445,7 @@ STYLE :
         }
     }
 
-    protected function executeImageGeneration(string $message, int $userId): array
+    protected function executeImageGeneration(string $message, string $userId): array
     {
         $prompt = $this->extractImagePrompt($message);
         try {
@@ -401,7 +482,7 @@ STYLE :
         }
     }
 
-    protected function updateUserAnalytics(int $userId, array $toolsUsed): void
+    protected function updateUserAnalytics(string $userId, array $toolsUsed): void
     {
         $analytics = UserAnalytics::firstOrCreate(['user_id' => $userId]);
         

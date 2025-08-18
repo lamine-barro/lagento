@@ -29,6 +29,7 @@
   --success-700: #15803D;
   --error: #DC2626;
   --danger: #DC2626;
+  --danger-text: #ffffff;  /* Texte blanc pour les boutons danger */
   --danger-50: #FEF2F2;
   --danger-100: #FEE2E2;
   --danger-200: #FECACA;
@@ -82,9 +83,9 @@
   --z-base: 1;
   --z-dropdown: 10;
   --z-sticky: 20;
-  --z-fixed: 30;
   --z-overlay: 40;
   --z-modal: 50;
+  --z-fixed: 100;
 
   /* Transitions unifiées */
   --transition: 0.2s ease;
@@ -142,4 +143,25 @@
   /* Border colors */
   --border: #262626;
   --border-light: #404040;
+  
+  /* Warning colors for dark mode */
+  --warning-50: #1c1917;           /* Very dark brown */
+  --warning-100: #292524;          /* Dark brown background */
+  --warning-200: #44403c;
+  --warning-600: #fbbf24;          /* Bright warning text */
+  --warning-700: #f59e0b;          /* Bright warning accent */
+  
+  /* Success colors for dark mode */
+  --success-100: #14532d;          /* Dark green background */
+  --success-700: #16a34a;          /* Bright green text */
+  
+  /* Orange colors for dark mode */
+  --orange-900: #1a0f0a;           /* Very dark orange for transparency */
+  
+  /* Danger colors for dark mode - ensure white text */
+  --danger: #ef4444;               /* Brighter red for better contrast */
+  --danger-text: #ffffff;          /* Force white text in dark mode too */
+  --danger-50: #1c1917;            /* Very dark red background */
+  --danger-100: #2d1b1b;           /* Dark red background */
+  --danger-200: #542020;           /* Medium dark red */
 }

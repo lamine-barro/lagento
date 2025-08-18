@@ -358,4 +358,104 @@ class BusinessConstants
         '2015' => '2015',
         'AVANT_2015' => 'Avant 2015'
     ];
+
+    // Constantes pour UserAnalytics
+    public const NIVEAU_ENTREPRENEUR = [
+        'DEBUTANT' => 'débutant',
+        'CONFIRME' => 'confirmé', 
+        'EXPERT' => 'expert'
+    ];
+
+    public const PROFIL_TYPE_ENTREPRENEUR = [
+        'INNOVATEUR' => 'innovateur',
+        'GESTIONNAIRE' => 'gestionnaire',
+        'COMMERCIAL' => 'commercial',
+        'ARTISAN' => 'artisan',
+        'COMMERCANT' => 'commerçant'
+    ];
+
+    public const IMPACT_PROGRESSION = [
+        'IMMEDIAT' => 'immédiat',
+        'COURT_TERME' => 'court_terme',
+        'LONG_TERME' => 'long_terme'
+    ];
+
+    public const NIVEAU_MATURITE_PROJET = [
+        'IDEE' => 'idée',
+        'LANCEMENT' => 'lancement',
+        'CROISSANCE' => 'croissance',
+        'EXPANSION' => 'expansion'
+    ];
+
+    public const VIABILITE_PROJET = [
+        'TRES_FORTE' => 'très_forte',
+        'FORTE' => 'forte',
+        'MOYENNE' => 'moyenne',
+        'A_RENFORCER' => 'à_renforcer'
+    ];
+
+    public const STATUT_INDICATEUR = [
+        'OK' => 'ok',
+        'A_FAIRE' => 'à_faire',
+        'EN_COURS' => 'en_cours',
+        'PARTIEL' => 'partiel'
+    ];
+
+    public const URGENCE_NIVEAU = [
+        'IMMEDIATE' => 'immédiate',
+        'SOUS_30J' => 'sous_30j',
+        'SOUS_90J' => 'sous_90j'
+    ];
+
+    public const STATUT_FINANCE = [
+        'SAIN' => 'sain',
+        'STABLE' => 'stable',
+        'FRAGILE' => 'fragile'
+    ];
+
+    public const POSITION_MARCHE = [
+        'LEADER' => 'leader',
+        'BIEN_PLACE' => 'bien_placé',
+        'NOUVEAU' => 'nouveau',
+        'DIFFICILE' => 'difficile'
+    ];
+
+    public const POTENTIEL_MARCHE = [
+        'TRES_ELEVE' => 'très_élevé',
+        'ELEVE' => 'élevé',
+        'MOYEN' => 'moyen',
+        'FAIBLE' => 'faible'
+    ];
+
+    public const TYPES_OPPORTUNITES_ANALYTICS = [
+        'FINANCEMENT' => 'financement',
+        'FORMATION' => 'formation',
+        'MARCHE' => 'marché',
+        'ACCOMPAGNEMENT' => 'accompagnement'
+    ];
+
+    public const URGENCE_OPPORTUNITE = [
+        'CANDIDATER_AVANT_7J' => 'candidater_avant_7j',
+        'CE_MOIS' => 'ce_mois',
+        'TRIMESTRE' => 'trimestre'
+    ];
+
+    public const TYPE_SYNERGIE_PARTENAIRE = [
+        'CLIENT' => 'client',
+        'FOURNISSEUR' => 'fournisseur',
+        'COMPLEMENTAIRE' => 'complémentaire',
+        'STRATEGIQUE' => 'stratégique'
+    ];
+
+    public const CONFORMITE_REGLEMENTAIRE = [
+        'CONFORME' => 'conforme',
+        'PARTIEL' => 'partiel',
+        'NON_CONFORME' => 'non_conforme'
+    ];
+
+    public const TYPES_AVANTAGES_FISCAUX = [
+        'EXONERATION' => 'exonération',
+        'SUBVENTION' => 'subvention',
+        'STATUT_SPECIAL' => 'statut_special'
+    ];
 }

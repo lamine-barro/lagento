@@ -23,7 +23,7 @@
         @forelse($conversations ?? [] as $conversation)
             <div class="border rounded-lg p-4 cursor-pointer hover:shadow-sm transition-shadow" 
                  style="border-color: var(--gray-100);"
-                 onclick="window.location.href = '{{ route('chat', ['conversation' => $conversation->id]) }}'">
+                 onclick="window.location.href = '{{ route('chat.index', ['conversation' => $conversation->id]) }}'">
                 
                 <div class="flex items-start justify-between mb-2">
                     <div class="flex items-start gap-3 flex-1">

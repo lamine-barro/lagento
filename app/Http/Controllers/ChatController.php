@@ -25,15 +25,19 @@ class ChatController extends Controller
         $user = Auth::user();
         $conversationId = $request->get('conversation');
         
+        // Get all user conversations for tabs
+        $conversations = UserConversation::where('user_id', $user->id)
+            ->orderBy('last_message_at', 'desc')
+            ->limit(10)
+            ->get();
+        
         // Get specific conversation or create default one
         if ($conversationId) {
             $conversation = UserConversation::where('user_id', $user->id)
                 ->where('id', $conversationId)
                 ->firstOrFail();
         } else {
-            $conversation = UserConversation::where('user_id', $user->id)
-                ->latest('last_message_at')
-                ->first();
+            $conversation = $conversations->first();
                 
             if (!$conversation) {
                 $conversation = UserConversation::create([
@@ -41,17 +45,81 @@ class ChatController extends Controller
                     'title' => 'Nouvelle conversation',
                     'last_message_at' => now()
                 ]);
+                $conversations = collect([$conversation]);
             }
         }
         
-        // Get messages
+        // Get messages with proper formatting for frontend
         $messages = UserMessage::where('conversation_id', $conversation->id)
             ->orderBy('created_at')
-            ->get();
+            ->get()
+            ->map(function($message) {
+                return [
+                    'id' => $message->id,
+                    'role' => $message->role,
+                    'content' => $message->text_content, // Ensure content is properly mapped
+                    'created_at' => $message->created_at->toISOString(),
+                    'attachments' => $message->attachments ?? [],
+                    'executed_tools' => $message->executed_tools ?? []
+                ];
+            });
         
-        return view('chat', compact('messages', 'conversation'));
+        return view('chat', compact('messages', 'conversation', 'conversations'));
     }
     
+    public function saveUserMessage(Request $request)
+    {
+        $request->validate([
+            'message' => 'required|string|max:5000',
+            'conversation_id' => 'nullable|string'
+        ]);
+
+        $user = Auth::user();
+        $conversationId = $request->get('conversation_id');
+        $userMessageContent = $request->get('message');
+        
+        // Get or create conversation
+        $conversation = null;
+        if ($conversationId) {
+            $conversation = UserConversation::where('user_id', $user->id)
+                ->where('id', $conversationId)
+                ->first();
+        }
+        
+        if (!$conversation) {
+            $conversation = UserConversation::create([
+                'user_id' => $user->id,
+                'title' => 'Nouvelle conversation',
+                'last_message_at' => now()
+            ]);
+        }
+
+        // Save user message
+        $userMessage = UserMessage::create([
+            'conversation_id' => $conversation->id,
+            'role' => 'user',
+            'text_content' => $userMessageContent
+        ]);
+        
+        // Update conversation
+        $conversation->increment('message_count', 1);
+        $conversation->update(['last_message_at' => now()]);
+        
+        return response()->json([
+            'success' => true,
+            'user_message_id' => $userMessage->id,
+            'conversation_id' => $conversation->id,
+            'message' => [
+                'id' => $userMessage->id,
+                'role' => $userMessage->role,
+                'content' => $userMessage->text_content,
+                'created_at' => $userMessage->created_at->toISOString(),
+                'attachments' => $userMessage->attachments ?? [],
+                'executed_tools' => $userMessage->executed_tools ?? []
+            ]
+        ]);
+    }
+
     public function sendMessage(Request $request)
     {
         $request->validate([
@@ -96,15 +164,35 @@ class ChatController extends Controller
                 "[Fichier joint: {$file->getClientOriginalName()}]";
         }
         
-        // Save user message
-        $userMessage = UserMessage::create([
-            'conversation_id' => $conversation->id,
-            'role' => 'user',
-            'content' => $userMessageContent
-        ]);
+        // Check if user message was already saved (to avoid duplication)
+        $userMessage = null;
+        if ($userMessageContent) {
+            // Check for recent user message with same content in this conversation
+            $recentUserMessage = UserMessage::where('conversation_id', $conversation->id)
+                ->where('role', 'user')
+                ->where('text_content', $userMessageContent)
+                ->where('created_at', '>=', now()->subMinutes(1)) // Within last minute
+                ->first();
+            
+            if ($recentUserMessage) {
+                // Message already exists, don't create duplicate
+                $userMessage = $recentUserMessage;
+            } else {
+                // Create new user message only if no recent duplicate found
+                $userMessage = UserMessage::create([
+                    'conversation_id' => $conversation->id,
+                    'role' => 'user',
+                    'text_content' => $userMessageContent
+                ]);
+                
+                // Update conversation count only for new messages
+                $conversation->increment('message_count', 1);
+                $conversation->update(['last_message_at' => now()]);
+            }
+        }
         
         // Generate title for new conversation
-        $isNewConversation = $conversation->message_count === 0;
+        $isNewConversation = $conversation->message_count === 1;
         if ($isNewConversation && $userMessageContent) {
             $titleResult = $this->agentService->generateTitle(
                 $userMessageContent,
@@ -135,11 +223,11 @@ class ChatController extends Controller
         $aiMessage = UserMessage::create([
             'conversation_id' => $conversation->id,
             'role' => 'assistant',
-            'content' => $agentResult['response']
+            'text_content' => $agentResult['response']
         ]);
         
-        // Update conversation
-        $conversation->increment('message_count', 2);
+        // Update conversation (only increment by 1 for AI message, user message already counted)
+        $conversation->increment('message_count', 1);
         $conversation->update(['last_message_at' => now()]);
         
         // Track chat interaction
@@ -191,5 +279,111 @@ class ChatController extends Controller
         $result = $this->agentService->refreshSuggestions($user->id, $activePage);
         
         return response()->json($result);
+    }
+
+    public function createConversation(Request $request)
+    {
+        $user = Auth::user();
+        
+        $conversation = UserConversation::create([
+            'user_id' => $user->id,
+            'title' => 'Nouvelle conversation',
+            'last_message_at' => now()
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'conversation_id' => $conversation->id,
+            'redirect_url' => route('chat.index', ['conversation' => $conversation->id])
+        ]);
+    }
+
+    public function getConversations(Request $request)
+    {
+        $user = Auth::user();
+        
+        $conversations = UserConversation::where('user_id', $user->id)
+            ->orderBy('last_message_at', 'desc')
+            ->limit(20)
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'conversations' => $conversations->map(function($conv) {
+                return [
+                    'id' => $conv->id,
+                    'title' => $conv->title,
+                    'last_message_at' => $conv->last_message_at,
+                    'message_count' => $conv->message_count ?? 0
+                ];
+            })
+        ]);
+    }
+
+    public function deleteConversation(Request $request, $conversationId)
+    {
+        $user = Auth::user();
+        
+        $conversation = UserConversation::where('user_id', $user->id)
+            ->where('id', $conversationId)
+            ->first();
+        
+        if (!$conversation) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Conversation non trouvée'
+            ], 404);
+        }
+        
+        // Supprimer tous les messages de la conversation
+        UserMessage::where('conversation_id', $conversationId)->delete();
+        
+        // Supprimer la conversation
+        $conversation->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversation supprimée avec succès'
+        ]);
+    }
+
+    public function getConversationMessages(Request $request, $conversationId)
+    {
+        $user = Auth::user();
+        
+        $conversation = UserConversation::where('user_id', $user->id)
+            ->where('id', $conversationId)
+            ->first();
+        
+        if (!$conversation) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Conversation non trouvée'
+            ], 404);
+        }
+        
+        $messages = UserMessage::where('conversation_id', $conversationId)
+            ->orderBy('created_at')
+            ->get()
+            ->map(function($message) {
+                return [
+                    'id' => $message->id,
+                    'role' => $message->role,
+                    'content' => $message->text_content,
+                    'created_at' => $message->created_at->toISOString(),
+                    'attachments' => $message->attachments ?? [],
+                    'executed_tools' => $message->executed_tools ?? []
+                ];
+            });
+        
+        return response()->json([
+            'success' => true,
+            'messages' => $messages,
+            'conversation' => [
+                'id' => $conversation->id,
+                'title' => $conversation->title,
+                'message_count' => $conversation->message_count ?? 0
+            ]
+        ]);
     }
 }

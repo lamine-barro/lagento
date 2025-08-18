@@ -88,7 +88,7 @@ class User extends Authenticatable
     public function getRemainingDiagnostics(): int
     {
         $this->resetDiagnosticsIfNewMonth();
-        return max(0, 3 - $this->diagnostics_used_this_month);
+        return max(0, 50 - $this->diagnostics_used_this_month);
     }
 
     /**
