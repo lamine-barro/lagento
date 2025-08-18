@@ -1,6 +1,31 @@
 @extends('layouts.app')
 
-@section('title', 'Agent O')
+@section('title', 'Chat Assistant IA')
+@section('page_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LAgentO')
+@section('seo_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LAgentO')
+@section('meta_description', 'Chattez avec votre assistant IA entrepreneurial 24/7. Conseils business personnalisés, opportunités de financement, stratégie d\'entreprise et accompagnement pour entrepreneurs ivoiriens.')
+@section('meta_keywords', 'chat assistant IA, conseil business 24/7, assistant entrepreneur, aide startup, conseil IA côte ivoire')
+@section('meta_robots', 'noindex, nofollow')
+@section('canonical_url', route('chat.index'))
+@section('og_title', 'Chat Assistant IA Entrepreneurial - LAgentO')
+@section('og_description', 'Obtenez des conseils business instantanés avec votre assistant IA entrepreneurial personnalisé.')
+@section('schema_org')
+@verbatim
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Chat Assistant IA LAgentO",
+    "applicationCategory": "BusinessApplication",
+    "description": "Assistant IA conversationnel pour entrepreneurs et startups",
+    "operatingSystem": "Web Browser",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "XOF"
+    }
+}
+@endverbatim
+@endsection
 
 @section('content')
 <div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="{{ $conversation->id ?? '' }}">

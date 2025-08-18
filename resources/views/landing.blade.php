@@ -18,39 +18,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
 @endpush
 
-@section('schema_org', json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'WebSite',
-    'name' => 'LAgentO',
-    'alternateName' => 'Agent O',
-    'description' => 'Premier assistant IA entrepreneurial pour la Côte d\'Ivoire',
-    'url' => url('/'),
-    'sameAs' => [
-        'https://linkedin.com/company/lagento',
-        'https://twitter.com/LAgentO_CI'
+@section('page_title', 'Agent O - Assistant IA Entrepreneurial')
+
+@section('schema_org')
+@verbatim
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "LAgentO",
+    "alternateName": "Agent O",
+    "description": "Premier assistant IA entrepreneurial pour la Côte d'Ivoire",
+@endverbatim
+    "url": "{{ url('/') }}",
+@verbatim
+    "sameAs": [
+        "https://linkedin.com/company/lagento",
+        "https://twitter.com/LAgentO_CI"
     ],
-    'offers' => [
-        '@type' => 'Offer',
-        'price' => '0',
-        'priceCurrency' => 'XOF',
-        'availability' => 'https://schema.org/InStock',
-        'description' => 'Assistant IA gratuit pour entrepreneurs'
-    ],
-    'audience' => [
-        '@type' => 'Audience',
-        'audienceType' => 'Entrepreneurs',
-        'geographicArea' => [
-            '@type' => 'Country',
-            'name' => 'Côte d\'Ivoire',
-            'alternateName' => 'Ivory Coast'
-        ]
-    ],
-    'potentialAction' => [
-        '@type' => 'SearchAction',
-        'target' => url('/projets') . '?search={search_term_string}',
-        'query-input' => 'required name=search_term_string'
-    ]
-]))
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "XOF",
+        "availability": "https://schema.org/InStock",
+        "description": "Assistant IA gratuit pour entrepreneurs"
+    },
+    "audience": {
+        "@type": "Audience",
+        "audienceType": "Entrepreneurs",
+        "geographicArea": {
+            "@type": "Country",
+            "name": "Côte d'Ivoire",
+            "alternateName": "Ivory Coast"
+        }
+    },
+    "potentialAction": {
+        "@type": "SearchAction",
+@endverbatim
+        "target": "{{ url('/projets') }}?search={search_term_string}",
+@verbatim
+        "query-input": "required name=search_term_string"
+    }
+}
+@endverbatim
+@endsection
 
 @section('content')
 <div class="min-h-screen flex flex-col bg-white" style="background: linear-gradient(180deg, #fff 0%, #fff7f2 100%);" data-dark-bg>

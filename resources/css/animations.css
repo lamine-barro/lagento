@@ -60,6 +60,17 @@
   }
 }
 
+/* Skeleton dark mode avec data-theme */
+[data-theme="dark"] .skeleton {
+  background: var(--gray-200);
+  background-image: linear-gradient(
+    90deg,
+    var(--gray-200) 0%,
+    var(--gray-300) 50%,
+    var(--gray-200) 100%
+  );
+}
+
 .skeleton-text {
   height: 1rem;
   width: 100%;
@@ -102,50 +113,71 @@
   }
 }
 
-/* Effet shimmer pour les textes de loading */
+/* Effet shimmer pour les textes de loading - Version avec couleur de texte visible */
 .shimmer-text {
-  background: linear-gradient(90deg, 
-    var(--gray-600) 25%, 
-    var(--gray-400) 50%, 
-    var(--gray-600) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmerText 1.8s infinite;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  position: relative;
+  color: var(--gray-600);
+  animation: shimmerGlow 1.8s infinite;
 }
 
-/* Shimmer adapté au mode sombre avec data-theme */
-[data-theme="dark"] .shimmer-text {
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0.4) 25%, 
-    rgba(255, 255, 255, 0.8) 50%, 
-    rgba(255, 255, 255, 0.4) 75%
-  );
-}
-
-/* Shimmer adapté au mode sombre avec prefers-color-scheme */
-@media (prefers-color-scheme: dark) {
-  .shimmer-text {
-    background: linear-gradient(90deg, 
-      rgba(255, 255, 255, 0.4) 25%, 
-      rgba(255, 255, 255, 0.8) 50%, 
-      rgba(255, 255, 255, 0.4) 75%
-    );
-    background-size: 200% 100%;
-  }
-}
-
-@keyframes shimmerText {
+/* Animation de scintillement sans masquer le texte */
+@keyframes shimmerGlow {
   0% {
-    background-position: -200% 0;
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
   }
   100% {
-    background-position: 200% 0;
+    opacity: 0.6;
   }
 }
+
+/* Shimmer adapté au mode sombre - texte blanc avec scintillement */
+@media (prefers-color-scheme: dark) {
+  .shimmer-text {
+    color: rgba(255, 255, 255, 0.9);
+    animation: shimmerGlowDark 1.8s infinite;
+  }
+  
+  @keyframes shimmerGlowDark {
+    0% {
+      opacity: 0.7;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    50% {
+      opacity: 1;
+      color: rgba(255, 255, 255, 1);
+    }
+    100% {
+      opacity: 0.7;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+/* Shimmer adapté avec data-theme pour plus de contrôle */
+[data-theme="dark"] .shimmer-text {
+  color: var(--gray-600);
+  animation: shimmerGlowDataDark 1.8s infinite;
+}
+
+@keyframes shimmerGlowDataDark {
+  0% {
+    opacity: 0.6;
+    color: var(--gray-500);
+  }
+  50% {
+    opacity: 1;
+    color: var(--gray-700);
+  }
+  100% {
+    opacity: 0.6;
+    color: var(--gray-500);
+  }
+}
+
+/* Ancienne keyframe shimmerText supprimée car plus utilisée */
 
 /* Animation de pulsation pour les icônes */
 .pulse-icon {

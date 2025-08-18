@@ -26,7 +26,7 @@
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form id="step4-form" method="POST" action="<?php echo e(route('onboarding.step4')); ?>" class="space-y-6 mt-4">
+        <form id="step4-form" method="POST" action="<?php echo e(route('onboarding.step4.process')); ?>" class="space-y-6 mt-4">
             <?php echo csrf_field(); ?>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: <?php echo e(old('founders_count', $projet->nombre_fondateurs ?? 1)); ?>, female: <?php echo e(old('female_founders_count', $projet->nombre_fondatrices ?? 0)); ?>, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
@@ -71,7 +71,7 @@
 
             <!-- Tranches d'âge -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Tranches d'âge des fondateurs</label>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Tranches d'âge des fondateurs</label>
                 <p class="text-sm mb-4" style="color: var(--gray-600);">Sélectionnez toutes les tranches d'âge qui s'appliquent</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'age_ranges[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     <?php $__currentLoopData = config('constants.AGE_RANGES'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -159,6 +159,13 @@
 <?php $component = $__componentOriginal4973fa7765c1d7ef7e43a98d4867113c; ?>
 <?php unset($__componentOriginal4973fa7765c1d7ef7e43a98d4867113c); ?>
 <?php endif; ?>
+    
+    <!-- Debug: Bouton temporaire de contournement -->
+    <div class="text-center mt-4">
+        <a href="<?php echo e(route('diagnostic')); ?>" class="text-sm text-gray-500 underline">
+            [DEBUG] Aller directement au diagnostic
+        </a>
+    </div>
 </div>
 
 <?php $__env->startPush('scripts'); ?>

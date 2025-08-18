@@ -9,7 +9,7 @@
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form id="step4-form" method="POST" action="{{ route('onboarding.step4') }}" class="space-y-6 mt-4">
+        <form id="step4-form" method="POST" action="{{ route('onboarding.step4.process') }}" class="space-y-6 mt-4">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: {{ old('founders_count', $projet->nombre_fondateurs ?? 1) }}, female: {{ old('female_founders_count', $projet->nombre_fondatrices ?? 0) }}, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
@@ -54,7 +54,7 @@
 
             <!-- Tranches d'âge -->
             <div>
-                <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Tranches d'âge des fondateurs</label>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Tranches d'âge des fondateurs</label>
                 <p class="text-sm mb-4" style="color: var(--gray-600);">Sélectionnez toutes les tranches d'âge qui s'appliquent</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'age_ranges[]')" x-init="updateDisabled()" @change="updateDisabled()">
                     @foreach(config('constants.AGE_RANGES') as $a)
@@ -123,6 +123,13 @@
     </div>
 
     <x-onboarding.footer :next-form-id="'step4-form'" next-label="Finaliser" :is-final="true" />
+    
+    <!-- Debug: Bouton temporaire de contournement -->
+    <div class="text-center mt-4">
+        <a href="{{ route('diagnostic') }}" class="text-sm text-gray-500 underline">
+            [DEBUG] Aller directement au diagnostic
+        </a>
+    </div>
 </div>
 
 @push('scripts')

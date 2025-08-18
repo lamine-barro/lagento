@@ -1,4 +1,27 @@
-<?php $__env->startSection('title', 'Profil'); ?>
+<?php $__env->startSection('title', 'Mon Profil Entrepreneur'); ?>
+<?php $__env->startSection('seo_title', 'Profil Entrepreneur - Gérez vos Informations Business | LAgentO'); ?>
+<?php $__env->startSection('meta_description', 'Gérez votre profil entrepreneur sur LAgentO : informations personnelles, projets d\'entreprise, préférences et paramètres de votre assistant IA business personnalisé.'); ?>
+<?php $__env->startSection('meta_keywords', 'profil entrepreneur, gestion compte business, paramètres assistant IA, profil startup, dashboard entrepreneur'); ?>
+<?php $__env->startSection('meta_robots', 'noindex, nofollow'); ?>
+<?php $__env->startSection('canonical_url', route('profile')); ?>
+<?php $__env->startSection('og_title', 'Mon Profil Entrepreneur - LAgentO'); ?>
+<?php $__env->startSection('og_description', 'Gérez votre profil et paramètres sur LAgentO, votre assistant IA entrepreneurial personnalisé.'); ?>
+<?php $__env->startSection('page_title', 'Mon Profil Entrepreneur'); ?>
+
+<?php $__env->startSection('schema_org'); ?>
+
+{
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "name": "Profil Entrepreneur LAgentO",
+    "description": "Page de profil pour entrepreneurs utilisant l'assistant IA LAgentO",
+    "mainEntity": {
+        "@type": "Person",
+        "name": "Entrepreneur"
+    }
+}
+
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-white" x-data="profileManager()">
@@ -54,9 +77,15 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">
-                            Mettre à jour
-                        </button>
+                        <div class="flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Mettre à jour
+                            </button>
+                            <!-- Bouton de test temporaire -->
+                            <button type="button" @click="showOtpModal = true; newEmail = 'test@example.com'" class="btn btn-secondary text-xs">
+                                Test OTP
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -125,10 +154,85 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal OTP pour changement d'email (dans le scope profileManager) -->
+    <div x-show="showOtpModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4" 
+         style="background: rgba(0, 0, 0, 0.5); display: none;">
+        
+        <div @click.stop 
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            
+            <div class="text-center">
+                <h3 class="text-lg font-semibold mb-4" style="color: var(--gray-900);">
+                    Vérification de votre nouvelle adresse email
+                </h3>
+                
+                <p class="text-sm text-gray-600 mb-6">
+                    Un code de vérification a été envoyé à <strong x-text="newEmail"></strong>. 
+                    Veuillez saisir le code à 6 chiffres reçu :
+                </p>
+                
+                <input type="text" 
+                       x-model="otpCode"
+                       placeholder="000000"
+                       maxlength="6"
+                       class="input-field w-full text-center text-lg tracking-widest mb-6"
+                       @input="otpCode = $event.target.value.replace(/[^0-9]/g, '').slice(0, 6)"
+                       @keydown.enter="verifyOtp()">
+                
+                <div class="flex gap-3 mb-4">
+                    <button @click="closeOtpModal()" 
+                            class="btn btn-ghost flex-1">
+                        Annuler
+                    </button>
+                    <button @click="verifyOtp()" 
+                            :disabled="otpCode.length !== 6"
+                            class="btn btn-primary flex-1">
+                        Valider
+                    </button>
+                </div>
+                
+                <button @click="resendOtp()" 
+                        class="text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                    Renvoyer le code
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Delete Account Modal -->
-<div x-data="{ open: false }" 
+<div x-data="{ 
+        open: false, 
+        confirmText: '',
+        deleteAccount() {
+            if (this.confirmText === 'SUPPRIMER') {
+                fetch('<?php echo e(route('profile.delete')); ?>', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(() => {
+                    window.location.href = '<?php echo e(route('landing')); ?>';
+                });
+            }
+        }
+    }" 
      @open-delete-account-modal.window="open = true"
      x-show="open" 
      x-transition:enter="transition ease-out duration-300"
@@ -249,11 +353,25 @@
 </style>
 
 <script>
-function profileManager() {
-    return {
+document.addEventListener('alpine:init', () => {
+    Alpine.data('profileManager', () => ({
         profile: <?php echo json_encode($user ?? [], 15, 512) ?>,
         project: <?php echo json_encode($project ?? [], 15, 512) ?>,
-        confirmText: '',
+        showOtpModal: false,
+        newEmail: '',
+        otpCode: '',
+        
+        init() {
+            // Force l'initialisation des variables pour éviter les erreurs
+            this.showOtpModal = false;
+            this.newEmail = '';
+            this.otpCode = '';
+            console.log('ProfileManager initialized', {
+                showOtpModal: this.showOtpModal,
+                newEmail: this.newEmail,
+                otpCode: this.otpCode
+            });
+        },
         
         updateProfile() {
             fetch('<?php echo e(route("profile.update")); ?>', {
@@ -267,12 +385,15 @@ function profileManager() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    if (data.email_changed) {
+                    if (data.email_change_pending) {
+                        // Afficher la modal OTP
+                        this.newEmail = data.new_email;
+                        this.showOtpModal = true;
+                        this.otpCode = '';
+                        
                         if (typeof window.showSuccessToast === 'function') {
-                            window.showSuccessToast(data.message || 'Email mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse.');
+                            window.showSuccessToast(data.message || 'Un code de vérification a été envoyé à votre nouvelle adresse email.');
                         }
-                        // Optionnel: rediriger vers la page de vérification OTP
-                        // window.location.href = '<?php echo e(route("auth.verify-otp-form")); ?>';
                     } else {
                         if (typeof window.showSuccessToast === 'function') {
                             window.showSuccessToast(data.message || 'Profil mis à jour avec succès');
@@ -280,14 +401,94 @@ function profileManager() {
                     }
                 } else {
                     if (typeof window.showErrorToast === 'function') {
-                    window.showErrorToast('Erreur lors de la mise à jour du profil');
-                }
+                        window.showErrorToast(data.message || 'Erreur lors de la mise à jour du profil');
+                    }
                 }
             })
             .catch(error => {
                 console.error('Erreur:', error);
                 if (typeof window.showErrorToast === 'function') {
                     window.showErrorToast('Erreur lors de la mise à jour du profil');
+                }
+            });
+        },
+
+        closeOtpModal() {
+            this.showOtpModal = false;
+            this.newEmail = '';
+            this.otpCode = '';
+            // Restaurer l'ancien email dans le formulaire
+            this.profile.email = <?php echo json_encode($user->email ?? '', 15, 512) ?>;
+        },
+
+        verifyOtp() {
+            if (this.otpCode.length !== 6) {
+                if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Veuillez saisir un code à 6 chiffres');
+                }
+                return;
+            }
+
+            fetch('<?php echo e(route("email-change.verify")); ?>', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ otp: this.otpCode })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.showOtpModal = false;
+                    this.profile.email = data.new_email;
+                    
+                    if (typeof window.showSuccessToast === 'function') {
+                        window.showSuccessToast(data.message || 'Votre adresse email a été mise à jour avec succès');
+                    }
+                    
+                    // Optionnel: actualiser la page pour refléter les changements
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    if (typeof window.showErrorToast === 'function') {
+                        window.showErrorToast(data.message || 'Code OTP incorrect');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Erreur lors de la vérification du code');
+                }
+            });
+        },
+
+        resendOtp() {
+            fetch('<?php echo e(route("email-change.send-otp")); ?>', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: this.newEmail })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.otpCode = '';
+                    if (typeof window.showSuccessToast === 'function') {
+                        window.showSuccessToast(data.message || 'Un nouveau code a été envoyé');
+                    }
+                } else {
+                    if (typeof window.showErrorToast === 'function') {
+                        window.showErrorToast(data.message || 'Erreur lors de l\'envoi du code');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                if (typeof window.showErrorToast === 'function') {
+                    window.showErrorToast('Erreur lors de l\'envoi du code');
                 }
             });
         },
@@ -315,24 +516,9 @@ function profileManager() {
                     console.log('Préférences mises à jour');
                 }
             });
-        },
-        
-        deleteAccount() {
-            if (this.confirmText === 'SUPPRIMER') {
-                fetch('<?php echo e(route("profile.delete")); ?>', {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(() => {
-                    window.location.href = '<?php echo e(route("landing")); ?>';
-                });
-            }
         }
-    }
-}
+    }))
+});
 </script>
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>

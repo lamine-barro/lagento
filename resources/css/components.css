@@ -548,6 +548,83 @@
   }
 }
 
+/* === MODAUX === */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem; /* 16px de padding sur tous les côtés */
+}
+
+.modal {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  position: relative;
+  z-index: calc(var(--z-modal) + 1);
+  margin: 0 1rem; /* 16px de marge gauche et droite */
+}
+
+.modal-header {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.modal-body {
+  padding: var(--space-6);
+}
+
+.modal-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--gray-200);
+  background-color: var(--gray-50);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+/* Responsive pour les modaux */
+@media (max-width: 767px) {
+  .modal-backdrop {
+    padding: 1rem; /* 16px */
+  }
+  
+  .modal {
+    margin: 0 1rem; /* 16px de marge gauche/droite sur mobile */
+    max-height: calc(100vh - 2rem); /* Hauteur max moins les marges */
+    overflow-y: auto;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+  
+  .modal-body {
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+  }
+}
+
 /* === UTILITIES === */
 .truncate {
   overflow: hidden;

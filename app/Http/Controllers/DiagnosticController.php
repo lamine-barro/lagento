@@ -9,6 +9,7 @@ use App\Services\UserAnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class DiagnosticController extends Controller
 {
@@ -83,22 +84,44 @@ class DiagnosticController extends Controller
         
         // Si l'email a changé, réinitialiser la vérification
         if ($emailChanged) {
+            // NE PAS mettre à jour l'email immédiatement, attendre la validation OTP
+            // Mettre à jour seulement les autres champs
             $user->update([
                 'name' => $request->name,
-                'email' => $request->email,
                 'phone' => $request->phone,
                 'is_public' => $request->boolean('is_public'),
                 'email_notifications' => $request->boolean('email_notifications'),
-                'email_verified_at' => null, // Réinitialiser la vérification
             ]);
             
-            // TODO: Envoyer un nouveau code OTP à la nouvelle adresse
-            // Ici vous pourriez appeler votre service d'envoi d'OTP
+            // Stocker le nouveau email temporairement et envoyer l'OTP
+            session([
+                'email_change_new_email' => $request->email,
+                'email_change_otp' => str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT),
+                'email_change_otp_expires_at' => now()->addMinutes(10),
+                'email_change_user_id' => $user->id
+            ]);
+            
+            // Envoyer l'OTP à la nouvelle adresse
+            try {
+                Mail::to($request->email)->send(new \App\Mail\OtpMail(
+                    session('email_change_otp'), 
+                    $user->name,
+                    'Validation de votre nouvelle adresse email'
+                ));
+                Log::info("Email change OTP sent to {$request->email} for user {$user->id}");
+            } catch (\Exception $e) {
+                Log::error("Failed to send email change OTP to {$request->email}: " . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'envoi de l\'email de vérification. Veuillez réessayer.'
+                ], 500);
+            }
             
             return response()->json([
                 'success' => true, 
-                'email_changed' => true,
-                'message' => 'Profil mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse email.'
+                'email_change_pending' => true,
+                'new_email' => $request->email,
+                'message' => 'Profil mis à jour. Un code de vérification a été envoyé à votre nouvelle adresse email pour confirmer le changement.'
             ]);
         }
         
@@ -232,6 +255,124 @@ class DiagnosticController extends Controller
                 'error_details' => config('app.debug') ? $e->getMessage() : null,
                 'can_retry' => true,
                 'remaining' => $user->getRemainingDiagnostics() // Pas décompté
+            ], 500);
+        }
+    }
+
+    /**
+     * Envoyer un OTP pour la validation du changement d'email
+     */
+    public function sendEmailChangeOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users,email,' . auth()->id()
+        ]);
+
+        $user = Auth::user();
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        
+        // Stocker l'OTP en session
+        session([
+            'email_change_new_email' => $request->email,
+            'email_change_otp' => $otp,
+            'email_change_otp_expires_at' => now()->addMinutes(10),
+            'email_change_user_id' => $user->id
+        ]);
+        
+        try {
+            Mail::to($request->email)->send(new \App\Mail\OtpMail(
+                $otp, 
+                $user->name,
+                'Validation de votre nouvelle adresse email'
+            ));
+            
+            Log::info("Email change OTP sent to {$request->email} for user {$user->id}");
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Un code de vérification a été envoyé à votre nouvelle adresse email.'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error("Failed to send email change OTP to {$request->email}: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'envoi de l\'email de vérification. Veuillez réessayer.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Vérifier l'OTP et confirmer le changement d'email
+     */
+    public function verifyEmailChange(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|digits:6'
+        ]);
+
+        $sessionOtp = session('email_change_otp');
+        $otpExpiresAt = session('email_change_otp_expires_at');
+        $newEmail = session('email_change_new_email');
+        $userId = session('email_change_user_id');
+
+        // Vérifications de base
+        if (!$sessionOtp || !$otpExpiresAt || !$newEmail || !$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session expirée. Veuillez recommencer la procédure.'
+            ], 400);
+        }
+
+        if (now()->gt($otpExpiresAt)) {
+            session()->forget(['email_change_otp', 'email_change_otp_expires_at', 'email_change_new_email', 'email_change_user_id']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Code OTP expiré. Veuillez en demander un nouveau.'
+            ], 400);
+        }
+
+        if ($request->otp !== $sessionOtp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Code OTP incorrect.'
+            ], 400);
+        }
+
+        // Vérifier que l'utilisateur connecté correspond
+        if (Auth::id() != $userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session invalide. Veuillez vous reconnecter.'
+            ], 401);
+        }
+
+        try {
+            // Mettre à jour l'email de l'utilisateur
+            $user = Auth::user();
+            $oldEmail = $user->email;
+            
+            $user->update([
+                'email' => $newEmail,
+                'email_verified_at' => now()
+            ]);
+
+            // Nettoyer la session
+            session()->forget(['email_change_otp', 'email_change_otp_expires_at', 'email_change_new_email', 'email_change_user_id']);
+
+            Log::info("Email changed successfully for user {$user->id} from {$oldEmail} to {$newEmail}");
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Votre adresse email a été mise à jour avec succès.',
+                'new_email' => $newEmail
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Failed to update email for user {$userId}: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour de l\'email. Veuillez réessayer.'
             ], 500);
         }
     }

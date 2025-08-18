@@ -9,7 +9,7 @@
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form id="step2-form" method="POST" action="{{ route('onboarding.step2') }}" class="space-y-6 mt-4">
+        <form id="step2-form" method="POST" action="{{ route('onboarding.step2.process') }}" class="space-y-6 mt-4">
             @csrf
 
             <!-- Contact principal -->

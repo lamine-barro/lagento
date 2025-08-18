@@ -1,4 +1,29 @@
-<?php $__env->startSection('title', 'Agent O'); ?>
+<?php $__env->startSection('title', 'Chat Assistant IA'); ?>
+<?php $__env->startSection('page_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LAgentO'); ?>
+<?php $__env->startSection('seo_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LAgentO'); ?>
+<?php $__env->startSection('meta_description', 'Chattez avec votre assistant IA entrepreneurial 24/7. Conseils business personnalisés, opportunités de financement, stratégie d\'entreprise et accompagnement pour entrepreneurs ivoiriens.'); ?>
+<?php $__env->startSection('meta_keywords', 'chat assistant IA, conseil business 24/7, assistant entrepreneur, aide startup, conseil IA côte ivoire'); ?>
+<?php $__env->startSection('meta_robots', 'noindex, nofollow'); ?>
+<?php $__env->startSection('canonical_url', route('chat.index')); ?>
+<?php $__env->startSection('og_title', 'Chat Assistant IA Entrepreneurial - LAgentO'); ?>
+<?php $__env->startSection('og_description', 'Obtenez des conseils business instantanés avec votre assistant IA entrepreneurial personnalisé.'); ?>
+<?php $__env->startSection('schema_org'); ?>
+
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Chat Assistant IA LAgentO",
+    "applicationCategory": "BusinessApplication",
+    "description": "Assistant IA conversationnel pour entrepreneurs et startups",
+    "operatingSystem": "Web Browser",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "XOF"
+    }
+}
+
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="<?php echo e($conversation->id ?? ''); ?>">
@@ -869,4 +894,5 @@ function chatInterface() {
 </script>
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/chat.blade.php ENDPATH**/ ?>

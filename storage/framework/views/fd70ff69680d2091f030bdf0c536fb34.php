@@ -1,16 +1,60 @@
 <!DOCTYPE html>
-<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     
-    <title><?php echo $__env->yieldContent('title', 'Dashboard'); ?> - LAgentO</title>
-    <meta name="description" content="<?php echo $__env->yieldContent('meta_description', 'Assistant IA entrepreneurial pour la Côte d\'Ivoire'); ?>">
+    <!-- SEO Meta Tags -->
+    <title><?php echo $__env->yieldContent('page_title'); ?></title>
+    <meta name="description" content="<?php echo $__env->yieldContent('meta_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement, diagnostic d\'entreprise et accompagnement personnalisé 24/7.'); ?>">
+    <meta name="keywords" content="<?php echo $__env->yieldContent('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, diagnostic entreprise, conseil business, innovation afrique'); ?>">
+    <meta name="author" content="LAgentO - Lamine Barro">
+    <meta name="robots" content="<?php echo $__env->yieldContent('meta_robots', 'index, follow'); ?>">
+    <link rel="canonical" href="<?php echo $__env->yieldContent('canonical_url', url()->current()); ?>">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:site_name" content="LAgentO">
+    <meta property="og:title" content="<?php echo $__env->yieldContent('og_title', 'LAgentO - Assistant IA Entrepreneurial Côte d\'Ivoire'); ?>">
+    <meta property="og:description" content="<?php echo $__env->yieldContent('og_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement et accompagnement personnalisé.'); ?>">
+    <meta property="og:type" content="<?php echo $__env->yieldContent('og_type', 'website'); ?>">
+    <meta property="og:url" content="<?php echo $__env->yieldContent('og_url', url()->current()); ?>">
+    <meta property="og:image" content="<?php echo $__env->yieldContent('og_image', asset('images/lagento-social-preview.jpg')); ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="fr_CI">
+    <meta property="og:locale:alternate" content="fr_FR">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@LAgentO_CI">
+    <meta name="twitter:creator" content="@LamBarro">
+    <meta name="twitter:title" content="<?php echo $__env->yieldContent('twitter_title', 'LAgentO - Assistant IA Entrepreneurial'); ?>">
+    <meta name="twitter:description" content="<?php echo $__env->yieldContent('twitter_description', 'Assistant IA pour entrepreneurs ivoiriens'); ?>">
+    <meta name="twitter:image" content="<?php echo $__env->yieldContent('twitter_image', asset('images/lagento-social-preview.jpg')); ?>">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#ff6b35">
+    <meta name="msapplication-TileColor" content="#ff6b35">
+    <meta name="application-name" content="LAgentO">
+    <meta name="apple-mobile-web-app-title" content="LAgentO">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon-light.png" id="favicon">
     <link rel="apple-touch-icon" href="/favicon-light.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <?php if (! empty(trim($__env->yieldContent('schema_org')))): ?>
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+        <?php echo $__env->yieldContent('schema_org'); ?>
+    </script>
+    <?php endif; ?>
     
     <!-- Theme Script (doit être avant les styles) -->
     <script>

@@ -1,17 +1,60 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
-    <title>@yield('title', 'LAgentO') - Assistant IA Entrepreneurial</title>
-    <meta name="description" content="@yield('meta_description', 'Assistant IA dédié aux entrepreneurs ivoiriens')">
+    <!-- SEO Meta Tags -->
+    <title>@yield('seo_title', 'LAgentO - Assistant IA Entrepreneurial Côte d\'Ivoire')</title>
+    <meta name="description" content="@yield('meta_description', 'LAgentO, le premier assistant IA entrepreneurial de Côte d\'Ivoire. Conseils personnalisés, opportunités de financement, diagnostic d\'entreprise et accompagnement business 24/7 pour entrepreneurs ivoiriens.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, conseil business, diagnostic entreprise, innovation afrique, lamine barro')">
+    <meta name="author" content="LAgentO - Lamine Barro">
+    <meta name="robots" content="@yield('meta_robots', 'index, follow')">
+    <link rel="canonical" href="@yield('canonical_url', url()->current())">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:site_name" content="LAgentO">
+    <meta property="og:title" content="@yield('og_title', 'LAgentO - Assistant IA Entrepreneurial')">
+    <meta property="og:description" content="@yield('og_description', 'LAgentO, le premier assistant IA entrepreneurial de Côte d\'Ivoire. Conseils personnalisés, opportunités de financement et accompagnement business 24/7.')">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:url" content="@yield('og_url', url()->current())">
+    <meta property="og:image" content="@yield('og_image', asset('images/lagento-social-preview.jpg'))">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="fr_CI">
+    <meta property="og:locale:alternate" content="fr_FR">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@LAgentO_CI">
+    <meta name="twitter:creator" content="@LamBarro">
+    <meta name="twitter:title" content="@yield('twitter_title', 'LAgentO - Assistant IA Entrepreneurial')">
+    <meta name="twitter:description" content="@yield('twitter_description', 'Assistant IA entrepreneurial pour la Côte d\'Ivoire')">
+    <meta name="twitter:image" content="@yield('twitter_image', asset('images/lagento-social-preview.jpg'))">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#ff6b35">
+    <meta name="msapplication-TileColor" content="#ff6b35">
+    <meta name="application-name" content="LAgentO">
+    <meta name="apple-mobile-web-app-title" content="LAgentO">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon-light.png" id="favicon">
     <link rel="apple-touch-icon" href="/favicon-light.png">
     <link rel="manifest" href="/site.webmanifest">
+    
+    @hasSection('schema_org')
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+        @yield('schema_org')
+    </script>
+    @endif
     
     <!-- Theme Script -->
     <script>

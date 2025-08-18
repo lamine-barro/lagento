@@ -26,10 +26,6 @@
 
 AgentO est une plateforme d'accompagnement entrepreneurial révolutionnaire, spécialement conçue pour l'écosystème ivoirien. Elle combine intelligence artificielle de pointe (OpenAI GPT-4), base de données réglementaire exhaustive et outils de diagnostic personnalisés pour accompagner les entrepreneurs de 18 à 35 ans dans leur parcours de création et développement d'entreprise.
 
-### **Qui est derrière AgentO ?**
-
-AgentO est créé par **Lamine BARRO**, entrepreneur tech et PDG d'Etudesk, reconnu comme Ambassadeur de l'Innovation par l'État ivoirien. Avec plus de 500 organisations accompagnées et 120 000+ jeunes touchés, l'équipe d'Etudesk apporte son expertise terrain pour créer un outil véritablement adapté aux réalités entrepreneuriales ivoiriennes.
-
 ### **Quelle est la mission d'AgentO ?**
 
 Démocratiser l'accès à l'information entrepreneuriale de qualité en Côte d'Ivoire, en fournissant un assistant IA disponible 24h/24 qui comprend les spécificités locales : réglementations OHADA, programmes gouvernementaux, opportunités de financement, et écosystème entrepreneurial ivoirien.

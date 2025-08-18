@@ -1,10 +1,15 @@
+# Robots.txt optimisé pour LAgentO
+# Assistant IA Entrepreneurial Côte d'Ivoire
+# https://lagento.ci
+
 User-agent: *
 Allow: /
 
-# Sitemap
+# Sitemaps (XML et autres)
 Sitemap: https://lagento.ci/sitemap.xml
+Sitemap: https://lagento.ci/sitemap-news.xml
 
-# Disallow sensitive areas
+# Disallow des zones privées et sensibles
 Disallow: /auth/
 Disallow: /onboarding/
 Disallow: /dashboard/
@@ -12,22 +17,67 @@ Disallow: /profile/
 Disallow: /chat/
 Disallow: /conversations/
 Disallow: /admin/
-Disallow: /*.pdf$
+Disallow: /api/
+Disallow: /storage/framework/
+Disallow: /storage/logs/
+Disallow: /_debugbar/
 
-# Allow public content
-Allow: /projets/
-Allow: /legal
+# Disallow des fichiers et dossiers techniques
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.log$
+Disallow: /vendor/
+Disallow: /node_modules/
+Disallow: /.env
+Disallow: /.git/
+
+# Allow explicite du contenu public important
 Allow: /
+Allow: /legal
+Allow: /assistant-ia-entrepreneur-cote-ivoire
+Allow: /financement-startup-pme-abidjan
+Allow: /diagnostic-entreprise-gratuit-ci
+Allow: /conseil-business-innovation-afrique
+Allow: /opportunites-entrepreneur-cote-ivoire
+Allow: /reseau-entrepreneurs-ivoiriens
 
-# Crawl-delay for respectful crawling
+# Allow des ressources statiques importantes
+Allow: /images/
+Allow: /css/
+Allow: /js/
+Allow: /favicon*.png
+Allow: /site.webmanifest
+
+# Crawl-delay par défaut
 Crawl-delay: 1
 
-# Specific rules for different search engines
+# Règles spécifiques par moteur de recherche
 User-agent: Googlebot
-Crawl-delay: 1
+Crawl-delay: 0.5
+Allow: /images/
+Allow: /build/
 
 User-agent: Bingbot
-Crawl-delay: 2
+Crawl-delay: 1
 
 User-agent: Slurp
 Crawl-delay: 2
+
+User-agent: DuckDuckBot
+Crawl-delay: 1
+
+User-agent: Yandex
+Crawl-delay: 3
+
+# Bloquer les mauvais bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Informations de contact pour les webmasters
+# Contact: lamine.barro@etudesk.org

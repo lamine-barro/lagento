@@ -16,39 +16,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
 <?php $__env->stopPush(); ?>
 
-<?php $__env->startSection('schema_org', json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'WebSite',
-    'name' => 'LAgentO',
-    'alternateName' => 'Agent O',
-    'description' => 'Premier assistant IA entrepreneurial pour la Côte d\'Ivoire',
-    'url' => url('/'),
-    'sameAs' => [
-        'https://linkedin.com/company/lagento',
-        'https://twitter.com/LAgentO_CI'
+<?php $__env->startSection('page_title', 'Agent O - Assistant IA Entrepreneurial'); ?>
+
+<?php $__env->startSection('schema_org'); ?>
+
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "LAgentO",
+    "alternateName": "Agent O",
+    "description": "Premier assistant IA entrepreneurial pour la Côte d'Ivoire",
+
+    "url": "<?php echo e(url('/')); ?>",
+
+    "sameAs": [
+        "https://linkedin.com/company/lagento",
+        "https://twitter.com/LAgentO_CI"
     ],
-    'offers' => [
-        '@type' => 'Offer',
-        'price' => '0',
-        'priceCurrency' => 'XOF',
-        'availability' => 'https://schema.org/InStock',
-        'description' => 'Assistant IA gratuit pour entrepreneurs'
-    ],
-    'audience' => [
-        '@type' => 'Audience',
-        'audienceType' => 'Entrepreneurs',
-        'geographicArea' => [
-            '@type' => 'Country',
-            'name' => 'Côte d\'Ivoire',
-            'alternateName' => 'Ivory Coast'
-        ]
-    ],
-    'potentialAction' => [
-        '@type' => 'SearchAction',
-        'target' => url('/projets') . '?search={search_term_string}',
-        'query-input' => 'required name=search_term_string'
-    ]
-])); ?>
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "XOF",
+        "availability": "https://schema.org/InStock",
+        "description": "Assistant IA gratuit pour entrepreneurs"
+    },
+    "audience": {
+        "@type": "Audience",
+        "audienceType": "Entrepreneurs",
+        "geographicArea": {
+            "@type": "Country",
+            "name": "Côte d'Ivoire",
+            "alternateName": "Ivory Coast"
+        }
+    },
+    "potentialAction": {
+        "@type": "SearchAction",
+
+        "target": "<?php echo e(url('/projets')); ?>?search={search_term_string}",
+
+        "query-input": "required name=search_term_string"
+    }
+}
+
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="min-h-screen flex flex-col bg-white" style="background: linear-gradient(180deg, #fff 0%, #fff7f2 100%);" data-dark-bg>
@@ -82,7 +92,7 @@
             
             <!-- Subtitle -->
             <p class="text-lg mb-8 mt-4" style="color: var(--gray-700);">
-                Conseils personnalisés, opportunités de financement et accompagnement 24/7 pour passer de l'idée à l'action.
+                LagentO a cartographié plus de 2000 milliards de Fcfa d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire a travers les initiatives gouvernementales et écosystèmes. Il est disposé 24h/7 pour vous accompagner à les saisir.
             </p>
 
             <!-- Email Form -->

@@ -118,7 +118,7 @@
   /* Dimensions de base */
   --header-height: 4rem;   /* 64px */
   --sidebar-width: 16rem;  /* 256px */
-  --chat-height: 5rem;     /* 80px */
+  --chat-height: 9rem;     /* 144px - Espace suffisant pour éviter que le chat cache le contenu */
   --container-max: 72rem;  /* 1152px */
 
   /* Breakpoints */

@@ -207,7 +207,7 @@ class Projet extends Model
     public function getOnboardingProgress(): array
     {
         $steps = [
-            'step1' => !empty($this->nom_projet) && !empty($this->raison_sociale) && !empty($this->formalise) && !empty($this->region),
+            'step1' => !empty($this->nom_projet) && !empty($this->formalise) && !empty($this->region),
             'step2' => true, // Pas de champs obligatoires
             'step3' => true, // Pas de champs obligatoires  
             'step4' => !is_null($this->nombre_fondateurs) && !is_null($this->nombre_fondatrices)

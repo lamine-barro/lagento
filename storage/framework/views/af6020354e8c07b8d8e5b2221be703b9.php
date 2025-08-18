@@ -68,14 +68,14 @@ unset($__defined_vars, $__key, $__value); ?>
              <?php if($closable): ?> @click="<?php echo e($show); ?> = false" <?php endif; ?>></div>
         
         <!-- Modal Container -->
-        <div class="flex items-center justify-center min-h-screen" style="padding: var(--space-4); position: relative; z-index: <?php echo e($zIndex + 1); ?>;">
+        <div class="flex items-center justify-center min-h-screen px-4 py-4" style="position: relative; z-index: <?php echo e($zIndex + 1); ?>;">
             <div x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100"
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-95"
-                 class="card <?php echo e($maxWidthClass); ?> w-full"
+                 class="card <?php echo e($maxWidthClass); ?> w-full mx-4"
                  style="position: relative; z-index: <?php echo e($zIndex + 2); ?>;"
                  @click.stop>
                 

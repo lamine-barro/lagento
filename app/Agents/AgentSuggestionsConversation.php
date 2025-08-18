@@ -2,6 +2,9 @@
 
 namespace App\Agents;
 
+use App\Services\VectorAccessService;
+use App\Models\User;
+
 class AgentSuggestionsConversation extends BaseAgent
 {
     protected function getConfig(): array
@@ -39,6 +42,9 @@ class AgentSuggestionsConversation extends BaseAgent
             // Get user context for personalization
             $userContext = $this->getUserAnalyticsContext($userId);
             
+            // Get user's vectorized data for personalized suggestions
+            $vectorContext = $this->getUserVectorContext($userId);
+            
             $this->logDebug('Building suggestions prompt', [
                 'previous_page' => $previousPage,
                 'active_page' => $activePage,
@@ -50,11 +56,12 @@ class AgentSuggestionsConversation extends BaseAgent
             $systemPrompt = $this->prepareSystemPrompt($instructions, [
                 'previous_page' => $previousPage,
                 'active_page' => $activePage,
-                'user_context' => $userContext
+                'user_context' => $userContext,
+                'vector_context' => $vectorContext
             ]);
 
             // Generate suggestions prompt
-            $userMessage = $this->buildSuggestionsPrompt($previousPage, $activePage, $userContext);
+            $userMessage = $this->buildSuggestionsPrompt($previousPage, $activePage, $userContext, $vectorContext);
 
             // Generate response using nano model for speed
             $config = $this->getConfig();
@@ -121,41 +128,42 @@ class AgentSuggestionsConversation extends BaseAgent
 
     protected function getSystemInstructions(): string
     {
-        return "Tu es un générateur de suggestions pour Agent O, l'assistant IA des entrepreneurs ivoiriens.
+        return "Tu génères des suggestions de questions que l'entrepreneur va poser à Agent O.
 
 MISSION :
-Générer 5 suggestions de messages pertinentes et contextuelles basées sur :
-- La page précédente de l'utilisateur
-- La page active actuelle
-- Le profil entrepreneurial de l'utilisateur
+Générer 5 questions pertinentes que l'utilisateur peut poser à Agent O basées sur :
+- Son contexte entrepreneurial personnalisé
+- Ses projets et diagnostics
+- La page où il se trouve
+- Ses besoins identifiés
 
 CONTRAINTES :
-- Chaque suggestion : MAXIMUM 20 mots
-- Suggestions courtes, directes et actionnables
-- Adaptées au contexte entrepreneurial ivoirien
+- Chaque question : MAXIMUM 15 mots
+- Questions directes que l'entrepreneur poserait naturellement
+- Adaptées à son niveau de maturité et ses défis spécifiques
 - Éviter les répétitions
-- Varier les types de questions (conseil, financement, légal, networking, etc.)
+- Mélanger différents aspects : stratégie, financement, opérationnel, légal
 
 FORMAT DE SORTIE :
-Retourne exactement 5 suggestions, une par ligne, sans numérotation ni puces.
-Chaque ligne contient une suggestion complète.
+Retourne exactement 5 questions, une par ligne, sans numérotation ni puces.
+Chaque ligne contient une question complète que l'entrepreneur poserait.
 
-CONTEXTE ENTREPRENEURIAL :
-- Formalisation d'entreprise en Côte d'Ivoire
-- Recherche de financement et opportunités
-- Accompagnement juridique et réglementaire
-- Networking et partenariats
-- Stratégies de croissance et d'expansion
+EXEMPLES DE STYLE :
+- \"Comment optimiser la rentabilité de mon projet EdTech ?\"
+- \"Quels financements pour une startup au stade prototype ?\"
+- \"Comment structurer mon équipe pour passer à l'échelle ?\"
+- \"Quelles démarches prioritaires pour formaliser rapidement ?\"
 
-STYLE :
-- Questions directes et pratiques
-- Langage familier mais professionnel
-- Orienté action et résultats";
+STYLE DES QUESTIONS :
+- À la première personne (\"Comment puis-je...\", \"Que dois-je...\")
+- Pratiques et orientées solutions
+- Spécifiques au contexte ivoirien quand pertinent
+- Reflètent les préoccupations réelles de l'entrepreneur";
     }
 
-    protected function buildSuggestionsPrompt(string $previousPage, string $activePage, array $userContext): string
+    protected function buildSuggestionsPrompt(string $previousPage, string $activePage, array $userContext, array $vectorContext = []): string
     {
-        $prompt = "Génère 5 suggestions de messages pour un entrepreneur ivoirien.\n\n";
+        $prompt = "Génère 5 questions que cet entrepreneur ivoirien va poser à Agent O.\n\n";
         
         if ($previousPage) {
             $prompt .= "Page précédente : {$previousPage}\n";
@@ -177,7 +185,29 @@ STYLE :
             $prompt .= "\nStade : " . config('constants.STADES_MATURITE')[$userContext['business_stage']] ?? $userContext['business_stage'];
         }
 
-        $prompt .= "\n\nGénère maintenant 5 suggestions de messages pertinentes :";
+        // Add personalized context from user's projects and analytics
+        if (!empty($vectorContext)) {
+            $prompt .= "\n\nContexte personnalisé :";
+            
+            if (!empty($vectorContext['projects'])) {
+                $prompt .= "\nProjets : " . implode(', ', array_column($vectorContext['projects'], 'name'));
+            }
+            
+            if (!empty($vectorContext['analytics'])) {
+                $analytics = $vectorContext['analytics'];
+                if (!empty($analytics['niveau_maturite'])) {
+                    $prompt .= "\nNiveau maturité : " . $analytics['niveau_maturite'];
+                }
+                if (!empty($analytics['forces'])) {
+                    $prompt .= "\nForces identifiées : " . implode(', ', array_slice($analytics['forces'], 0, 3));
+                }
+                if (!empty($analytics['besoins'])) {
+                    $prompt .= "\nBesoins prioritaires : " . implode(', ', array_slice($analytics['besoins'], 0, 2));
+                }
+            }
+        }
+
+        $prompt .= "\n\nGénère maintenant 5 questions pertinentes que cet entrepreneur poserait à Agent O :";
 
         return $prompt;
     }
@@ -186,22 +216,22 @@ STYLE :
     {
         switch ($activePage) {
             case 'diagnostic':
-                return "\nContexte : L'utilisateur consulte son diagnostic entrepreneurial. Suggestions sur l'analyse des données, optimisation, opportunités.";
+                return "\nContexte : Il vient de consulter son diagnostic. Questions sur optimisation, axes d'amélioration, actions concrètes.";
             
             case 'chat':
-                return "\nContexte : L'utilisateur est dans l'interface de chat. Suggestions variées sur tous les sujets entrepreneuriaux.";
+                return "\nContexte : Il est prêt à discuter. Questions variées selon ses besoins entrepreneuriaux actuels.";
             
             case 'conversations':
-                return "\nContexte : L'utilisateur consulte ses conversations. Suggestions sur nouveaux sujets, approfondissement.";
+                return "\nContexte : Il revient après avoir consulté ses conversations. Questions d'approfondissement ou nouveaux sujets.";
             
             case 'profile':
-                return "\nContexte : L'utilisateur consulte son profil. Suggestions sur optimisation du profil, mise à jour des données.";
+                return "\nContexte : Il vient de voir son profil. Questions sur mise à jour, optimisation de ses données.";
             
             case 'opportunities':
-                return "\nContexte : L'utilisateur consulte les opportunités. Suggestions sur financement, subventions, concours.";
+                return "\nContexte : Il cherche des opportunités. Questions sur financements, concours, partenariats adaptés.";
             
             default:
-                return "\nContexte : Navigation générale. Suggestions équilibrées sur tous les aspects entrepreneuriaux.";
+                return "\nContexte : Navigation générale. Questions équilibrées sur tous les aspects entrepreneuriaux.";
         }
     }
 
@@ -296,5 +326,75 @@ STYLE :
         }
 
         return $fallbacks;
+    }
+
+    /**
+     * Get vectorized context for user (projects and analytics)
+     */
+    protected function getUserVectorContext(string $userId): array
+    {
+        try {
+            $user = User::find($userId);
+            if (!$user) {
+                return [];
+            }
+
+            $vectorAccessService = app(VectorAccessService::class);
+            
+            // Search for user's project and analytics data
+            $results = $vectorAccessService->searchWithAccess(
+                'projet entreprise diagnostic profil', // Generic query to get user data
+                $user,
+                ['user_project', 'user_analytics'],
+                10 // Get more context
+            );
+
+            $context = [
+                'projects' => [],
+                'analytics' => []
+            ];
+
+            foreach ($results as $result) {
+                if ($result['memory_type'] === 'user_project') {
+                    // Extract project name from content
+                    if (preg_match('/Nom:\s*([^\n]+)/', $result['content'], $matches)) {
+                        $context['projects'][] = [
+                            'name' => trim($matches[1]),
+                            'content' => $result['content']
+                        ];
+                    }
+                } elseif ($result['memory_type'] === 'user_analytics') {
+                    // Extract analytics insights from content
+                    $analytics = [];
+                    
+                    if (preg_match('/Niveau global:\s*([^\n]+)/', $result['content'], $matches)) {
+                        $analytics['niveau_maturite'] = trim($matches[1]);
+                    }
+                    
+                    if (preg_match('/Forces:\s*([^\n]+)/', $result['content'], $matches)) {
+                        $analytics['forces'] = array_map('trim', explode(',', $matches[1]));
+                    }
+                    
+                    if (preg_match('/Besoins\s+[^\n]*:\s*([^\n]+)/', $result['content'], $matches)) {
+                        $analytics['besoins'] = array_map('trim', explode(',', $matches[1]));
+                    }
+                    
+                    if (preg_match('/Axes progression:\s*([^\n]+)/', $result['content'], $matches)) {
+                        $analytics['axes_progression'] = array_map('trim', explode(',', $matches[1]));
+                    }
+                    
+                    $context['analytics'] = array_merge($context['analytics'], $analytics);
+                }
+            }
+
+            return $context;
+
+        } catch (\Exception $e) {
+            \Log::error('Error getting user vector context', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
     }
 }

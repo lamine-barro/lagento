@@ -10,41 +10,59 @@
 @section('og_type', 'article')
 @section('canonical_url', route('projets.show', $projet))
 
-@section('schema_org', json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'Organization',
-    'name' => $projet->nom_projet,
-    'legalName' => $projet->raison_sociale,
-    'description' => $projet->description,
-    'url' => $projet->site_web,
-    'logo' => $projet->logo_url ? Storage::url($projet->logo_url) : null,
-    'foundingDate' => $projet->annee_creation,
-    'email' => $projet->email,
-    'telephone' => $projet->telephone,
-    'address' => [
-        '@type' => 'PostalAddress',
-        'addressRegion' => $projet->region,
-        'addressCountry' => 'CI'
-    ],
-    'sameAs' => array_filter(array_values($projet->reseaux_sociaux ?? [])),
-    'knowsAbout' => $projet->secteurs_labels,
-    'founder' => [
-        '@type' => 'Person',
-        'name' => $projet->user->name
-    ],
-    'employee' => [
-        '@type' => 'QuantitativeValue',
-        'value' => $projet->taille_equipe
-    ],
-    'makesOffer' => [
-        '@type' => 'Offer',
-        'itemOffered' => [
-            '@type' => 'Service',
-            'name' => implode(', ', $projet->produits_services ?? []),
-            'category' => implode(', ', $projet->secteurs_labels)
-        ]
-    ]
-]))
+@section('page_title', $projet->nom_projet . ' - ' . $projet->getMaturiteLabel())
+
+@section('schema_org')
+@verbatim
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+@endverbatim
+    "name": "{{ $projet->nom_projet }}",
+    "legalName": "{{ $projet->raison_sociale }}",
+    "description": "{{ $projet->description }}",
+    "url": "{{ $projet->site_web }}",
+    "logo": "{{ $projet->logo_url ? Storage::url($projet->logo_url) : null }}",
+    "foundingDate": "{{ $projet->annee_creation }}",
+    "email": "{{ $projet->email }}",
+    "telephone": "{{ $projet->telephone }}",
+@verbatim
+    "address": {
+        "@type": "PostalAddress",
+@endverbatim
+        "addressRegion": "{{ $projet->region }}",
+@verbatim
+        "addressCountry": "CI"
+    },
+@endverbatim
+    "sameAs": {!! json_encode(array_filter(array_values($projet->reseaux_sociaux ?? []))) !!},
+    "knowsAbout": {!! json_encode($projet->secteurs_labels) !!},
+@verbatim
+    "founder": {
+        "@type": "Person",
+@endverbatim
+        "name": "{{ $projet->user->name }}"
+@verbatim
+    },
+    "employee": {
+        "@type": "QuantitativeValue",
+@endverbatim
+        "value": "{{ $projet->taille_equipe }}"
+@verbatim
+    },
+    "makesOffer": {
+        "@type": "Offer",
+        "itemOffered": {
+            "@type": "Service",
+@endverbatim
+            "name": "{{ implode(', ', $projet->produits_services ?? []) }}",
+            "category": "{{ implode(', ', $projet->secteurs_labels) }}"
+@verbatim
+        }
+    }
+}
+@endverbatim
+@endsection
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-8">

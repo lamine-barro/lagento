@@ -6,11 +6,19 @@ use App\Models\User;
 use App\Models\UserAnalytics;
 use App\Models\Projet;
 use App\Models\UserMessage;
+use App\Services\MemoryManagerService;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class UserAnalyticsService
 {
+    protected MemoryManagerService $memoryManager;
+
+    public function __construct(MemoryManagerService $memoryManager)
+    {
+        $this->memoryManager = $memoryManager;
+    }
+
     /**
      * Update entrepreneur profile analytics based on onboarding data
      */
@@ -19,8 +27,9 @@ class UserAnalyticsService
         try {
             $analytics = $this->getOrCreateUserAnalytics($user);
             
-            // Enrich with lightweight LLM pass (gpt-5-mini) to extract salient tags and summary
-            $lmSummary = $this->summarizeBusinessData($onboardingData);
+            // Enrich with lightweight LLM pass (gpt-4.1-mini) to extract salient tags and summary
+            // Enhanced with vector memory context
+            $lmSummary = $this->summarizeBusinessData($onboardingData, $user);
 
             $profile = [
                 'niveau_global' => $lmSummary['level'] ?? null,
@@ -71,7 +80,7 @@ class UserAnalyticsService
         }
     }
 
-    private function summarizeBusinessData(array $data): array
+    private function summarizeBusinessData(array $data, User $user): array
     {
         try {
             $text = json_encode($data, JSON_UNESCAPED_UNICODE);
@@ -80,12 +89,36 @@ class UserAnalyticsService
                 return [];
             }
             
-            Log::info('UserAnalyticsService: Starting business data summarization', ['data_size' => strlen($text)]);
+            Log::info('UserAnalyticsService: Starting enhanced business data summarization', ['data_size' => strlen($text), 'user_id' => $user->id]);
+
+            // Get contextual insights from vector memories
+            $vectorContext = $this->getVectorContextForDiagnostic($data, $user);
+            $contextualInfo = $this->formatVectorContextForPrompt($vectorContext);
+            
+            $systemPrompt = "Tu es un analyste business expert de l'écosystème entrepreneurial ivoirien. 
+
+CONTEXTE DISPONIBLE:
+" . $contextualInfo . "
+
+Sur la base des données de projet ET du contexte ci-dessus, génère un JSON STRICT avec:
+- summary (3 phrases max avec insights contextuels)
+- keywords (5 mots-clés français)
+- risks (≤3 risques spécifiques identifiés)
+- level (débutant|confirmé|expert)
+- potential_score (0-100 basé sur le contexte écosystème)
+- strengths[{domaine,description}] (forces identifiées vs écosystème)
+- improvements[{domaine,action_suggeree,impact,resources}] (avec ressources recommandées)
+- training_needs[string] (besoins formation spécifiques)
+- profile_type (innovateur|gestionnaire|commercial|artisan|commerçant)
+- opportunities_match (nombre d'opportunités potentiellement pertinentes)
+- ecosystem_position (positionnement dans l'écosystème CI)
+
+Réponds UNIQUEMENT ce JSON.";
 
             $messages = [
                 [
                     'role' => 'system',
-                    'content' => 'Tu es un analyste business. Sur la base des données de projet et profil, génère un JSON STRICT avec: summary (3 phrases max), keywords (5 FR), risks (≤3), level (débutant|confirmé|expert), potential_score (0-100), strengths[{domaine,description}], improvements[{domaine,action_suggeree,impact}], training_needs[string], profile_type (innovateur|gestionnaire|commercial|artisan|commerçant). Réponds UNIQUEMENT ce JSON.'
+                    'content' => $systemPrompt
                 ],
                 [
                     'role' => 'user',
@@ -94,13 +127,17 @@ class UserAnalyticsService
             ];
 
             $lm = app(\App\Services\LanguageModelService::class);
-            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 20000, ['response_format' => ['type' => 'json_object']]);
+            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 25000, ['response_format' => ['type' => 'json_object']]);
             
-            Log::info('UserAnalyticsService: LLM response received', ['raw_length' => strlen($raw), 'raw_preview' => substr($raw, 0, 200)]);
+            Log::info('UserAnalyticsService: Enhanced LLM response received', [
+                'raw_length' => strlen($raw), 
+                'raw_preview' => substr($raw, 0, 200),
+                'vector_context_length' => strlen($contextualInfo)
+            ]);
             
             $parsed = json_decode($raw, true);
             if (is_array($parsed)) {
-                Log::info('UserAnalyticsService: JSON parsing successful', ['keys' => array_keys($parsed)]);
+                Log::info('UserAnalyticsService: Enhanced JSON parsing successful', ['keys' => array_keys($parsed)]);
                 return $parsed;
             }
             
@@ -111,6 +148,7 @@ class UserAnalyticsService
         }
         return [];
     }
+
 
     /**
      * Track user interaction with chat/agents
@@ -444,15 +482,346 @@ class UserAnalyticsService
             'message_principal_after' => $analytics->fresh()->message_principal ?? 'NULL'
         ]);
     }
+
+    /**
+     * Récupérer les institutions et opportunités vectorisées pour enrichir le diagnostic
+     */
+    private function getVectorContextForDiagnostic(array $data, $user = null): array
+    {
+        try {
+            // Extraire des informations clés pour orienter la recherche vectorielle
+            $searchTerms = [];
+            
+            // Extraire depuis le projet Laravel (nouvelle structure)
+            if (isset($data['projet_data'])) {
+                $projet = $data['projet_data'];
+                
+                // Ajouter les secteurs
+                if (!empty($projet['secteurs'])) {
+                    if (is_array($projet['secteurs'])) {
+                        $searchTerms = array_merge($searchTerms, $projet['secteurs']);
+                    } else {
+                        $searchTerms[] = $projet['secteurs'];
+                    }
+                }
+                
+                // Ajouter la maturité
+                if (!empty($projet['maturite'])) {
+                    $searchTerms[] = $projet['maturite'];
+                }
+                
+                // Ajouter la région
+                if (!empty($projet['region'])) {
+                    $searchTerms[] = $projet['region'];
+                }
+                
+                // Ajouter le stade de financement
+                if (!empty($projet['stade_financement'])) {
+                    $searchTerms[] = $projet['stade_financement'];
+                }
+                
+                // Ajouter les types de soutien recherchés
+                if (!empty($projet['types_soutien']) && is_array($projet['types_soutien'])) {
+                    $searchTerms = array_merge($searchTerms, $projet['types_soutien']);
+                }
+            }
+            
+            // Support pour l'ancienne structure (si elle existe encore)
+            if (isset($data['project_sectors']) && is_array($data['project_sectors'])) {
+                $searchTerms = array_merge($searchTerms, $data['project_sectors']);
+            }
+            
+            if (isset($data['project_stage'])) {
+                $searchTerms[] = $data['project_stage'];
+            }
+            
+            if (isset($data['user_region'])) {
+                $searchTerms[] = $data['user_region'];
+            }
+            
+            // Construire une requête de recherche enrichie
+            $query = implode(' ', array_filter($searchTerms)) . ' startup entrepreneur financement accompagnement';
+            
+            // Rechercher les institutions pertinentes
+            $institutions = $this->memoryManager->searchAcrossMemories(
+                $query,
+                ['institution'],
+                null,
+                8
+            );
+            
+            // Rechercher les opportunités pertinentes  
+            $opportunities = $this->memoryManager->searchAcrossMemories(
+                $query,
+                ['opportunite'],
+                null,
+                12
+            );
+            
+            // Rechercher les textes officiels pertinents
+            $officialTexts = $this->memoryManager->searchAcrossMemories(
+                $query,
+                ['texte_officiel'],
+                null,
+                6
+            );
+            
+            return [
+                'institutions' => $this->formatInstitutionsForContext($institutions),
+                'opportunities' => $this->formatOpportunitiesForContext($opportunities),
+                'official_texts' => $this->formatOfficialTextsForContext($officialTexts),
+                'search_terms' => $searchTerms
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error('Error getting vector context for diagnostic', [
+                'error' => $e->getMessage(),
+                'data_keys' => array_keys($data)
+            ]);
+            
+            return [
+                'institutions' => [],
+                'opportunities' => [],
+                'search_terms' => []
+            ];
+        }
+    }
+    
+    /**
+     * Formater les institutions pour le contexte LLM
+     */
+    private function formatInstitutionsForContext(array $institutions): array
+    {
+        $formatted = [];
+        
+        foreach ($institutions as $result) {
+            // Extraire les informations de l'institution depuis le contenu vectorisé
+            $content = $result['content'];
+            $metadata = $result['metadata'] ?? [];
+            
+            $institution = [];
+            
+            if (preg_match('/Nom:\s*([^\n]+)/i', $content, $matches)) {
+                $institution['nom'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Type:\s*([^\n]+)/i', $content, $matches)) {
+                $institution['type'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Description:\s*([^\n]+)/i', $content, $matches)) {
+                $institution['description'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Services:\s*([^\n]+)/i', $content, $matches)) {
+                $institution['services'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Contact:\s*([^\n]+)/i', $content, $matches)) {
+                $institution['contact'] = trim($matches[1]);
+            }
+            
+            $institution['region'] = $metadata['region'] ?? 'Non spécifiée';
+            $institution['similarity_score'] = round($result['similarity'] * 100, 1);
+            
+            if (!empty($institution['nom'])) {
+                $formatted[] = $institution;
+            }
+        }
+        
+        return array_slice($formatted, 0, 6); // Limiter à 6 institutions max
+    }
+    
+    /**
+     * Formater les opportunités pour le contexte LLM
+     */
+    private function formatOpportunitiesForContext(array $opportunities): array
+    {
+        $formatted = [];
+        
+        foreach ($opportunities as $result) {
+            $content = $result['content'];
+            $metadata = $result['metadata'] ?? [];
+            
+            $opportunity = [];
+            
+            if (preg_match('/Titre:\s*([^\n]+)/i', $content, $matches)) {
+                $opportunity['titre'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Type:\s*([^\n]+)/i', $content, $matches)) {
+                $opportunity['type'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Description:\s*([^\n]+)/i', $content, $matches)) {
+                $opportunity['description'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Montant:\s*([^\n]+)/i', $content, $matches)) {
+                $opportunity['montant'] = trim($matches[1]);
+            }
+            
+            if (preg_match('/Date limite:\s*([^\n]+)/i', $content, $matches)) {
+                $opportunity['deadline'] = trim($matches[1]);
+            }
+            
+            $opportunity['type_meta'] = $metadata['type'] ?? 'Non spécifié';
+            $opportunity['deadline_meta'] = $metadata['deadline'] ?? null;
+            $opportunity['similarity_score'] = round($result['similarity'] * 100, 1);
+            
+            if (!empty($opportunity['titre'])) {
+                $formatted[] = $opportunity;
+            }
+        }
+        
+        return array_slice($formatted, 0, 10); // Limiter à 10 opportunités max
+    }
+    
+    /**
+     * Formater les textes officiels pour le contexte LLM
+     */
+    private function formatOfficialTextsForContext(array $officialTexts): array
+    {
+        $formatted = [];
+        
+        foreach ($officialTexts as $result) {
+            $content = $result['content'];
+            $metadata = $result['metadata'] ?? [];
+            
+            $text = [];
+            
+            // Extraire le titre depuis le contenu
+            if (preg_match('/Titre:\s*([^\n]+)/i', $content, $matches)) {
+                $text['titre'] = trim($matches[1]);
+            }
+            
+            // Extraire la classification
+            if (preg_match('/Classification:\s*([^\n]+)/i', $content, $matches)) {
+                $text['classification'] = trim($matches[1]);
+            }
+            
+            // Extraire la date de publication
+            if (preg_match('/Date publication:\s*([^\n]+)/i', $content, $matches)) {
+                $text['date_publication'] = trim($matches[1]);
+            }
+            
+            // Extraire le statut
+            if (preg_match('/Statut:\s*([^\n]+)/i', $content, $matches)) {
+                $text['statut'] = trim($matches[1]);
+            }
+            
+            // Extraire le contenu principal (après "=== CONTENU PDF ===")
+            if (preg_match('/=== CONTENU PDF ===\n(.*?)$/s', $content, $matches)) {
+                $text['contenu'] = trim(substr($matches[1], 0, 500)) . '...'; // Limiter à 500 chars
+            } else {
+                // Si pas de PDF, utiliser le début du contenu
+                $text['contenu'] = trim(substr($content, 0, 300)) . '...';
+            }
+            
+            $text['classification_meta'] = $metadata['classification'] ?? 'Non spécifiée';
+            $text['has_pdf'] = $metadata['has_pdf'] ?? false;
+            $text['similarity_score'] = round($result['similarity'] * 100, 1);
+            
+            if (!empty($text['titre'])) {
+                $formatted[] = $text;
+            }
+        }
+        
+        return array_slice($formatted, 0, 6); // Limiter à 6 textes officiels max
+    }
+    
+    /**
+     * Formater le contexte vectoriel pour le prompt LLM
+     */
+    private function formatVectorContextForPrompt(array $vectorContext): string
+    {
+        $contextualInfo = "🏛️ INSTITUTIONS PARTENAIRES DISPONIBLES :\n";
+        
+        if (!empty($vectorContext['institutions'])) {
+            foreach ($vectorContext['institutions'] as $institution) {
+                $contextualInfo .= "• {$institution['nom']} ({$institution['type']})\n";
+                $contextualInfo .= "  📍 {$institution['region']}\n";
+                $contextualInfo .= "  📝 {$institution['description']}\n";
+                if (!empty($institution['services'])) {
+                    $contextualInfo .= "  🎯 Services: {$institution['services']}\n";
+                }
+                if (!empty($institution['contact'])) {
+                    $contextualInfo .= "  📞 Contact: {$institution['contact']}\n";
+                }
+                $contextualInfo .= "  ⭐ Score de pertinence: {$institution['similarity_score']}%\n\n";
+            }
+        } else {
+            $contextualInfo .= "Aucune institution trouvée dans la base de données.\n\n";
+        }
+        
+        $contextualInfo .= "🎯 OPPORTUNITÉS DISPONIBLES :\n";
+        
+        if (!empty($vectorContext['opportunities'])) {
+            foreach ($vectorContext['opportunities'] as $opportunity) {
+                $contextualInfo .= "• {$opportunity['titre']}\n";
+                $contextualInfo .= "  🏷️ Type: {$opportunity['type']}\n";
+                $contextualInfo .= "  📝 Description: {$opportunity['description']}\n";
+                if (!empty($opportunity['montant'])) {
+                    $contextualInfo .= "  💰 Montant: {$opportunity['montant']}\n";
+                }
+                if (!empty($opportunity['deadline'])) {
+                    $contextualInfo .= "  📅 Deadline: {$opportunity['deadline']}\n";
+                }
+                $contextualInfo .= "  ⭐ Score de pertinence: {$opportunity['similarity_score']}%\n\n";
+            }
+        } else {
+            $contextualInfo .= "Aucune opportunité trouvée dans la base de données.\n\n";
+        }
+        
+        $contextualInfo .= "📋 TEXTES OFFICIELS PERTINENTS :\n";
+        
+        if (!empty($vectorContext['official_texts'])) {
+            foreach ($vectorContext['official_texts'] as $text) {
+                $contextualInfo .= "• {$text['titre']}\n";
+                $contextualInfo .= "  🏷️ Classification: {$text['classification']}\n";
+                if (!empty($text['date_publication'])) {
+                    $contextualInfo .= "  📅 Date: {$text['date_publication']}\n";
+                }
+                if (!empty($text['statut'])) {
+                    $contextualInfo .= "  📊 Statut: {$text['statut']}\n";
+                }
+                $contextualInfo .= "  📄 Contenu: {$text['contenu']}\n";
+                $contextualInfo .= "  ⭐ Score de pertinence: {$text['similarity_score']}%\n\n";
+            }
+        } else {
+            $contextualInfo .= "Aucun texte officiel trouvé dans la base de données.\n\n";
+        }
+        
+        return $contextualInfo;
+    }
     
     private function generateDashboardStructureWithLLM(array $data): array
     {
         try {
-            $prompt = "DIAGNOSTIC ENTREPRENEURIAL APPROFONDI - CÔTE D'IVOIRE
+            // Récupérer les institutions et opportunités vectorisées pour enrichir le contexte
+            $user = $data['user_info'] ?? null;
+            $vectorContext = $this->getVectorContextForDiagnostic($data, $user);
+            
+            // Formater le contexte vectoriel pour le prompt
+            $contextualInfo = $this->formatVectorContextForPrompt($vectorContext);
+            
+            $prompt = "DIAGNOSTIC ENTREPRENEURIAL IVOIRIEN - EXPERT SENIOR
 
-Tu es un consultant senior spécialisé en développement entrepreneurial en Côte d'Ivoire, avec 15+ ans d'expérience dans l'écosystème startup africain. Analyse ce projet en profondeur et génère un diagnostic complet, détaillé et actionnable.
+Tu es Dr. Kouame N'Guessan, consultant senior avec 15+ ans d'expérience dans l'écosystème entrepreneurial ivoirien. Ton expertise couvre l'analyse stratégique, les financements startup, et la réglementation OHADA.
 
-🎯 OBJECTIF : Créer un diagnostic stratégique de 8-10k tokens qui transforme les données brutes en insights actionnables, avec des recommandations précises et contextualisées pour le marché ivoirien.
+🎯 MISSION : Générer un diagnostic complet, précis et actionnable avec insights contextualisés Côte d'Ivoire.
+
+📊 CONTEXTE TEMPS RÉEL DISPONIBLE :
+{$contextualInfo}
+
+📊 FOCUS RENDU OPTIMISÉ :
+- Messages concis mais informatifs (max 2-3 phrases par insight)
+- Actions spécifiques avec timeframes réalistes
+- Opportunités réelles avec deadlines précises (utilise UNIQUEMENT les opportunités du contexte ci-dessus)
+- Métriques quantifiées (montants FCFA, pourcentages)
+- Recommandations hiérarchisées par urgence/impact
+- Partenaires réels (utilise UNIQUEMENT les institutions du contexte ci-dessus)
+- Références juridiques précises (utilise UNIQUEMENT les textes officiels du contexte ci-dessus)
 
 📋 CONTRAINTES ÉNUMÉRATIONS (RESPECT STRICT) :
 NIVEAU_ENTREPRENEUR: débutant, confirmé, expert
@@ -468,15 +837,15 @@ POSITION_MARCHE: leader, bien_placé, nouveau, difficile
 POTENTIEL_MARCHE: très_élevé, élevé, moyen, faible
 TYPE_SYNERGIE: strategique, operationnelle, commerciale
 
-🏗️ STRUCTURE JSON COMPLÈTE À GÉNÉRER :
+🏗️ STRUCTURE JSON OPTIMISÉE :
 
 {
   \"resume_executif\": {
     \"score_progression\": 75,
-    \"message_principal\": \"Votre startup présente un potentiel prometteur...\",
-    \"trois_actions_cles\": [\"Action 1\", \"Action 2\", \"Action 3\"],
-    \"opportunite_du_mois\": \"Description opportunité\",
-    \"alerte_importante\": \"Alert si nécessaire\"
+    \"message_principal\": \"Projet à fort potentiel avec 3 axes d'amélioration prioritaires. Marché addressable de 150M FCFA identifié.\",
+    \"trois_actions_cles\": [\"Finaliser formalisation RCCM (30j - 25K FCFA)\", \"Structurer pitch investisseurs (14j)\", \"Lancer pilot client (45j)\"],
+    \"opportunite_du_mois\": \"Appel à projets Orange Digital Ventures - deadline 15/09 - jusqu'à 50M FCFA + mentorat\",
+    \"alerte_importante\": \"Conformité OHADA requise avant candidature aux financements publics\"
   },
   \"profil_entrepreneur\": {
     \"niveau_global\": \"confirmé\",
@@ -555,36 +924,57 @@ TYPE_SYNERGIE: strategique, operationnelle, commerciale
    - Prochaines étapes: Minimum 5 étapes avec priorités 1-5, délais réalistes, coûts estimés
    - Indicateurs clés: Analyser TOUS les indicateurs (formalisation, finance, équipe, marché)
 
-4. OPPORTUNITÉS - Base de données réelle CI:
-   - Minimum 6-8 opportunités diverses (subventions, concours, incubation, financement)
-   - Institutions réelles ivoiriennes avec contacts/liens fictifs mais réalistes
-   - Scores de compatibilité justifiés, montants en FCFA
+4. OPPORTUNITÉS - STRICTEMENT du contexte fourni:
+   - OBLIGATOIRE: Utilise UNIQUEMENT les opportunités listées dans le CONTEXTE TEMPS RÉEL ci-dessus
+   - Si aucune opportunité dans le contexte: marque nombre_total à 0 et top_opportunites comme tableau vide []
+   - INTERDIT de créer des opportunités fictives ou d'exemples
+   - Score de compatibilité basé sur le similarity_score fourni dans le contexte
+   - Titres, institutions, montants, deadlines : reprendre EXACTEMENT du contexte
 
 5. INSIGHTS MARCHÉ - Données macro-économiques:
    - Chiffres réalistes du marché ivoirien (PIB numérique, nombre startups, investissements)
    - Concurrents réels identifiables
    - Zones géographiques avec justification économique détaillée
 
-6. RÉGULATIONS - Conformité juridique précise:
-   - Obligations réelles du droit ivoirien (OHADA, CEPICI, etc.)
-   - Coûts en FCFA réels, délais administratifs authentiques
-   - Avantages fiscaux disponibles (startup act, zones franches)
+6. RÉGULATIONS - STRICTEMENT basé sur les textes officiels fournis:
+   - OBLIGATOIRE: Référence les textes officiels du CONTEXTE TEMPS RÉEL ci-dessus
+   - Citations directes des textes officiels pertinents avec leur titre
+   - Obligations basées sur le contenu réel des PDFs officiels fournis
+   - Si pas de texte officiel pertinent dans le contexte: reste générique
+   - Coûts et délais : uniquement s'ils sont mentionnés dans les textes officiels
 
-7. PARTENAIRES - Écosystème local:
-   - Institutions réelles (Jokkolabs, Impact Hub, CGECI, etc.)
-   - Propositions de collaboration détaillées et réalistes
-   - Synergies stratégiques expliquées
+7. PARTENAIRES - STRICTEMENT du contexte fourni:
+   - OBLIGATOIRE: Utilise UNIQUEMENT les institutions listées dans le CONTEXTE TEMPS RÉEL ci-dessus
+   - Si aucune institution dans le contexte: marque nombre_matches à 0 et top_partenaires comme tableau vide []
+   - INTERDIT de créer des institutions fictives (Jokkolabs, Impact Hub, etc.)
+   - Noms, secteurs, localisations : reprendre EXACTEMENT du contexte
+   - Score de pertinence basé sur le similarity_score fourni dans le contexte
 
-GÉNÈRE LE JSON COMPLET, DÉTAILLÉ ET RICHE:";
+8. OPTIMISATION RENDU:
+   - Messages principaux: max 150 caractères, impact clair
+   - Actions clés: format \"Action (délai - coût)\" 
+   - Opportunités: titre + institution + deadline + montant
+   - Insights marché: chiffres précis, sources identifiables
+   - Partenaires: nom + proposition + bénéfice quantifié
+
+GÉNÈRE LE JSON OPTIMISÉ POUR INTERFACE UTILISATEUR:";
 
             $messages = [
-                ['role' => 'system', 'content' => 'Tu es Dr. Kouame N\'Guessan, consultant senior en développement entrepreneurial avec 15 ans d\'expérience dans l\'écosystème startup ivoirien. Ancien directeur de programme chez Jokkolabs Abidjan et expert en financement de startups africaines. 
+                ['role' => 'system', 'content' => 'Tu es Dr. Kouame N\'Guessan, consultant senior en développement entrepreneurial avec 15 ans d\'expérience dans l\'écosystème startup ivoirien. Ancien directeur de programme chez Jokkolabs Abidjan et expert en financement de startups africaines.
 
 EXPERTISE: Écosystème CI (CGECI, CEPICI, ministères), réglementation OHADA, financement startup, analyse sectorielle, stratégies B2G/B2B.
 
-MISSION: Générer un diagnostic entrepreneurial de niveau consultant senior (8-10k tokens), avec insights actionnables, données réelles du marché ivoirien, et recommandations stratégiques précises. AUCUNE données génériques - tout doit être contextualisé Côte d\'Ivoire.
+STYLE DE RENDU OPTIMISÉ:
+- Messages clairs et actionnables (éviter le jargon)
+- Priorités chiffrées avec impact business quantifié
+- Deadlines précises et réalistes
+- Montants en FCFA avec sources
+- Contacts et liens institutionnels réels
+- Recommandations hiérarchisées par ROI/urgence
 
-OUTPUT: JSON uniquement, détaillé, professionnel, exploitable immédiatement par l\'entrepreneur.'],
+MISSION: Générer un diagnostic entrepreneurial compact mais riche (6-8k tokens), avec insights immédiatement exploitables. Focus sur l\'actionnable plutôt que la théorie.
+
+OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibilité maximale.'],
                 ['role' => 'user', 'content' => $prompt]
             ];
 
@@ -592,7 +982,7 @@ OUTPUT: JSON uniquement, détaillé, professionnel, exploitable immédiatement p
             
             Log::info('UserAnalyticsService: Starting dashboard analytics generation', ['prompt_size' => strlen($prompt)]);
             
-            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.3, 20000, [
+            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 18000, [
                 'response_format' => ['type' => 'json_object']
             ]);
             
@@ -1000,7 +1390,7 @@ OUTPUT: JSON uniquement, détaillé, professionnel, exploitable immédiatement p
             'email' => $user->email,
             'phone' => $user->phone,
             'business_name' => $onboardingData['business_name'] ?? null,
-            'business_sector' => $onboardingData['business_sector'] ?? null,
+            'business_sector' => isset($onboardingData['business_sector']) ? $onboardingData['business_sector'] : null,
             'business_stage' => $onboardingData['business_stage'] ?? null,
             'target_market' => $onboardingData['target_market'] ?? null,
             'funding_needs' => $onboardingData['funding_needs'] ?? null
@@ -1055,7 +1445,7 @@ OUTPUT: JSON uniquement, détaillé, professionnel, exploitable immédiatement p
     }
 
     /**
-     * Generate personalized recommendations
+     * Generate enhanced personalized recommendations with better UX
      */
     private function generateRecommendations(User $user, UserAnalytics $analytics): array
     {
@@ -1064,40 +1454,277 @@ OUTPUT: JSON uniquement, détaillé, professionnel, exploitable immédiatement p
         $profileCompletion = $analytics->entrepreneur_profile['completion_score'] ?? 0;
         $chatInteractions = $analytics->metadata['chat_interactions']['total_messages'] ?? 0;
         $dataUploads = $analytics->metadata['data_sources']['total_uploads'] ?? 0;
+        $daysSinceReg = $user->created_at->diffInDays(now());
+        $engagementLevel = $this->calculateEngagementLevel($user);
 
-        // Profile completion recommendations
-        if ($profileCompletion < 80) {
+        // Prioritized recommendations with actionable steps and estimated impact
+        
+        // Critical path recommendations (highest impact)
+        if ($profileCompletion < 60) {
             $recommendations[] = [
                 'type' => 'profile_completion',
+                'priority' => 'critical',
+                'urgency' => 'immediate',
+                'title' => 'Finalisez votre profil entrepreneur',
+                'description' => "Profil {$profileCompletion}% complet. +40% de pertinence des recommandations avec profil complet.",
+                'action' => 'complete_profile',
+                'estimated_time' => '10-15 minutes',
+                'impact_score' => 85,
+                'next_step' => 'Accédez aux informations projet'
+            ];
+        }
+
+        // Engagement optimization
+        if ($chatInteractions < 3 && $daysSinceReg > 1) {
+            $recommendations[] = [
+                'type' => 'first_interaction',
                 'priority' => 'high',
-                'title' => 'Complétez votre profil entrepreneur',
-                'description' => 'Votre profil est complété à ' . $profileCompletion . '%. Complétez-le pour de meilleures recommandations.',
+                'urgency' => 'this_week', 
+                'title' => 'Découvrez les capacités IA',
+                'description' => 'Testez l\'analyse personnalisée : "Quelles opportunités pour mon secteur ?"',
+                'action' => 'start_guided_chat',
+                'estimated_time' => '5 minutes',
+                'impact_score' => 75,
+                'next_step' => 'Commencer une conversation'
+            ];
+        }
+
+        // Advanced features for engaged users
+        if ($chatInteractions >= 5 && $dataUploads === 0) {
+            $recommendations[] = [
+                'type' => 'data_enhancement',
+                'priority' => 'medium',
+                'urgency' => 'this_month',
+                'title' => 'Analyses business personnalisées',
+                'description' => 'Uploadez votre business plan pour un diagnostic approfondi et recommandations sectorielles.',
+                'action' => 'upload_business_documents',
+                'estimated_time' => '3-5 minutes',
+                'impact_score' => 90,
+                'next_step' => 'Accéder aux documents'
+            ];
+        }
+
+        // Milestone-based recommendations
+        if ($profileCompletion >= 80 && $chatInteractions >= 10) {
+            $recommendations[] = [
+                'type' => 'advanced_features',
+                'priority' => 'medium',
+                'urgency' => 'this_month',
+                'title' => 'Optimisez votre stratégie',
+                'description' => 'Lancez un diagnostic complet pour identifier opportunités de financement et partenariats.',
+                'action' => 'run_full_diagnostic',
+                'estimated_time' => '2-3 minutes',
+                'impact_score' => 95,
+                'next_step' => 'Diagnostic approfondi'
+            ];
+        }
+
+        // Inactivity recovery
+        if ($engagementLevel === 'inactive' && $daysSinceReg > 7) {
+            $recommendations[] = [
+                'type' => 'reengagement',
+                'priority' => 'low',
+                'urgency' => 'flexible',
+                'title' => 'Reprenez où vous vous êtes arrêté',
+                'description' => 'Nouvelles opportunités disponibles dans votre secteur. Consultez les mises à jour.',
+                'action' => 'check_updates',
+                'estimated_time' => '2 minutes',
+                'impact_score' => 50,
+                'next_step' => 'Voir les nouveautés'
+            ];
+        }
+
+        // Sort by priority and impact
+        usort($recommendations, function($a, $b) {
+            $priorityWeight = ['critical' => 4, 'high' => 3, 'medium' => 2, 'low' => 1];
+            return ($priorityWeight[$b['priority']] ?? 0) <=> ($priorityWeight[$a['priority']] ?? 0);
+        });
+
+        return array_slice($recommendations, 0, 3); // Return top 3 most relevant
+    }
+
+    /**
+     * Generate enhanced insights with improved structure and metrics
+     */
+    public function generateEnhancedInsights(User $user): array
+    {
+        try {
+            $analytics = $this->getOrCreateUserAnalytics($user);
+            $daysSinceReg = $user->created_at->diffInDays(now());
+            $profileCompletion = $this->calculateProfileCompletion($user, $analytics->entrepreneur_profile['business_info'] ?? []);
+            $engagementLevel = $this->calculateEngagementLevel($user);
+            
+            // Generate contextual insights with optimized rendering
+            $insights = [
+                'user_journey' => [
+                    'registration_date' => $user->created_at->format('d/m/Y'),
+                    'days_since_registration' => $daysSinceReg,
+                    'journey_stage' => $this->determineJourneyStage($daysSinceReg, $profileCompletion, $engagementLevel),
+                    'onboarding_completed' => !empty($analytics->entrepreneur_profile),
+                    'profile_completion' => $profileCompletion,
+                    'engagement_level' => $engagementLevel,
+                    'engagement_score' => $this->calculateEngagementScore($analytics),
+                    'milestone_reached' => $this->getLatestMilestone($user, $analytics)
+                ],
+                'activity_summary' => [
+                    'total_interactions' => ($analytics->metadata['chat_interactions']['total_messages'] ?? 0) + ($analytics->metadata['data_sources']['total_uploads'] ?? 0),
+                    'chat_activity' => [
+                        'total_messages' => $analytics->metadata['chat_interactions']['total_messages'] ?? 0,
+                        'avg_messages_per_session' => $this->calculateAvgMessagesPerSession($analytics),
+                        'most_active_period' => 'Après-midi' // Simplified for now
+                    ],
+                    'data_usage' => [
+                        'total_uploads' => $analytics->metadata['data_sources']['total_uploads'] ?? 0,
+                        'preferred_file_types' => array_keys($analytics->metadata['data_sources']['file_types'] ?? []),
+                        'total_data_mb' => $analytics->metadata['data_sources']['total_size_mb'] ?? 0
+                    ],
+                    'last_activity' => $analytics->metadata['last_activity'] ?? null,
+                    'activity_trend' => $this->getActivityTrend($analytics),
+                    'most_used_agent' => $this->getMostUsedAgent($analytics),
+                    'favorite_topics' => $this->getTopTopics($analytics)
+                ],
+                'performance_metrics' => [
+                    'progression_rate' => $this->calculateProgressionRate($user, $analytics),
+                    'goal_completion' => $this->getGoalCompletion($analytics),
+                    'next_milestone' => $this->getNextMilestone($profileCompletion, $engagementLevel),
+                    'estimated_completion_date' => $this->estimateCompletionDate($user, $analytics)
+                ],
+                'recommendations' => $this->generateRecommendations($user, $analytics),
+                'generated_at' => now()->format('d/m/Y à H:i')
+            ];
+
+            return $insights;
+            
+        } catch (\Exception $e) {
+            Log::error("Failed to generate enhanced insights for user {$user->id}: " . $e->getMessage());
+            return $this->generateFallbackInsights($user);
+        }
+    }
+
+    // Helper methods for enhanced insights
+    
+    private function determineJourneyStage(int $daysSinceReg, int $profileCompletion, string $engagementLevel): string
+    {
+        if ($daysSinceReg <= 1) return 'onboarding';
+        if ($profileCompletion < 60) return 'setup';
+        if ($engagementLevel === 'high') return 'active_user';
+        if ($engagementLevel === 'medium') return 'exploring';
+        return 'dormant';
+    }
+
+    private function calculateEngagementScore(UserAnalytics $analytics): int
+    {
+        $messages = $analytics->metadata['chat_interactions']['total_messages'] ?? 0;
+        $uploads = $analytics->metadata['data_sources']['total_uploads'] ?? 0;
+        $sessions = $analytics->metadata['chat_interactions']['total_sessions'] ?? 1;
+        
+        $baseScore = min(($messages * 2) + ($uploads * 5), 70);
+        $sessionBonus = min($sessions * 3, 20);
+        $consistencyBonus = $this->getConsistencyBonus($analytics);
+        
+        return min($baseScore + $sessionBonus + $consistencyBonus, 100);
+    }
+
+    private function getConsistencyBonus(UserAnalytics $analytics): int
+    {
+        $lastActivity = $analytics->metadata['last_activity'] ?? null;
+        if (!$lastActivity) return 0;
+        
+        $daysSinceLastActivity = now()->diffInDays($lastActivity);
+        if ($daysSinceLastActivity <= 1) return 10;
+        if ($daysSinceLastActivity <= 3) return 5;
+        return 0;
+    }
+
+    private function getLatestMilestone(User $user, UserAnalytics $analytics): ?string
+    {
+        $profileCompletion = $analytics->entrepreneur_profile['completion_score'] ?? 0;
+        $messages = $analytics->metadata['chat_interactions']['total_messages'] ?? 0;
+        
+        if ($messages >= 20) return 'Expert utilisateur';
+        if ($profileCompletion >= 90) return 'Profil complet';
+        if ($messages >= 10) return 'Utilisateur actif';
+        if ($profileCompletion >= 60) return 'Profil configuré';
+        if ($messages >= 1) return 'Premier échange';
+        return 'Inscription complétée';
+    }
+
+    private function calculateAvgMessagesPerSession(UserAnalytics $analytics): float
+    {
+        $totalMessages = $analytics->metadata['chat_interactions']['total_messages'] ?? 0;
+        $totalSessions = max($analytics->metadata['chat_interactions']['total_sessions'] ?? 1, 1);
+        return round($totalMessages / $totalSessions, 1);
+    }
+
+    private function getActivityTrend(UserAnalytics $analytics): string
+    {
+        $lastActivity = $analytics->metadata['last_activity'] ?? null;
+        if (!$lastActivity) return 'nouvelle_inscription';
+        
+        $daysSinceLastActivity = now()->diffInDays($lastActivity);
+        if ($daysSinceLastActivity <= 1) return 'très_actif';
+        if ($daysSinceLastActivity <= 3) return 'actif';
+        if ($daysSinceLastActivity <= 7) return 'modéré';
+        return 'inactif';
+    }
+
+    private function calculateProgressionRate(User $user, UserAnalytics $analytics): float
+    {
+        $daysSinceReg = max($user->created_at->diffInDays(now()), 1);
+        $profileCompletion = $analytics->entrepreneur_profile['completion_score'] ?? 0;
+        return round($profileCompletion / $daysSinceReg, 2);
+    }
+
+    private function getGoalCompletion(UserAnalytics $analytics): array
+    {
+        $profileComplete = ($analytics->entrepreneur_profile['completion_score'] ?? 0) >= 90;
+        $activeUser = ($analytics->metadata['chat_interactions']['total_messages'] ?? 0) >= 10;
+        $dataUploaded = ($analytics->metadata['data_sources']['total_uploads'] ?? 0) > 0;
+        
+        return [
+            'profile_setup' => $profileComplete,
+            'platform_exploration' => $activeUser,
+            'data_integration' => $dataUploaded
+        ];
+    }
+
+    private function getNextMilestone(int $profileCompletion, string $engagementLevel): string
+    {
+        if ($profileCompletion < 60) return 'Compléter le profil';
+        if ($engagementLevel === 'low') return 'Explorer les fonctionnalités';
+        if ($engagementLevel === 'medium') return 'Lancer un diagnostic complet';
+        return 'Optimiser sa stratégie business';
+    }
+
+    private function estimateCompletionDate(User $user, UserAnalytics $analytics): ?string
+    {
+        $progressionRate = $this->calculateProgressionRate($user, $analytics);
+        if ($progressionRate <= 0) return null;
+        
+        $profileCompletion = $analytics->entrepreneur_profile['completion_score'] ?? 0;
+        $remainingProgress = 100 - $profileCompletion;
+        $estimatedDays = ceil($remainingProgress / $progressionRate);
+        
+        return now()->addDays($estimatedDays)->format('d/m/Y');
+    }
+
+    private function generateFallbackInsights(User $user): array
+    {
+        return [
+            'user_journey' => [
+                'registration_date' => $user->created_at->format('d/m/Y'),
+                'journey_stage' => 'onboarding',
+                'profile_completion' => 0,
+                'engagement_level' => 'new'
+            ],
+            'recommendations' => [[
+                'type' => 'getting_started',
+                'priority' => 'high',
+                'title' => 'Bienvenue sur LAgentO',
+                'description' => 'Commencez par compléter votre profil entrepreneur.',
                 'action' => 'complete_profile'
-            ];
-        }
-
-        // Engagement recommendations
-        if ($chatInteractions < 5) {
-            $recommendations[] = [
-                'type' => 'engagement',
-                'priority' => 'medium',
-                'title' => 'Explorez LAgentO davantage',
-                'description' => 'Posez des questions sur la création d\'entreprise, les financements ou les réglementations.',
-                'action' => 'start_chat'
-            ];
-        }
-
-        // Data source recommendations
-        if ($dataUploads === 0) {
-            $recommendations[] = [
-                'type' => 'data_sources',
-                'priority' => 'medium',
-                'title' => 'Ajoutez vos documents business',
-                'description' => 'Téléchargez votre business plan ou documents pour des analyses personnalisées.',
-                'action' => 'upload_documents'
-            ];
-        }
-
-        return $recommendations;
+            ]],
+            'generated_at' => now()->format('d/m/Y à H:i')
+        ];
     }
 }

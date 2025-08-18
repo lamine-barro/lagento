@@ -8,41 +8,59 @@
 <?php $__env->startSection('og_type', 'article'); ?>
 <?php $__env->startSection('canonical_url', route('projets.show', $projet)); ?>
 
-<?php $__env->startSection('schema_org', json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'Organization',
-    'name' => $projet->nom_projet,
-    'legalName' => $projet->raison_sociale,
-    'description' => $projet->description,
-    'url' => $projet->site_web,
-    'logo' => $projet->logo_url ? Storage::url($projet->logo_url) : null,
-    'foundingDate' => $projet->annee_creation,
-    'email' => $projet->email,
-    'telephone' => $projet->telephone,
-    'address' => [
-        '@type' => 'PostalAddress',
-        'addressRegion' => $projet->region,
-        'addressCountry' => 'CI'
-    ],
-    'sameAs' => array_filter(array_values($projet->reseaux_sociaux ?? [])),
-    'knowsAbout' => $projet->secteurs_labels,
-    'founder' => [
-        '@type' => 'Person',
-        'name' => $projet->user->name
-    ],
-    'employee' => [
-        '@type' => 'QuantitativeValue',
-        'value' => $projet->taille_equipe
-    ],
-    'makesOffer' => [
-        '@type' => 'Offer',
-        'itemOffered' => [
-            '@type' => 'Service',
-            'name' => implode(', ', $projet->produits_services ?? []),
-            'category' => implode(', ', $projet->secteurs_labels)
-        ]
-    ]
-])); ?>
+<?php $__env->startSection('page_title', $projet->nom_projet . ' - ' . $projet->getMaturiteLabel()); ?>
+
+<?php $__env->startSection('schema_org'); ?>
+
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+
+    "name": "<?php echo e($projet->nom_projet); ?>",
+    "legalName": "<?php echo e($projet->raison_sociale); ?>",
+    "description": "<?php echo e($projet->description); ?>",
+    "url": "<?php echo e($projet->site_web); ?>",
+    "logo": "<?php echo e($projet->logo_url ? Storage::url($projet->logo_url) : null); ?>",
+    "foundingDate": "<?php echo e($projet->annee_creation); ?>",
+    "email": "<?php echo e($projet->email); ?>",
+    "telephone": "<?php echo e($projet->telephone); ?>",
+
+    "address": {
+        "@type": "PostalAddress",
+
+        "addressRegion": "<?php echo e($projet->region); ?>",
+
+        "addressCountry": "CI"
+    },
+
+    "sameAs": <?php echo json_encode(array_filter(array_values($projet->reseaux_sociaux ?? []))); ?>,
+    "knowsAbout": <?php echo json_encode($projet->secteurs_labels); ?>,
+
+    "founder": {
+        "@type": "Person",
+
+        "name": "<?php echo e($projet->user->name); ?>"
+
+    },
+    "employee": {
+        "@type": "QuantitativeValue",
+
+        "value": "<?php echo e($projet->taille_equipe); ?>"
+
+    },
+    "makesOffer": {
+        "@type": "Offer",
+        "itemOffered": {
+            "@type": "Service",
+
+            "name": "<?php echo e(implode(', ', $projet->produits_services ?? [])); ?>",
+            "category": "<?php echo e(implode(', ', $projet->secteurs_labels)); ?>"
+
+        }
+    }
+}
+
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="max-w-4xl mx-auto px-4 py-8">

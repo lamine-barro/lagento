@@ -133,3 +133,6 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+/* ========== CHAT FIXED SPACING ========== */
+/* Note: Le padding-bottom principal est géré dans layouts/app.blade.php sur .main avec var(--chat-height) */

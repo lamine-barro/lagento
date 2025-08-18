@@ -8,7 +8,13 @@ use App\Models\UserAnalytics;
 use App\Models\Opportunite;
 use App\Models\Institution;
 use App\Models\TexteOfficiel;
+use App\Services\MemoryManagerService;
+use App\Services\VectorAccessService;
+use App\Services\LanguageModelService;
+use App\Services\EmbeddingService;
+use App\Services\SemanticSearchService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PhpOffice\PhpWord\PhpWord;
@@ -16,6 +22,22 @@ use PhpOffice\PhpWord\IOFactory;
 
 class AgentPrincipal extends BaseAgent
 {
+    protected MemoryManagerService $memoryManager;
+
+    public function __construct(
+        ?LanguageModelService $llm = null,
+        ?EmbeddingService $embedding = null,
+        ?SemanticSearchService $search = null
+    ) {
+        // Use service container if no dependencies provided
+        $llm = $llm ?: app(LanguageModelService::class);
+        $embedding = $embedding ?: app(EmbeddingService::class);
+        $search = $search ?: app(SemanticSearchService::class);
+        
+        parent::__construct($llm, $embedding, $search);
+        $this->memoryManager = app(MemoryManagerService::class);
+    }
+
     protected function getConfig(): array
     {
         return [
@@ -25,6 +47,7 @@ class AgentPrincipal extends BaseAgent
             'tools' => [
                 'gestion_base_donnees',
                 'recherche_semantique', 
+                'recherche_vectorielle',
                 'generation_fichier',
                 'generation_image'
             ]
@@ -258,6 +281,39 @@ CONTEXTE IVOIRIEN :
 OUTILS ET QUAND LES UTILISER :
 - gestion_base_donnees : lorsque l'utilisateur parle d'opportunités, financements, institutions, partenaires, ou de ses projets. Par défaut lecture; si l'utilisateur le demande explicitement, proposer la mise à jour du projet et/ou des analytics.
 - recherche_semantique : pour les lois, réglementations, procédures OHADA, textes officiels et références légales.
+- recherche_vectorielle : pour conseils personnalisés, exemples, recommandations, expériences similaires, cas d'usage. Accède aux MÉMOIRES VECTORISÉES suivantes (chaque type recherché INDÉPENDAMMENT pour garantir diversité) :
+  
+  * 'opportunite' (83 entrées) : Opportunités de financement, concours, subventions, fonds d'investissement CI
+    → Utiliser pour : recherche de financements, bourses, concours entrepreneuriaux, levées de fonds
+    → Mots-clés déclencheurs : financement, subvention, bourse, concours, capital, investissement, aide financière
+    
+  * 'institution' (189 entrées) : Institutions d'accompagnement entrepreneurial ivoiriennes
+    → Utiliser pour : recherche d'incubateurs, accélérateurs, cabinets conseil, associations, espaces coworking
+    → Mots-clés déclencheurs : accompagnement, incubateur, accélérateur, mentor, conseil, partenaire, structure
+    
+  * 'texte_officiel' (1765 entrées) : Corpus juridique complet OHADA et réglementation ivoirienne
+    → Utiliser pour : questions légales, procédures administratives, obligations réglementaires
+    → Mots-clés déclencheurs : loi, réglementation, juridique, OHADA, procédure, obligation, statut légal
+    
+  * 'user_project' : Projets entrepreneuriaux spécifiques de l'utilisateur (secteur, maturité, besoins)
+    → Utiliser pour : analyse personnalisée du projet, recommandations contextualisées
+    → Mots-clés déclencheurs : mon projet, ma startup, mon entreprise, Etudesk, analyser mon activité
+    
+  * 'user_analytics' : Profil entrepreneurial et diagnostic personnalisé (forces, axes progression)
+    → Utiliser pour : conseils basés sur le niveau de maturité, recommandations de formation
+    → Mots-clés déclencheurs : mes forces, mes faiblesses, mon profil, diagnostic, développement personnel
+    
+  * 'presentation' : Documentation LagentO/Horizon-O (fonctionnalités, missions, services)
+    → Utiliser pour : questions sur l'outil, ses capacités, son utilisation
+    → Mots-clés déclencheurs : LagentO, Agent O, fonctionnalités, comment utiliser, que peux-tu faire
+    
+  * 'faq' : Questions fréquentes entrepreneuriat CI et utilisation LagentO
+    → Utiliser pour : réponses aux questions courantes, guides pratiques
+    → Mots-clés déclencheurs : comment créer, étapes de, procédures courantes, questions fréquentes
+    
+  * 'timeline_gov' : Chronologie des actions gouvernementales et politiques d'appui CI
+    → Utiliser pour : contexte politique économique, programmes gouvernementaux
+    → Mots-clés déclencheurs : gouvernement, politique, État, programme officiel, initiatives publiques
 - generation_fichier (docx, csv, txt, md) : quand un document est demandé (business plan, CV, rapport, plan, résumé). Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
 - generation_image : pour logos/visuels/maquettes. Utilise exclusivement gpt-image-1. Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
 - web search (intégré au modèle) : si besoin d'actualités/informations récentes (mots-clés : actualité, récent, 2024, 2025, prix, taux). Le modèle l'activera automatiquement.
@@ -277,6 +333,18 @@ STYLE :
         // Recherche sémantique pour questions légales/réglementaires
         if (preg_match('/(loi|légal|réglementation|ohada|juridique|statut|formalisation)/i', $message)) {
             $tools[] = 'recherche_semantique';
+        }
+
+        // Recherche vectorielle pour conseils/exemples/recommandations + mots-clés spécifiques
+        if (preg_match('/(conseil|exemple|recommandation|similaire|expérience|comment|aide|inspiration|référence|cas|financement|subvention|bourse|concours|capital|investissement|accompagnement|incubateur|accélérateur|mentor|partenaire|forces|faiblesses|profil|diagnostic)/i', $message)) {
+            $tools[] = 'recherche_vectorielle';
+        }
+
+        // Recherche vectorielle pour les projets/entreprises spécifiques (noms propres, descriptions, analyses)
+        if (preg_match('/(projet|entreprise|startup|etudesk|business|mon projet|ma startup|décris|décrire|présente|analyser|mon entreprise|mon activité)/i', $message)) {
+            $tools[] = 'recherche_vectorielle';
+            // Aussi chercher dans la base de données pour les projets
+            $tools[] = 'gestion_base_donnees';
         }
 
         // Base de données pour opportunités/institutions
@@ -305,6 +373,9 @@ STYLE :
             
             case 'recherche_semantique':
                 return $this->executeSemanticSearch($message);
+            
+            case 'recherche_vectorielle':
+                return $this->executeVectorSearch($message, $userId);
             
             case 'generation_fichier':
                 return $this->executeFileGeneration($message, $userId);
@@ -365,6 +436,140 @@ STYLE :
             \Log::error('Semantic search error: ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Execute vector search across all memories
+     */
+    protected function executeVectorSearch(string $message, string $userId): array
+    {
+        try {
+            $user = User::find($userId);
+            if (!$user) {
+                return ['error' => 'Utilisateur non trouvé'];
+            }
+
+            // Use VectorAccessService for access-controlled search
+            $vectorAccessService = app(VectorAccessService::class);
+            
+            // Determine relevant memory types based on message content  
+            $relevantTypes = $this->determineRelevantMemoryTypes($message);
+            
+            // Perform access-controlled semantic search
+            $results = $vectorAccessService->searchWithAccess(
+                $message,
+                $user,
+                $relevantTypes,
+                8 // Limit results
+            );
+
+            $accessSummary = $vectorAccessService->getAccessSummary($user);
+            
+            Log::info('Vector search executed with access control', [
+                'user_id' => $userId,
+                'access_level' => $accessSummary['access_level'],
+                'requested_types' => $relevantTypes,
+                'accessible_types' => $accessSummary['accessible_types'],
+                'results_count' => count($results),
+                'query_preview' => substr($message, 0, 100)
+            ]);
+
+            return [
+                'vector_results' => $results,
+                'searched_types' => array_intersect($relevantTypes, $accessSummary['accessible_types']),
+                'access_level' => $accessSummary['access_level'],
+                'total_accessible_chunks' => $accessSummary['total_accessible_chunks']
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error('Vector search error', [
+                'error' => $e->getMessage(),
+                'user_id' => $userId,
+                'message' => substr($message, 0, 100)
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Determine relevant memory types based on message content
+     */
+    private function determineRelevantMemoryTypes(string $message): array
+    {
+        $message = strtolower($message);
+        $types = [];
+
+        // Always include core memories for general queries
+        $types[] = 'presentation'; // LagentO info
+
+        // OPPORTUNITÉ : financement, bourses, concours, investissement
+        if (preg_match('/(opportunité|financement|bourse|subvention|concours|fonds|capital|investissement|levée|aide financière|crowdfunding|startup boost)/i', $message)) {
+            $types[] = 'opportunite';
+        }
+
+        // TEXTE_OFFICIEL : lois, réglementation, OHADA, procédures
+        if (preg_match('/(loi|réglementation|texte|officiel|juridique|ohada|procédure|obligation|statut légal|décret|arrêté|formalisation)/i', $message)) {
+            $types[] = 'texte_officiel';
+        }
+
+        // INSTITUTION : accompagnement, incubateurs, mentors, conseils
+        if (preg_match('/(institution|organisme|structure|accompagnement|incubateur|accélérateur|cabinet|conseil|association|partenaire|mentor|coworking|coaching)/i', $message)) {
+            $types[] = 'institution';
+        }
+
+        // TIMELINE_GOV : gouvernement, politiques, programmes officiels
+        if (preg_match('/(gouvernement|état|politique|timeline|action|programme officiel|initiative publique|ministère|cepici|cgeci)/i', $message)) {
+            $types[] = 'timeline_gov';
+        }
+
+        // USER_PROJECT : projets personnels, startup, entreprise spécifique
+        if (preg_match('/(projet|entreprise|startup|business|entrepreneuriat|etudesk|décris|décrire|présente|analyser|mon projet|ma startup|mon entreprise|mon activité)/i', $message)) {
+            $types[] = 'user_project';
+        }
+        
+        // USER_ANALYTICS : profil personnel, diagnostic, forces/faiblesses
+        if (preg_match('/(mes forces|mes faiblesses|mon profil|diagnostic|développement personnel|mes compétences|mon niveau|ma maturité|axes progression)/i', $message)) {
+            $types[] = 'user_analytics';
+        }
+        
+        // Inclure user_analytics aussi pour les questions de projet (souvent liées)
+        if (in_array('user_project', $types)) {
+            $types[] = 'user_analytics';
+        }
+
+        // FAQ : questions courantes, guides pratiques
+        if (preg_match('/(comment créer|étapes de|procédures courantes|questions fréquentes|guide|comment faire|tutoriel)/i', $message)) {
+            $types[] = 'faq';
+        }
+        
+        // PRESENTATION : fonctionnalités LagentO, utilisation de l'outil
+        if (preg_match('/(lagento|agent o|fonctionnalités|comment utiliser|que peux-tu faire|tes capacités|horizon-o)/i', $message)) {
+            // Remove default presentation if specific LagentO question
+            $types = array_diff($types, ['presentation']);
+            $types[] = 'presentation';
+        }
+
+        if (preg_match('/(document|fichier|upload|pdf)/i', $message)) {
+            $types[] = 'documents';
+            $types[] = 'attachments';
+        }
+
+        if (preg_match('/(conversation|historique|contexte|précédent)/i', $message)) {
+            $types[] = 'conversations';
+        }
+
+        // If no specific types detected, search all
+        if (empty($types) || count($types) == 1) {
+            $types = [
+                'presentation',
+                'opportunite',
+                'institution',
+                'user_project',
+                'user_analytics'
+            ];
+        }
+
+        return array_unique($types);
     }
 
     protected function executeFileGeneration(string $message, string $userId): array
@@ -541,6 +746,11 @@ STYLE :
         if (isset($toolResults['gestion_base_donnees'])) {
             $formattedResponse = $this->appendDataCards($formattedResponse, $toolResults['gestion_base_donnees']);
         }
+        
+        // Add custom cards for vector search results
+        if (isset($toolResults['recherche_vectorielle'])) {
+            $formattedResponse = $this->appendVectorCards($formattedResponse, $toolResults['recherche_vectorielle']);
+        }
 
         // Ensure proper markdown structure
         $formattedResponse = $this->ensureMarkdownStructure($formattedResponse);
@@ -570,6 +780,65 @@ STYLE :
         if (isset($data['projets'])) {
             foreach ($data['projets'] as $projet) {
                 $cards .= $this->createProjectCard($projet);
+            }
+        }
+
+        return $response . "\n\n" . $cards;
+    }
+
+    /**
+     * Append vector search results as custom cards
+     */
+    protected function appendVectorCards(string $response, array $vectorResults): string
+    {
+        if (!isset($vectorResults['vector_results']) || empty($vectorResults['vector_results'])) {
+            return $response;
+        }
+
+        $cards = "";
+        $processedEntities = []; // Éviter les doublons
+
+        foreach ($vectorResults['vector_results'] as $result) {
+            $memoryType = $result['memory_type'];
+            $content = $result['content'];
+            $metadata = $result['metadata'] ?? [];
+
+            // Créer des cartes selon le type de mémoire
+            switch ($memoryType) {
+                case 'opportunite':
+                    $card = $this->createOpportunityCardFromVector($content, $metadata);
+                    if ($card && !in_array($card, $processedEntities)) {
+                        $cards .= $card;
+                        $processedEntities[] = $card;
+                    }
+                    break;
+
+                case 'institution':
+                    $card = $this->createInstitutionCardFromVector($content, $metadata);
+                    if ($card && !in_array($card, $processedEntities)) {
+                        $cards .= $card;
+                        $processedEntities[] = $card;
+                    }
+                    break;
+
+                case 'texte_officiel':
+                    $card = $this->createOfficialTextCardFromVector($content, $metadata);
+                    if ($card && !in_array($card, $processedEntities)) {
+                        $cards .= $card;
+                        $processedEntities[] = $card;
+                    }
+                    break;
+
+                case 'user_project':
+                    $card = $this->createProjectCardFromVector($content, $metadata);
+                    if ($card && !in_array($card, $processedEntities)) {
+                        $cards .= $card;
+                        $processedEntities[] = $card;
+                    }
+                    break;
+
+                // Les user_analytics, presentation, faq ne nécessitent pas de cartes
+                // car elles sont déjà intégrées dans la réponse textuelle
             }
         }
 
@@ -650,6 +919,118 @@ STYLE :
                ($region !== '' ? "📍 **Région:** {$region}\n" : '') .
                ($site !== '' ? "🌐 **Site:** {$site}\n" : '') .
                ":::\n";
+    }
+
+    /**
+     * Create opportunity card from vector content
+     */
+    protected function createOpportunityCardFromVector(string $content, array $metadata): ?string
+    {
+        // Extraire les informations du contenu vectorisé
+        $titre = '';
+        $description = '';
+        $type = $metadata['type'] ?? '';
+        $deadline = $metadata['deadline'] ?? '';
+        
+        // Parser le contenu pour extraire titre et description
+        if (preg_match('/Titre:\s*([^\n]+)/i', $content, $matches)) {
+            $titre = trim($matches[1]);
+        }
+        
+        if (preg_match('/Description:\s*([^\n]+)/i', $content, $matches)) {
+            $description = trim($matches[1]);
+        }
+        
+        if (empty($titre)) {
+            return null; // Pas assez d'informations
+        }
+
+        return "\n\n[carte-opportunite:{$titre}|{$description}|{$deadline}|]\n";
+    }
+
+    /**
+     * Create institution card from vector content
+     */
+    protected function createInstitutionCardFromVector(string $content, array $metadata): ?string
+    {
+        $nom = '';
+        $description = '';
+        $contact = '';
+        $site = '';
+        
+        // Parser le contenu vectorisé
+        if (preg_match('/Nom:\s*([^\n]+)/i', $content, $matches)) {
+            $nom = trim($matches[1]);
+        }
+        
+        if (preg_match('/Description:\s*([^\n]+)/i', $content, $matches)) {
+            $description = trim($matches[1]);
+        }
+        
+        if (preg_match('/Contact:\s*([^\n]+)/i', $content, $matches)) {
+            $contact = trim($matches[1]);
+        }
+        
+        if (preg_match('/Site web:\s*([^\n]+)/i', $content, $matches)) {
+            $site = trim($matches[1]);
+        }
+        
+        if (empty($nom)) {
+            return null;
+        }
+
+        return "\n\n[carte-institution:{$nom}|{$description}|{$contact}|{$site}]\n";
+    }
+
+    /**
+     * Create official text card from vector content
+     */
+    protected function createOfficialTextCardFromVector(string $content, array $metadata): ?string
+    {
+        $titre = '';
+        $description = '';
+        $classification = $metadata['classification'] ?? '';
+        $source = 'Textes officiels CI';
+        
+        if (preg_match('/Titre:\s*([^\n]+)/i', $content, $matches)) {
+            $titre = trim($matches[1]);
+        }
+        
+        if (preg_match('/Résumé:\s*([^\n]+)/i', $content, $matches)) {
+            $description = trim($matches[1]);
+        } elseif (preg_match('/Classification:\s*([^\n]+)/i', $content, $matches)) {
+            $description = "Texte " . trim($matches[1]);
+        }
+        
+        if (empty($titre)) {
+            return null;
+        }
+
+        return "\n\n[carte-texte-officiel:{$titre}|{$description}|{$source}|]\n";
+    }
+
+    /**
+     * Create project card from vector content
+     */
+    protected function createProjectCardFromVector(string $content, array $metadata): ?string
+    {
+        $nom = '';
+        $description = '';
+        $synergie = 'Projet entrepreneurial similaire';
+        
+        if (preg_match('/Nom:\s*([^\n]+)/i', $content, $matches)) {
+            $nom = trim($matches[1]);
+        }
+        
+        if (preg_match('/Description:\s*([^\n]+)/i', $content, $matches)) {
+            $description = trim($matches[1]);
+        }
+        
+        if (empty($nom)) {
+            return null;
+        }
+
+        return "\n\n[carte-partenaire:{$nom}|{$description}|{$synergie}|]\n";
     }
 
     protected function ensureMarkdownStructure(string $content): string

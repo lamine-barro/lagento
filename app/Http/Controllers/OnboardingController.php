@@ -177,16 +177,23 @@ class OnboardingController extends Controller
 
     public function processStep4(Request $request)
     {
+        \Log::info('Step 4 form submitted', [
+            'request_data' => $request->all(),
+            'user_id' => auth()->id()
+        ]);
+
         $request->validate([
             'founders_count' => 'required|integer|min:1',
             'female_founders_count' => 'required|integer|min:0',
             'age_ranges' => 'nullable|array',
-            'founders_location' => 'nullable|in:local,diaspora,mixte',
+            'founders_location' => 'nullable|in:local,diaspora,mixte,LOCAL,DIASPORA,MIXTE',
             'team_size' => 'nullable|string',
             'support_structures' => 'nullable|array',
             'support_types' => 'nullable|array|max:5',
             'additional_info' => 'nullable|string|max:1000'
         ]);
+
+        \Log::info('Step 4 validation passed');
 
         $user = Auth::user();
         $projet = Projet::where('user_id', $user->id)->latest()->first();
@@ -198,31 +205,22 @@ class OnboardingController extends Controller
             'nombre_fondateurs' => (int)$request->founders_count,
             'nombre_fondatrices' => (int)$request->female_founders_count,
             'tranches_age_fondateurs' => $request->age_ranges ?: [],
-            'localisation_fondateurs' => $request->founders_location ?: null,
+            'localisation_fondateurs' => $request->founders_location ? strtolower($request->founders_location) : null,
             'structures_accompagnement' => $request->support_structures ?: [],
             'types_soutien' => $request->support_types ?: [],
             'details_besoins' => $request->additional_info,
         ]);
 
-        // Vérifier si l'onboarding est complet (Finaliser)
-        if ($projet->isOnboardingComplete()) {
-            // Analytics désactivé - géré uniquement via le bouton diagnostic
-            
-            return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet.');
-        } else {
-            // Rediriger vers l'étape manquante
-            $progress = $projet->getOnboardingProgress();
-            
-            if (!$progress['steps']['step1']) {
-                return redirect()->route('onboarding.step1')->with('warning', 'Veuillez compléter les informations de votre entreprise.');
-            }
-            
-            if (!$progress['steps']['step4']) {
-                return redirect()->route('onboarding.step4')->with('warning', 'Veuillez compléter les informations sur votre équipe.');
-            }
-            
-            // Si toutes les étapes semblent complètes mais isOnboardingComplete() retourne false
-            return redirect()->route('onboarding.step1')->with('error', 'Veuillez vérifier et compléter toutes les informations obligatoires.');
-        }
+        // Rafraîchir le modèle pour être sûr d'avoir les dernières données
+        $projet->refresh();
+
+        \Log::info('Step 4 completed successfully', [
+            'projet_id' => $projet->id,
+            'redirecting_to' => 'diagnostic'
+        ]);
+
+        // Si on arrive ici, c'est que step 4 a été soumis avec succès
+        // Forcer la finalisation de l'onboarding
+        return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet.');
     }
 }

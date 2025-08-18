@@ -1,7 +1,7 @@
 <?php $__env->startSection('title', 'Documents'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="container max-w-4xl mx-auto section">
+<div class="container max-w-4xl mx-auto section px-4">
     <!-- En-tête -->
     <div class="mb-6">
         <div class="flex items-center gap-3 mb-2">

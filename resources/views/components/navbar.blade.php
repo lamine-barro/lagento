@@ -1,4 +1,4 @@
-<header class="fixed top-0 left-0 right-0 z-fixed" style="height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--gray-200);">
+<header class="fixed top-0 left-0 right-0 z-fixed z-10" style="height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--gray-200);">
     <div class="container max-w-4xl mx-auto flex items-center justify-between h-full">
         <!-- Toggle mobile (Diagnostic / Agent) -->
         <div class="md:hidden flex items-center gap-1 bg-gray-100 rounded-md" style="padding: 2px !important;">

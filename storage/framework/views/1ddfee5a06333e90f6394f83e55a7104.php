@@ -26,7 +26,7 @@
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form id="step1-form" method="POST" action="<?php echo e(route('onboarding.step1')); ?>" enctype="multipart/form-data" class="space-y-6 mt-4">
+        <form id="step1-form" method="POST" action="<?php echo e(route('onboarding.step1.process')); ?>" enctype="multipart/form-data" class="space-y-6 mt-4">
             <?php echo csrf_field(); ?>
 
             <!-- Identité & Contact -->
