@@ -594,6 +594,12 @@ function chatInterface() {
                     }
                 }
                 
+                console.log('sendDirectMessage called with:', {
+                    message: message,
+                    hasAttachment: !!attachment,
+                    attachmentName: attachment?.name
+                });
+                
                 // Étape 1: Sauver le message utilisateur avec le fichier
                 const formData = new FormData();
                 formData.append('message', message.trim() || '');

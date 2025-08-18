@@ -267,6 +267,13 @@
                 const userMessage = this.message;
                 const file = this.attachedFile;
                 
+                console.log('Sending message with file:', {
+                    message: userMessage,
+                    hasFile: !!file,
+                    fileName: file?.name,
+                    fileSize: file?.size
+                });
+                
                 // Si on n'est pas sur la page chat, stocker le message et rediriger
                 const currentPath = window.location.pathname;
                 if (currentPath !== '/chat') {
@@ -307,8 +314,8 @@
                     this.attachedFile = null;
                     this.isLoading = false;
                     
-                    // Déléguer au composant chat principal
-                    chatData.sendDirectMessage(userMessage);
+                    // Déléguer au composant chat principal avec le fichier
+                    chatData.sendDirectMessage(userMessage, file);
                     return; // Sortir tôt pour éviter la duplication
                 }
                 

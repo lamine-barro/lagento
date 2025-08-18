@@ -327,7 +327,7 @@
                     formData.append('file', file);
                 }
                 
-                fetch('<?php echo e(route("chat.send")); ?>', {
+                fetch('<?php echo e(route("chat.save-user-message")); ?>', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
