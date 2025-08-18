@@ -54,12 +54,17 @@ class ChatController extends Controller
             ->orderBy('created_at')
             ->get()
             ->map(function($message) {
+                $attachment = null;
+                if ($message->attachments && is_array($message->attachments) && count($message->attachments) > 0) {
+                    $attachment = $message->attachments[0]; // Take the first attachment
+                }
+                
                 return [
                     'id' => $message->id,
                     'role' => $message->role,
                     'content' => $message->text_content, // Ensure content is properly mapped
                     'created_at' => $message->created_at->toISOString(),
-                    'attachments' => $message->attachments ?? [],
+                    'attachment' => $attachment,
                     'executed_tools' => $message->executed_tools ?? []
                 ];
             });
@@ -70,13 +75,22 @@ class ChatController extends Controller
     public function saveUserMessage(Request $request)
     {
         $request->validate([
-            'message' => 'required|string|max:5000',
-            'conversation_id' => 'nullable|string'
+            'message' => 'nullable|string|max:5000',
+            'conversation_id' => 'nullable|string',
+            'file' => 'nullable|file|max:32768' // 32MB max (OpenAI limit)
         ]);
+
+        // Validate that we have either message or file
+        if (!$request->message && !$request->hasFile('file')) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Message ou fichier requis'
+            ], 400);
+        }
 
         $user = Auth::user();
         $conversationId = $request->get('conversation_id');
-        $userMessageContent = $request->get('message');
+        $userMessageContent = $request->get('message') ?? '';
         
         // Get or create conversation
         $conversation = null;
@@ -94,11 +108,49 @@ class ChatController extends Controller
             ]);
         }
 
+        $attachmentData = null;
+        $vectorMemoryId = null;
+        
+        // Handle file attachment
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            
+            try {
+                // Store file locally
+                $filePath = $file->store('chat-attachments', 'public');
+                
+                $attachmentData = [
+                    'name' => $file->getClientOriginalName(),
+                    'type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'path' => $filePath,
+                    'url' => asset('storage/' . $filePath)
+                ];
+                
+                // Vectoriser le fichier pour le contexte
+                $vectorMemoryId = $this->vectorizeFileContent($file, $user->id, $conversation->id);
+                
+                // Add file reference to message if no text content
+                if (empty($userMessageContent)) {
+                    $userMessageContent = "[Fichier attaché: {$file->getClientOriginalName()}]";
+                }
+                
+            } catch (\Exception $e) {
+                \Log::error('Erreur traitement fichier: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Erreur lors du traitement du fichier'
+                ], 500);
+            }
+        }
+
         // Save user message
         $userMessage = UserMessage::create([
             'conversation_id' => $conversation->id,
             'role' => 'user',
-            'text_content' => $userMessageContent
+            'text_content' => $userMessageContent,
+            'attachments' => $attachmentData ? [$attachmentData] : null,
+            'vector_memory_id' => $vectorMemoryId
         ]);
         
         // Update conversation
@@ -109,87 +161,101 @@ class ChatController extends Controller
             'success' => true,
             'user_message_id' => $userMessage->id,
             'conversation_id' => $conversation->id,
+            'vector_memory_id' => $vectorMemoryId,
+            'attachment' => $attachmentData,
             'message' => [
                 'id' => $userMessage->id,
                 'role' => $userMessage->role,
                 'content' => $userMessage->text_content,
                 'created_at' => $userMessage->created_at->toISOString(),
-                'attachments' => $userMessage->attachments ?? [],
+                'attachment' => $attachmentData,
                 'executed_tools' => $userMessage->executed_tools ?? []
             ]
         ]);
+    }
+    
+    private function vectorizeFileContent($file, $userId, $conversationId)
+    {
+        // Utiliser le service de vectorisation existant
+        $vectorService = app(\App\Services\VoyageVectorService::class);
+        $pdfService = app(\App\Services\PdfExtractionService::class);
+        
+        try {
+            // Extraire le contenu selon le type de fichier
+            $content = '';
+            $mimeType = $file->getMimeType();
+            
+            if ($mimeType === 'application/pdf') {
+                $content = $pdfService->extractTextFromFile($file->getPathname());
+            } elseif (str_starts_with($mimeType, 'text/')) {
+                $content = file_get_contents($file->getPathname());
+            } elseif (in_array($mimeType, ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])) {
+                // Pour les fichiers Word, on peut utiliser une librairie ou simplement stocker le nom
+                $content = "Document Word: " . $file->getClientOriginalName();
+            } else {
+                // Pour les images et autres fichiers, on stocke juste les métadonnées
+                $content = "Fichier: " . $file->getClientOriginalName() . " (type: " . $mimeType . ")";
+            }
+            
+            if (empty($content)) {
+                throw new \Exception("Impossible d'extraire le contenu du fichier");
+            }
+            
+            // Créer l'entrée vector_memory
+            $vectorMemory = \App\Models\VectorMemory::create([
+                'user_id' => $userId,
+                'content' => $content,
+                'metadata' => [
+                    'source' => 'chat_attachment',
+                    'conversation_id' => $conversationId,
+                    'filename' => $file->getClientOriginalName(),
+                    'mime_type' => $mimeType,
+                    'size' => $file->getSize()
+                ],
+                'source_type' => 'chat_attachment',
+                'source_id' => $conversationId
+            ]);
+            
+            // Vectoriser le contenu
+            $embedding = $vectorService->createEmbedding($content);
+            $vectorMemory->update(['embedding' => $embedding]);
+            
+            return $vectorMemory->id;
+            
+        } catch (\Exception $e) {
+            \Log::error('Erreur vectorisation fichier: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function sendMessage(Request $request)
     {
         $request->validate([
             'message' => 'nullable|string|max:5000',
-            'file' => 'nullable|file|max:5120' // 5MB max
+            'conversation_id' => 'required|string',
+            'vector_memory_id' => 'nullable|string'
         ]);
 
-        // Validate that we have either message or file
-        if (!$request->message && !$request->hasFile('file')) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Message ou fichier requis'
-            ], 400);
-        }
-        
         $user = Auth::user();
         $conversationId = $request->get('conversation_id');
+        $vectorMemoryId = $request->get('vector_memory_id');
         
-        // Get or create conversation
-        $conversation = null;
-        if ($conversationId) {
-            $conversation = UserConversation::where('user_id', $user->id)
-                ->where('id', $conversationId)
-                ->first();
-        }
+        // Get conversation
+        $conversation = UserConversation::where('user_id', $user->id)
+            ->where('id', $conversationId)
+            ->first();
         
         if (!$conversation) {
-            $conversation = UserConversation::create([
-                'user_id' => $user->id,
-                'title' => 'Nouvelle conversation',
-                'last_message_at' => now()
-            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'Conversation non trouvée'
+            ], 404);
         }
 
         $userMessageContent = $request->message ?? '';
         
-        // Handle file attachment
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filePath = $file->store('chat-attachments', 'public');
-            $userMessageContent .= ($userMessageContent ? "\n\n" : '') . 
-                "[Fichier joint: {$file->getClientOriginalName()}]";
-        }
-        
-        // Check if user message was already saved (to avoid duplication)
-        $userMessage = null;
-        if ($userMessageContent) {
-            // Check for recent user message with same content in this conversation
-            $recentUserMessage = UserMessage::where('conversation_id', $conversation->id)
-                ->where('role', 'user')
-                ->where('text_content', $userMessageContent)
-                ->where('created_at', '>=', now()->subMinutes(1)) // Within last minute
-                ->first();
-            
-            if ($recentUserMessage) {
-                // Message already exists, don't create duplicate
-                $userMessage = $recentUserMessage;
-            } else {
-                // Create new user message only if no recent duplicate found
-                $userMessage = UserMessage::create([
-                    'conversation_id' => $conversation->id,
-                    'role' => 'user',
-                    'text_content' => $userMessageContent
-                ]);
-                
-                // Update conversation count only for new messages
-                $conversation->increment('message_count', 1);
-                $conversation->update(['last_message_at' => now()]);
-            }
-        }
+        // Note: User message should already be saved by saveUserMessage endpoint
+        // This endpoint only processes the AI response
         
         // Generate title for new conversation
         $isNewConversation = $conversation->message_count === 1;
@@ -209,7 +275,8 @@ class ChatController extends Controller
         $agentResult = $this->agentService->processMessage(
             $userMessageContent,
             $user->id,
-            $conversation->id
+            $conversation->id,
+            $vectorMemoryId
         );
         
         if (!$agentResult['success']) {
@@ -236,7 +303,7 @@ class ChatController extends Controller
             'message_length' => strlen($userMessageContent),
             'tools_used' => $agentResult['tools_used'] ?? [],
             'response_length' => strlen($agentResult['response']),
-            'has_attachment' => $request->hasFile('file'),
+            'has_attachment' => !empty($vectorMemoryId),
             'conversation_id' => $conversation->id,
             'timestamp' => now()->toISOString()
         ];

@@ -81,10 +81,6 @@
                             <button type="submit" class="btn btn-primary">
                                 Mettre à jour
                             </button>
-                            <!-- Bouton de test temporaire -->
-                            <button type="button" @click="showOtpModal = true; newEmail = 'test@example.com'" class="btn btn-secondary text-xs">
-                                Test OTP
-                            </button>
                         </div>
                     </div>
                 </div>

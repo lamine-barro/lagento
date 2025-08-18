@@ -25,13 +25,15 @@ class AgentService
     /**
      * Process user message with AgentPrincipal
      */
-    public function processMessage(string $message, string $userId, ?string $conversationId = null): array
+    public function processMessage(string $message, string $userId, ?string $conversationId = null, ?string $vectorMemoryId = null): array
     {
         $agent = new AgentPrincipal($this->llm, $this->embedding, $this->search);
 
         // Injecter le contexte: 4 derniers messages + résumé de conversation
         $contextMessages = [];
         $conversationSummary = '';
+        $attachedFileContent = '';
+        
         if ($conversationId) {
             $conv = \App\Models\UserConversation::find($conversationId);
             if ($conv) {
@@ -46,6 +48,18 @@ class AgentService
                     ->toArray();
             }
         }
+        
+        // Récupérer le contenu du fichier vectorisé si présent
+        if ($vectorMemoryId) {
+            $vectorMemory = \App\Models\VectorMemory::find($vectorMemoryId);
+            if ($vectorMemory) {
+                $attachedFileContent = $vectorMemory->content;
+                $metadata = $vectorMemory->metadata ?? [];
+                if (isset($metadata['filename'])) {
+                    $attachedFileContent = "Contenu du fichier '{$metadata['filename']}':\n\n" . $attachedFileContent;
+                }
+            }
+        }
 
         return $agent->execute([
             'user_message' => $message,
@@ -53,6 +67,7 @@ class AgentService
             'conversation_id' => $conversationId,
             'recent_messages' => $contextMessages,
             'conversation_summary' => $conversationSummary,
+            'attached_file_content' => $attachedFileContent,
         ]);
     }
 

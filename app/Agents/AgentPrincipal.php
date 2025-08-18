@@ -133,6 +133,7 @@ class AgentPrincipal extends BaseAgent
             // Injecter contexte conversationnel
             $recent = $inputs['recent_messages'] ?? [];
             $summary = trim((string)($inputs['conversation_summary'] ?? ''));
+            $attachedFileContent = trim((string)($inputs['attached_file_content'] ?? ''));
 
             $contextBlock = '';
             if (!empty($recent)) {
@@ -146,6 +147,10 @@ class AgentPrincipal extends BaseAgent
             if ($summary !== '') {
                 $contextBlock .= "\nRésumé de la conversation:\n" . $summary . "\n";
                 $this->logDebug('Added conversation summary', ['summary_length' => strlen($summary)]);
+            }
+            if ($attachedFileContent !== '') {
+                $contextBlock .= "\n\nFichier attaché par l'utilisateur:\n" . $attachedFileContent . "\n";
+                $this->logDebug('Added attached file content', ['content_length' => strlen($attachedFileContent)]);
             }
 
             $messages = $this->formatMessages($systemPrompt . $contextBlock, $userMessage);

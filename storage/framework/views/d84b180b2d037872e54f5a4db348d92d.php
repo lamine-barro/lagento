@@ -216,7 +216,7 @@ document.addEventListener('alpine:init', () => {
             </div>
             
             <div x-collapse x-show="sectionsState.resume" class="card-body">
-                <div class="mb-3 p-3 rounded-lg" style="background: var(--orange-100);">
+                <div class="mb-3 p-3 rounded-lg message-principal">
                     <h4 class="font-medium text-orange mb-1">Message Principal</h4>
                     <p class="text-sm"><?php echo e($analytics->executive_summary['message_principal'] ?? 'Analyse en cours...'); ?></p>
                 </div>
@@ -284,9 +284,9 @@ document.addEventListener('alpine:init', () => {
                         </h4>
                         <div class="space-y-3">
                             <?php $__currentLoopData = ($analytics->entrepreneur_profile['forces'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $force): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-orange mb-1"><?php echo e($force['domaine'] ?? 'N/A'); ?></h5>
-                                <p class="text-sm text-gray-600 dark:text-gray-400"><?php echo e($force['description'] ?? 'N/A'); ?></p>
+                                <p class="text-sm text-gray-600"><?php echo e($force['description'] ?? 'N/A'); ?></p>
                             </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
@@ -299,12 +299,12 @@ document.addEventListener('alpine:init', () => {
                         </h4>
                         <div class="space-y-3">
                             <?php $__currentLoopData = ($analytics->entrepreneur_profile['axes_progression'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $axe): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <div class="flex items-start justify-between mb-1">
-                                    <h5 class="font-medium text-gray-900 dark:text-gray-100"><?php echo e($axe['domaine'] ?? 'N/A'); ?></h5>
-                                    <span class="text-xs badge badge-<?php echo e(($axe['impact'] ?? null) === 'immédiat' ? 'orange' : (($axe['impact'] ?? null) === 'court_terme' ? 'blue' : 'gray')); ?>"><?php echo e($axe['impact'] ?? 'N/A'); ?></span>
+                                    <h5 class="font-medium text-gray-900"><?php echo e($axe['domaine'] ?? 'N/A'); ?></h5>
+                                    <span class="text-xs badge badge-<?php echo e(($axe['impact'] ?? null) === 'immédiat' ? 'orange' : (($axe['impact'] ?? null) === 'court_terme' ? 'orange' : 'gray')); ?>"><?php echo e($axe['impact'] ?? 'N/A'); ?></span>
                                 </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400"><?php echo e($axe['action_suggeree'] ?? 'N/A'); ?></p>
+                                <p class="text-sm text-gray-600"><?php echo e($axe['action_suggeree'] ?? 'N/A'); ?></p>
                             </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
@@ -340,7 +340,7 @@ document.addEventListener('alpine:init', () => {
                         <div class="space-y-3">
                             <?php if(isset($analytics->project_diagnostic['indicateurs_cles'])): ?>
                             <?php $__currentLoopData = $analytics->project_diagnostic['indicateurs_cles']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $domaine => $indicateur): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <div class="flex items-center justify-between mb-1">
                                     <h5 class="font-medium capitalize text-gray-900 dark:text-gray-100"><?php echo e($domaine); ?></h5>
                                     <span class="badge badge-<?php echo e(($indicateur['statut'] ?? null) === 'ok' ? 'success' : (($indicateur['statut'] ?? null) === 'en_cours' ? 'warning' : 'gray')); ?>"><?php echo e($indicateur['statut'] ?? 'N/A'); ?></span>
@@ -361,7 +361,7 @@ document.addEventListener('alpine:init', () => {
                         </h4>
                         <div class="space-y-3">
                             <?php $__currentLoopData = ($analytics->project_diagnostic['prochaines_etapes'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $etape): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <div class="flex items-start gap-2">
                                     <span class="bg-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 font-medium"><?php echo e($etape['priorite'] ?? '?'); ?></span>
                                     <div class="flex-1">
@@ -397,7 +397,7 @@ document.addEventListener('alpine:init', () => {
             <div x-collapse x-show="sectionsState.opportunites" class="card-body">
                 <div class="space-y-4">
                     <?php $__currentLoopData = ($analytics->matched_opportunities['top_opportunites'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opportunite): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-sm transition-shadow">
+                    <div class="p-4 rounded-lg border border-gray-200 bg-white opportunity-card">
                         <div class="flex items-start justify-between mb-2">
                             <h4 class="font-semibold text-orange text-base"><?php echo e($opportunite['titre'] ?? 'N/A'); ?></h4>
                             <span class="badge badge-<?php echo e(($opportunite['urgence'] ?? null) === 'candidater_avant_7j' ? 'orange' : 'blue'); ?>"><?php echo e($opportunite['urgence'] ?? 'N/A'); ?></span>
@@ -445,7 +445,7 @@ document.addEventListener('alpine:init', () => {
                         </h4>
                         <div class="space-y-3">
                             <!-- Marché Local -->
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">Marché Local</h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
                                     <?php echo e($analytics->market_insights['taille_marche']['local'] ?? 'N/A'); ?>
@@ -454,7 +454,7 @@ document.addEventListener('alpine:init', () => {
                             </div>
                             
                             <!-- Potentiel -->
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">Potentiel de Croissance</h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
                                     <?php echo e($analytics->market_insights['taille_marche']['potentiel'] ?? 'N/A'); ?>
@@ -463,7 +463,7 @@ document.addEventListener('alpine:init', () => {
                             </div>
                             
                             <!-- Croissance -->
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">Taux de Croissance</h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
                                     <?php echo e($analytics->market_insights['taille_marche']['croissance'] ?? 'N/A'); ?>
@@ -480,7 +480,7 @@ document.addEventListener('alpine:init', () => {
                         </h4>
                         <div class="space-y-3">
                             <?php $__currentLoopData = ($analytics->market_insights['zones_opportunites'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $zone): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1"><?php echo e($zone['region'] ?? 'N/A'); ?></h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400"><?php echo e($zone['raison'] ?? 'N/A'); ?></p>
                             </div>
@@ -533,7 +533,7 @@ document.addEventListener('alpine:init', () => {
                         </h4>
                         <div class="space-y-3">
                             <?php $__currentLoopData = ($analytics->regulations['a_prevoir'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prevoir): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="p-3 rounded-lg bg-gray-50/10 dark:bg-gray-800/5 border border-gray-100/20 dark:border-gray-700/10">
+                            <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1"><?php echo e($prevoir['obligation'] ?? 'N/A'); ?></h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">Échéance : <?php echo e($prevoir['echeance'] ?? 'N/A'); ?></p>
                             </div>
@@ -564,7 +564,7 @@ document.addEventListener('alpine:init', () => {
             <div x-collapse x-show="sectionsState.partenaires" class="card-body">
                 <div class="space-y-4">
                     <?php $__currentLoopData = ($analytics->suggested_partners['top_partenaires'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $partenaire): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-sm transition-shadow">
+                    <div class="p-4 rounded-lg border border-gray-200 bg-white partner-card">
                         <div class="flex items-start justify-between mb-2">
                             <h4 class="font-semibold text-gray-900 dark:text-gray-100 text-base"><?php echo e($partenaire['nom_projet'] ?? 'N/A'); ?></h4>
                             <span class="badge badge-blue"><?php echo e($partenaire['score_pertinence'] ?? 0); ?>% match</span>
@@ -743,6 +743,244 @@ document.addEventListener('alpine:init', () => {
         </div>
     </div>
 </div>
+
+<?php $__env->startPush('styles'); ?>
+<style>
+/* Styles propres pour la page diagnostic - Dark/Light mode compatible */
+
+/* Cartes de base - utilisation des variables CSS existantes */
+.diagnostic-cards .card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+}
+
+.diagnostic-cards .card:hover {
+    border-color: var(--gray-300);
+}
+
+/* En-têtes de cartes */
+.diagnostic-cards .card-header {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.diagnostic-cards .card-title {
+    color: var(--gray-900);
+    font-weight: var(--font-weight-semibold);
+}
+
+.diagnostic-cards .card-description {
+    color: var(--gray-500);
+    font-size: var(--text-sm);
+}
+
+/* Corps de cartes */
+.diagnostic-cards .card-body {
+    background: var(--white);
+}
+
+/* Blocs de contenu - harmonisation */
+.diagnostic-cards .card-body > div[class*="bg-gray-50"],
+.diagnostic-cards .card-body > div[class*="border-gray-100"] {
+    background: var(--gray-50) !important;
+    border: 1px solid var(--gray-200) !important;
+}
+
+/* Messages et alertes - couleurs système */
+.diagnostic-cards div[style*="background: var(--orange-100)"] {
+    background: var(--orange-100) !important;
+    border: 1px solid var(--orange-200) !important;
+}
+
+.diagnostic-cards div[style*="background: var(--success-100)"] {
+    background: var(--success-100) !important;
+    border: 1px solid var(--green-200) !important;
+}
+
+/* Couleurs de texte orange pour les forces */
+.diagnostic-cards .text-orange {
+    color: var(--orange) !important;
+}
+
+/* Message Principal - bordure subtile */
+.diagnostic-cards .message-principal {
+    background: var(--orange-100);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+/* Cartes d'opportunités et partenaires - bordures subtiles */
+.diagnostic-cards .opportunity-card,
+.diagnostic-cards .partner-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+}
+
+.diagnostic-cards .opportunity-card:hover,
+.diagnostic-cards .partner-card:hover {
+    border-color: var(--gray-300);
+}
+
+/* Cartes d'opportunités et partenaires */
+.diagnostic-cards .card-body > .space-y-4 > div[class*="border"] {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+}
+
+.diagnostic-cards .card-body > .space-y-4 > div[class*="border"]:hover {
+    border-color: var(--gray-300);
+}
+
+/* Badges - couleurs système simples */
+.badge {
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-xs);
+    border-radius: var(--radius-sm);
+}
+
+.badge-orange,
+.badge-blue {
+    background: var(--orange-100);
+    color: var(--orange-dark);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+.badge-success {
+    background: var(--success-100);
+    color: var(--success-700);
+    border: 1px solid var(--green-200);
+}
+
+.badge-warning {
+    background: var(--warning-100);
+    color: var(--warning-700);
+    border: 1px solid var(--warning-200);
+}
+
+.badge-gray {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+}
+
+/* Indicateurs de priorité - orange simple */
+.diagnostic-cards .bg-orange.text-white {
+    background: var(--orange) !important;
+    color: var(--white) !important;
+}
+
+/* Sections urgentes - suppression des left-borders, style simple */
+.diagnostic-cards div[class*="border-l-3"] {
+    border-left: none !important;
+    background: var(--warning-50) !important;
+    border: 1px solid var(--warning-200) !important;
+}
+
+/* Skeleton loaders - couleurs système */
+.skeleton {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeleton-title {
+    height: 1.25rem;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+    height: 1rem;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* En-têtes hover - couleur système */
+.diagnostic-cards .card-header:hover {
+    background: var(--gray-100);
+}
+
+.diagnostic-cards .card-header button:hover i {
+    color: var(--gray-700) !important;
+}
+
+/* Modal - couleurs système */
+.bg-warning-100 {
+    background: var(--warning-100) !important;
+    border: 1px solid var(--warning-200) !important;
+}
+
+/* Boutons - couleurs système */
+.diagnostic-cards .btn {
+    font-weight: var(--font-weight-medium);
+    transition: var(--transition);
+}
+
+.diagnostic-cards .btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+}
+
+.diagnostic-cards .btn-secondary:hover {
+    background: var(--gray-200);
+    color: var(--gray-900);
+}
+
+/* Animation spin */
+.diagnostic-cards .smooth-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Shimmer effect simple */
+.shimmer-text {
+    opacity: 0.7;
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Amélioration des contrastes - utilisation des variables */
+.diagnostic-cards h4,
+.diagnostic-cards h5 {
+    color: var(--gray-900);
+    font-weight: var(--font-weight-semibold);
+}
+
+.diagnostic-cards .text-gray-600 {
+    color: var(--gray-600) !important;
+}
+
+.diagnostic-cards .text-gray-700 {
+    color: var(--gray-700) !important;
+}
+
+.diagnostic-cards .text-gray-900 {
+    color: var(--gray-900) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .diagnostic-cards .card-header,
+    .diagnostic-cards .card-body {
+        padding: var(--space-4);
+    }
+}
+</style>
+<?php $__env->stopPush(); ?>
 
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/diagnostic.blade.php ENDPATH**/ ?>

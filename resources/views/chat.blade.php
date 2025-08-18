@@ -76,9 +76,29 @@
             <div>
                 <!-- User Message -->
                 <div x-show="message.role === 'user'" class="flex justify-end">
-                    <div class="max-w-xs lg:max-w-lg xl:max-w-xl px-4 py-3 rounded-lg user-message" style="background: var(--orange-primary); color: white !important;">
-                        <p class="text-sm" style="color: white !important;" x-text="message.content"></p>
-                        <div class="text-xs mt-1" style="color: rgba(255, 255, 255, 0.8) !important;" x-text="formatTime(message.created_at)">
+                    <div class="max-w-xs lg:max-w-lg xl:max-w-xl">
+                        <div class="px-4 py-3 rounded-lg user-message" style="background: var(--orange-primary); color: white !important;">
+                            <p class="text-sm" style="color: white !important;" x-text="message.content"></p>
+                            <div class="text-xs mt-1" style="color: rgba(255, 255, 255, 0.8) !important;" x-text="formatTime(message.created_at)">
+                            </div>
+                        </div>
+                        <!-- Fichier attaché -->
+                        <div x-show="message.attachment" class="mt-2 p-3 rounded-lg border bg-white shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="paperclip" class="w-4 h-4" style="color: var(--gray-500);"></i>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium" style="color: var(--gray-900);" x-text="message.attachment?.name"></div>
+                                    <div class="text-xs" style="color: var(--gray-500);" x-text="formatFileSize(message.attachment?.size)"></div>
+                                </div>
+                                <template x-if="message.attachment?.type?.startsWith('image/')">
+                                    <img :src="message.attachment.url" :alt="message.attachment.name" class="w-8 h-8 rounded object-cover">
+                                </template>
+                                <template x-if="!message.attachment?.type?.startsWith('image/')">
+                                    <div class="w-8 h-8 rounded flex items-center justify-center" style="background: var(--gray-100);">
+                                        <i data-lucide="file" class="w-4 h-4" style="color: var(--gray-600);"></i>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -562,21 +582,32 @@ function chatInterface() {
             await this.sendDirectMessage(text);
         },
         
-        async sendDirectMessage(message) {
-            if (!message.trim()) return;
+        async sendDirectMessage(message, attachment = null) {
+            if (!message.trim() && !attachment) return;
             
             try {
-                // Étape 1: Sauver le message utilisateur d'abord
+                // Récupérer le fichier attaché depuis le chat fixe si pas fourni
+                if (!attachment) {
+                    const fixedChatComponent = document.querySelector('[x-data*="fixedChat"]');
+                    if (fixedChatComponent && fixedChatComponent._x_dataStack) {
+                        attachment = fixedChatComponent._x_dataStack[0].attachedFile;
+                    }
+                }
+                
+                // Étape 1: Sauver le message utilisateur avec le fichier
+                const formData = new FormData();
+                formData.append('message', message.trim() || '');
+                formData.append('conversation_id', this.currentConversationId);
+                if (attachment) {
+                    formData.append('file', attachment);
+                }
+                
                 const saveResponse = await fetch('/chat/save-user-message', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
-                    body: JSON.stringify({
-                        message: message.trim(),
-                        conversation_id: this.currentConversationId
-                    })
+                    body: formData
                 });
                 
                 const saveData = await saveResponse.json();
@@ -584,15 +615,27 @@ function chatInterface() {
                 if (saveData.success) {
                     console.log('User message saved successfully:', saveData);
                     
-                    // Ajouter le message utilisateur immédiatement
+                    // Ajouter le message utilisateur immédiatement avec l'attachement
                     const userMessage = {
                         id: saveData.user_message_id,
                         role: 'user',
-                        content: message.trim(),
-                        created_at: new Date().toISOString()
+                        content: message.trim() || '',
+                        created_at: new Date().toISOString(),
+                        attachment: saveData.attachment || null
                     };
                     
                     this.messages.push(userMessage);
+                    
+                    // Nettoyer le fichier attaché du chat fixe
+                    const fixedChatComponent = document.querySelector('[x-data*="fixedChat"]');
+                    if (fixedChatComponent && fixedChatComponent._x_dataStack) {
+                        const fixedData = fixedChatComponent._x_dataStack[0];
+                        fixedData.attachedFile = null;
+                        if (fixedData.$refs.fileInput) {
+                            fixedData.$refs.fileInput.value = '';
+                        }
+                    }
+                    
                     this.scrollToBottom();
                     
                     // Mettre à jour l'ID de conversation si nécessaire
@@ -613,16 +656,19 @@ function chatInterface() {
                     });
                     
                     // Étape 2: Traiter la réponse de l'agent
-                    const formData = new FormData();
-                    formData.append('message', message.trim());
-                    formData.append('conversation_id', this.currentConversationId);
+                    const aiFormData = new FormData();
+                    aiFormData.append('message', message.trim() || '');
+                    aiFormData.append('conversation_id', this.currentConversationId);
+                    if (saveData.vector_memory_id) {
+                        aiFormData.append('vector_memory_id', saveData.vector_memory_id);
+                    }
                     
                     const response = await fetch('/chat/send', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
-                        body: formData
+                        body: aiFormData
                     });
                     
                     const data = await response.json();
@@ -724,6 +770,14 @@ function chatInterface() {
                 console.error('Erreur de formatage de la date:', error);
                 return '';
             }
+        },
+        
+        formatFileSize(size) {
+            if (!size) return '';
+            if (size < 1024) return size + ' B';
+            if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+            if (size < 1024 * 1024 * 1024) return (size / (1024 * 1024)).toFixed(1) + ' MB';
+            return (size / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
         },
         
         scrollToBottom() {

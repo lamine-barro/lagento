@@ -169,12 +169,30 @@
                          onfocusout="this.style.borderColor='var(--gray-200)'; this.style.boxShadow='none'">
                         
                         <!-- Aperçu fichier -->
-                        <div x-show="attachedFile" class="absolute bottom-full mb-2 p-2 rounded-lg flex items-center gap-2" style="background: var(--gray-100); border: 1px solid var(--gray-200);">
-                            <i data-lucide="paperclip" class="w-4 h-4" style="color: var(--gray-500);"></i>
-                            <span x-text="attachedFile?.name" class="text-sm flex-1" style="color: var(--gray-700);"></span>
-                            <button type="button" @click="removeAttachment()" class="p-1 rounded transition-colors" style="color: var(--gray-500);" onmouseover="this.style.background='var(--gray-200)'" onmouseout="this.style.background='transparent'">
-                                <i data-lucide="x" class="w-4 h-4"></i>
-                            </button>
+                        <div x-show="attachedFile" class="absolute bottom-full mb-2 p-3 rounded-lg shadow-lg max-w-sm" style="background: var(--white); border: 1px solid var(--gray-200);">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--orange-50);">
+                                    <template x-if="attachedFile?.type?.startsWith('image/')">
+                                        <i data-lucide="image" class="w-5 h-5" style="color: var(--orange-primary);"></i>
+                                    </template>
+                                    <template x-if="attachedFile?.type?.includes('pdf')">
+                                        <i data-lucide="file-text" class="w-5 h-5" style="color: var(--red-500);"></i>
+                                    </template>
+                                    <template x-if="attachedFile?.type?.includes('word') || attachedFile?.name?.endsWith('.doc') || attachedFile?.name?.endsWith('.docx')">
+                                        <i data-lucide="file-text" class="w-5 h-5" style="color: var(--blue-500);"></i>
+                                    </template>
+                                    <template x-if="!attachedFile?.type?.startsWith('image/') && !attachedFile?.type?.includes('pdf') && !attachedFile?.type?.includes('word') && !attachedFile?.name?.endsWith('.doc') && !attachedFile?.name?.endsWith('.docx')">
+                                        <i data-lucide="file" class="w-5 h-5" style="color: var(--gray-600);"></i>
+                                    </template>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-medium truncate" style="color: var(--gray-900);" x-text="attachedFile?.name"></div>
+                                    <div class="text-xs" style="color: var(--gray-500);" x-text="formatFileSize(attachedFile?.size)"></div>
+                                </div>
+                                <button type="button" @click="removeAttachment()" class="p-1 rounded transition-colors" style="color: var(--gray-400);" onmouseover="this.style.background='var(--gray-100)'; this.style.color='var(--gray-600)'" onmouseout="this.style.background='transparent'; this.style.color='var(--gray-400)'">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <textarea 
@@ -195,16 +213,17 @@
                                     type="file" 
                                     x-ref="fileInput" 
                                     @change="handleFileUpload"
-                                    accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                                    accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp"
                                     class="hidden"
                                 />
                                 <button type="button" @click="$refs.fileInput.click()" 
-                                        class="p-1.5 rounded-lg transition-all" 
-                                        style="color: var(--gray-600);" 
-                                        onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'" 
-                                        onmouseout="this.style.color='var(--gray-600)'; this.style.background='transparent'"
-                                        title="Joindre un fichier">
+                                        class="p-1.5 rounded-lg transition-all relative" 
+                                        :style="attachedFile ? 'color: var(--orange-primary); background: var(--orange-50);' : 'color: var(--gray-600);'"
+                                        onmouseover="if (!this.querySelector('.attached-indicator')) { this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'; }" 
+                                        onmouseout="if (!this.querySelector('.attached-indicator')) { this.style.color='var(--gray-600)'; this.style.background='transparent'; }"
+                                        title="Joindre un fichier (PDF, DOC, images)">
                                     <i data-lucide="paperclip" class="w-4 h-4"></i>
+                                    <div x-show="attachedFile" class="attached-indicator absolute -top-1 -right-1 w-2 h-2 rounded-full" style="background: var(--orange-primary);"></div>
                                 </button>
                                 <button type="button" 
                                         @click="toggleSuggestions()"
@@ -384,6 +403,14 @@
                         suggestionsData.showSuggestions = false;
                     }
                 }
+            },
+            
+            formatFileSize(size) {
+                if (!size) return '';
+                if (size < 1024) return size + ' B';
+                if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+                if (size < 1024 * 1024 * 1024) return (size / (1024 * 1024)).toFixed(1) + ' MB';
+                return (size / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
             }
         }
     }
