@@ -82,18 +82,12 @@ class ChatController extends Controller
     public function saveUserMessage(Request $request)
     {
         $request->validate([
-            'message' => 'nullable|string|max:5000',
+            'message' => 'required|string|max:5000',
             'conversation_id' => 'nullable|string',
             'file' => 'nullable|file|max:32768' // 32MB max (OpenAI limit)
         ]);
 
-        // Validate that we have a message (required) and optionally a file
-        if (!$request->message || trim($request->message) === '') {
-            return response()->json([
-                'success' => false,
-                'error' => 'Message requis'
-            ], 400);
-        }
+        // Message is already validated by the request validation above
 
         $user = Auth::user();
         $conversationId = $request->get('conversation_id');
@@ -135,7 +129,12 @@ class ChatController extends Controller
                 ];
                 
                 // Vectoriser le fichier pour le contexte
-                $vectorMemoryId = $this->vectorizeFileContent($file, $user->id, $conversation->id);
+                try {
+                    $vectorMemoryId = $this->vectorizeFileContent($file, $user->id, $conversation->id);
+                } catch (\Exception $e) {
+                    \Log::error('Vectorisation failed, continuing without it: ' . $e->getMessage());
+                    $vectorMemoryId = null;
+                }
                 
             } catch (\Exception $e) {
                 \Log::error('Erreur traitement fichier: ' . $e->getMessage());
