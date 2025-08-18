@@ -225,7 +225,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <div x-collapse x-show="sectionsState.resume" class="card-body">
+            <div x-show="sectionsState.resume" x-transition class="card-body">
                 <div class="mb-3 p-3 rounded-lg message-principal">
                     <h4 class="font-medium text-orange mb-1">Message Principal</h4>
                     <p class="text-sm">{{ $analytics->executive_summary['message_principal'] ?? 'Analyse en cours...' }}</p>
@@ -283,7 +283,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <div x-collapse x-show="sectionsState.profil" class="card-body">
+            <div x-show="sectionsState.profil" x-transition class="card-body">
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
@@ -338,7 +338,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <div x-collapse x-show="sectionsState.diagnostic" class="card-body">
+            <div x-show="sectionsState.diagnostic" x-transition class="card-body">
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
@@ -402,7 +402,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <div x-collapse x-show="sectionsState.opportunites" class="card-body">
+            <div x-show="sectionsState.opportunites" x-transition class="card-body">
                 <div class="space-y-4">
                     @foreach(($analytics->matched_opportunities['top_opportunites'] ?? []) as $opportunite)
                     <div class="p-4 rounded-lg border border-gray-200 bg-white opportunity-card">
@@ -444,7 +444,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <div x-collapse x-show="sectionsState.marche" class="card-body">
+            <div x-show="sectionsState.marche" x-transition class="card-body">
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
@@ -513,7 +513,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <div x-collapse x-show="sectionsState.regulations" class="card-body">
+            <div x-show="sectionsState.regulations" x-transition class="card-body">
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-orange">
@@ -566,7 +566,7 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <div x-collapse x-show="sectionsState.partenaires" class="card-body">
+            <div x-show="sectionsState.partenaires" x-transition class="card-body">
                 <div class="space-y-4">
                     @foreach(($analytics->suggested_partners['top_partenaires'] ?? []) as $partenaire)
                     <div class="p-4 rounded-lg border border-gray-200 bg-white partner-card">

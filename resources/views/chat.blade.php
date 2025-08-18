@@ -583,7 +583,7 @@ function chatInterface() {
         },
         
         async sendDirectMessage(message, attachment = null) {
-            if (!message.trim() && !attachment) return;
+            if (!message.trim()) return;
             
             try {
                 // Récupérer le fichier attaché depuis le chat fixe si pas fourni

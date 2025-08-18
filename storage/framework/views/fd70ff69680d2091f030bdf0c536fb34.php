@@ -171,20 +171,6 @@
                         <!-- Aperçu fichier -->
                         <div x-show="attachedFile" class="absolute bottom-full mb-2 p-3 rounded-lg shadow-lg max-w-sm" style="background: var(--white); border: 1px solid var(--gray-200);">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--orange-50);">
-                                    <template x-if="attachedFile?.type?.startsWith('image/')">
-                                        <i data-lucide="image" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                                    </template>
-                                    <template x-if="attachedFile?.type?.includes('pdf')">
-                                        <i data-lucide="file-text" class="w-5 h-5" style="color: var(--red-500);"></i>
-                                    </template>
-                                    <template x-if="attachedFile?.type?.includes('word') || attachedFile?.name?.endsWith('.doc') || attachedFile?.name?.endsWith('.docx')">
-                                        <i data-lucide="file-text" class="w-5 h-5" style="color: var(--blue-500);"></i>
-                                    </template>
-                                    <template x-if="!attachedFile?.type?.startsWith('image/') && !attachedFile?.type?.includes('pdf') && !attachedFile?.type?.includes('word') && !attachedFile?.name?.endsWith('.doc') && !attachedFile?.name?.endsWith('.docx')">
-                                        <i data-lucide="file" class="w-5 h-5" style="color: var(--gray-600);"></i>
-                                    </template>
-                                </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="text-sm font-medium truncate" style="color: var(--gray-900);" x-text="attachedFile?.name"></div>
                                     <div class="text-xs" style="color: var(--gray-500);" x-text="formatFileSize(attachedFile?.size)"></div>
@@ -219,11 +205,10 @@
                                 <button type="button" @click="$refs.fileInput.click()" 
                                         class="p-1.5 rounded-lg transition-all relative" 
                                         :style="attachedFile ? 'color: var(--orange-primary); background: var(--orange-50);' : 'color: var(--gray-600);'"
-                                        onmouseover="if (!this.querySelector('.attached-indicator')) { this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'; }" 
-                                        onmouseout="if (!this.querySelector('.attached-indicator')) { this.style.color='var(--gray-600)'; this.style.background='transparent'; }"
+                                        onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)';" 
+                                        onmouseout="if (!this.classList.contains('attached')) { this.style.color='var(--gray-600)'; this.style.background='transparent'; }"
                                         title="Joindre un fichier (PDF, DOC, images)">
                                     <i data-lucide="paperclip" class="w-4 h-4"></i>
-                                    <div x-show="attachedFile" class="attached-indicator absolute -top-1 -right-1 w-2 h-2 rounded-full" style="background: var(--orange-primary);"></div>
                                 </button>
                                 <button type="button" 
                                         @click="toggleSuggestions()"
@@ -235,11 +220,12 @@
                                     <i data-lucide="lightbulb" class="w-4 h-4"></i>
                                 </button>
                                 <button type="button" 
+                                        @click="$dispatch('open-voice-modal')"
                                         class="p-1.5 rounded-lg transition-all" 
                                         style="color: var(--gray-600);" 
                                         onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)'" 
                                         onmouseout="this.style.color='var(--gray-600)'; this.style.background='transparent'"
-                                        title="Enregistrement vocal">
+                                        title="Mode vocal (bientôt disponible)">
                                     <i data-lucide="mic" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -595,6 +581,51 @@
         display: none;
     }
     </style>
+
+    <!-- Modal Voice Mode Teasing -->
+    <div x-data="{ showVoiceModal: false }" 
+         @open-voice-modal.window="showVoiceModal = true"
+         x-show="showVoiceModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4" 
+         style="background: rgba(0, 0, 0, 0.5); display: none;">
+        
+        <div @click.stop 
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            
+            <div class="text-center">
+                <!-- Icône micro avec animation -->
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style="background: var(--orange-100);">
+                    <i data-lucide="mic" class="w-8 h-8" style="color: var(--orange);"></i>
+                </div>
+                
+                <h3 class="text-lg font-semibold mb-2" style="color: var(--gray-900);">
+                    Mode Vocal
+                </h3>
+                
+                <p class="text-sm mb-6" style="color: var(--gray-600);">
+                    Le mode vocal sera bientôt disponible !<br>
+                    Vous pourrez discuter avec LAgentO en utilisant votre voix.
+                </p>
+                
+                <button @click="showVoiceModal = false" 
+                        class="btn btn-primary w-full">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
     <?php endif; ?>
     
     <!-- Global Toast Notifications -->

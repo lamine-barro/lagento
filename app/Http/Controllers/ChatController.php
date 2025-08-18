@@ -80,11 +80,11 @@ class ChatController extends Controller
             'file' => 'nullable|file|max:32768' // 32MB max (OpenAI limit)
         ]);
 
-        // Validate that we have either message or file
-        if (!$request->message && !$request->hasFile('file')) {
+        // Validate that we have a message (required) and optionally a file
+        if (!$request->message || trim($request->message) === '') {
             return response()->json([
                 'success' => false,
-                'error' => 'Message ou fichier requis'
+                'error' => 'Message requis'
             ], 400);
         }
 
@@ -129,11 +129,6 @@ class ChatController extends Controller
                 
                 // Vectoriser le fichier pour le contexte
                 $vectorMemoryId = $this->vectorizeFileContent($file, $user->id, $conversation->id);
-                
-                // Add file reference to message if no text content
-                if (empty($userMessageContent)) {
-                    $userMessageContent = "[Fichier attaché: {$file->getClientOriginalName()}]";
-                }
                 
             } catch (\Exception $e) {
                 \Log::error('Erreur traitement fichier: ' . $e->getMessage());
