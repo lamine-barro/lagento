@@ -10,7 +10,7 @@
             <a href="<?php echo e(route('chat.index')); ?>" 
                class="touch-target rounded-md transition-colors <?php echo e(request()->routeIs('chat.index') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'); ?>"
                title="Agent">
-                <i data-lucide="brain" class="w-4 h-4"></i>
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
             </a>
         </div>
         

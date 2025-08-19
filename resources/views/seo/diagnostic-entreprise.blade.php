@@ -1,11 +1,11 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'Diagnostic gratuit d\'entreprise en Côte d\'Ivoire - LAgentO')
-@section('meta_description', 'Obtenez un diagnostic complet et gratuit de votre entreprise en Côte d\'Ivoire avec LAgentO. Analyse stratégique, recommandations personnalisées et plan d\'action pour développer votre business à Abidjan.')
+@section('seo_title', 'Diagnostic gratuit d\'entreprise en Côte d\'Ivoire - LagentO')
+@section('meta_description', 'Obtenez un diagnostic complet et gratuit de votre entreprise en Côte d\'Ivoire avec LagentO. Analyse stratégique, recommandations personnalisées et plan d\'action pour développer votre business à Abidjan.')
 @section('meta_keywords', 'diagnostic entreprise gratuit, analyse business ci, évaluation startup abidjan, audit stratégique côte ivoire, conseil entreprise ivoirien')
 @section('canonical_url', route('seo.diagnostic'))
 
-@section('og_title', 'Diagnostic Entreprise Gratuit CI - LAgentO')
+@section('og_title', 'Diagnostic Entreprise Gratuit CI - LagentO')
 @section('og_description', 'Diagnostic complet et gratuit de votre entreprise en Côte d\'Ivoire. Analyse IA personnalisée avec recommandations stratégiques.')
 @section('og_type', 'website')
 
@@ -24,7 +24,7 @@
         "name": "Diagnostic Entreprise Gratuit",
         "provider": {
             "@type": "Organization",
-            "name": "LAgentO",
+            "name": "LagentO",
             "founder": {
                 "@type": "Person",
                 "name": "Lamine Barro"
@@ -81,14 +81,14 @@
                 📊 Diagnostic gratuit de votre entreprise en Côte d'Ivoire
             </h1>
             <p class="text-xl mb-8 opacity-90">
-                Une analyse complète de votre entreprise par l'intelligence artificielle LAgentO, adaptée au contexte ivoirien
+                Une analyse complète de votre entreprise par l'intelligence artificielle LagentO, adaptée au contexte ivoirien
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: white; color: var(--blue-600);">
                     🚀 Commencer mon Diagnostic
                 </a>
                 <a href="{{ route('seo.assistant-ia') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">
-                    🤖 Découvrir LAgentO
+                    🤖 Découvrir LagentO
                 </a>
             </div>
         </div>
@@ -99,7 +99,7 @@
         <div class="container max-w-4xl mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-6" style="color: var(--gray-900);">
-                    Comment fonctionne le diagnostic LAgentO ?
+                    Comment fonctionne le diagnostic LagentO ?
                 </h2>
                 <p class="text-lg" style="color: var(--gray-700);">
                     Une analyse complète de votre entreprise par intelligence artificielle, adaptée au marché ivoirien
@@ -164,7 +164,7 @@
     <section class="py-16" style="background: var(--gray-100);">
         <div class="container max-w-6xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-12 text-center" style="color: var(--gray-900);">
-                Comment fonctionne le diagnostic LAgentO ?
+                Comment fonctionne le diagnostic LagentO ?
             </h2>
             
             <div class="grid md:grid-cols-4 gap-8">
@@ -265,7 +265,7 @@
                             <p class="text-sm" style="color: var(--gray-600);">Startup AgriTech, Abidjan</p>
                         </div>
                     </div>
-                    <p style="color: var(--gray-700);">"Le diagnostic LAgentO m'a aidé à identifier les vraies opportunités de mon secteur en CI. Les recommandations étaient très précises et adaptées au contexte local."</p>
+                    <p style="color: var(--gray-700);">"Le diagnostic LagentO m'a aidé à identifier les vraies opportunités de mon secteur en CI. Les recommandations étaient très précises et adaptées au contexte local."</p>
                 </div>
                 
                 <div class="bg-white rounded-lg p-6 shadow-sm">

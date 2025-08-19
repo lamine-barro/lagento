@@ -1,4 +1,4 @@
-<?php $__env->startSection('seo_title', 'Annuaire des Projets Entrepreneuriaux - Côte d\'Ivoire | LAgentO'); ?>
+<?php $__env->startSection('seo_title', 'Annuaire des Projets Entrepreneuriaux - Côte d\'Ivoire | LagentO'); ?>
 <?php $__env->startSection('meta_description', 'Découvrez les projets innovants d\'entrepreneurs ivoiriens. Trouvez des partenaires, investisseurs et opportunités de collaboration dans l\'écosystème startup de Côte d\'Ivoire.'); ?>
 <?php $__env->startSection('meta_keywords', 'projets startup côte ivoire, entrepreneurs ivoiriens, annuaire entreprises ci, innovation abidjan, partenaires business afrique'); ?>
 <?php $__env->startSection('meta_robots', 'index, follow'); ?>

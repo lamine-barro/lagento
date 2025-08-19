@@ -128,86 +128,77 @@ class AgentSuggestionsConversation extends BaseAgent
 
     protected function getSystemInstructions(): string
     {
-        return "Tu génères des suggestions de questions que l'entrepreneur va poser à Agent O.
+        return "Tu génères des suggestions de questions business concrètes pour entrepreneurs ivoiriens.
 
 MISSION :
-Générer 5 questions pertinentes que l'utilisateur peut poser à Agent O basées sur :
-- Son contexte entrepreneurial personnalisé
-- Ses projets et diagnostics
-- La page où il se trouve
-- Ses besoins identifiés
+Générer 5 questions BUSINESS PRATIQUES que l'entrepreneur va poser à Agent O.
 
 CONTRAINTES :
-- Chaque question : MAXIMUM 15 mots
-- Questions directes que l'entrepreneur poserait naturellement
-- Adaptées à son niveau de maturité et ses défis spécifiques
-- Éviter les répétitions
-- Mélanger différents aspects : stratégie, financement, opérationnel, légal
+- Chaque question : MAXIMUM 12 mots
+- Questions directes, business-oriented
+- Variées : canvas, cible, vente, financement, légal, growth
+- Contexte Côte d'Ivoire quand pertinent
 
 FORMAT DE SORTIE :
-Retourne exactement 5 questions, une par ligne, sans numérotation ni puces.
-Chaque ligne contient une question complète que l'entrepreneur poserait.
+5 questions exactement, une par ligne, sans numérotation.
 
-EXEMPLES DE STYLE :
-- \"Comment optimiser la rentabilité de mon projet EdTech ?\"
-- \"Quels financements pour une startup au stade prototype ?\"
-- \"Comment structurer mon équipe pour passer à l'échelle ?\"
-- \"Quelles démarches prioritaires pour formaliser rapidement ?\"
+EXEMPLES OBLIGATOIRES À VARIER :
+- \"Donne-moi mon business lean canvas\"
+- \"Qui est ma cible idéale ?\"
+- \"Comment obtenir un RDV avec un corporate ?\"
+- \"Quel montage juridique OHADA pour ma SAS ?\"
+- \"Comment pitcher en 60 secondes ?\"
+- \"Quelles opportunités de financement disponibles maintenant ?\"
+- \"Comment calculer mon prix de vente optimal ?\"
+- \"Quelle stratégie pour mes premiers 10 clients ?\"
+- \"Comment valider mon product-market fit ?\"
+- \"Quel modèle de revenus récurrents adopter ?\"
 
-STYLE DES QUESTIONS :
-- À la première personne (\"Comment puis-je...\", \"Que dois-je...\")
-- Pratiques et orientées solutions
-- Spécifiques au contexte ivoirien quand pertinent
-- Reflètent les préoccupations réelles de l'entrepreneur";
+STYLE OBLIGATOIRE :
+- Questions courtes et percutantes
+- Vocabulaire business moderne
+- Orienté action et résultats
+- Mix stratégique/opérationnel/financier";
     }
 
     protected function buildSuggestionsPrompt(string $previousPage, string $activePage, array $userContext, array $vectorContext = []): string
     {
-        $prompt = "Génère 5 questions que cet entrepreneur ivoirien va poser à Agent O.\n\n";
+        $prompt = "Génère 5 questions business concrètes.\n\n";
         
-        if ($previousPage) {
-            $prompt .= "Page précédente : {$previousPage}\n";
-        }
+        // Context entrepreneurial
+        $entrepreneurContext = [];
         
-        if ($activePage) {
-            $prompt .= "Page actuelle : {$activePage}\n";
-        }
-
-        // Add specific context based on active page
-        $prompt .= $this->getPageSpecificContext($activePage);
-
-        // Add business context if available
         if (!empty($userContext['business_sector'])) {
-            $prompt .= "\nSecteur d'activité : " . config('constants.SECTEURS')[$userContext['business_sector']] ?? $userContext['business_sector'];
+            $sector = config('constants.SECTEURS')[$userContext['business_sector']] ?? $userContext['business_sector'];
+            $entrepreneurContext[] = "Secteur: {$sector}";
         }
 
         if (!empty($userContext['business_stage'])) {
-            $prompt .= "\nStade : " . config('constants.STADES_MATURITE')[$userContext['business_stage']] ?? $userContext['business_stage'];
+            $stage = config('constants.STADES_MATURITE')[$userContext['business_stage']] ?? $userContext['business_stage'];
+            $entrepreneurContext[] = "Stade: {$stage}";
+        }
+        
+        if (!empty($userContext['nom_entreprise'])) {
+            $entrepreneurContext[] = "Entreprise: {$userContext['nom_entreprise']}";
+        }
+        
+        if (!empty($entrepreneurContext)) {
+            $prompt .= "Contexte entrepreneur: " . implode(', ', $entrepreneurContext) . "\n";
         }
 
-        // Add personalized context from user's projects and analytics
-        if (!empty($vectorContext)) {
-            $prompt .= "\n\nContexte personnalisé :";
-            
-            if (!empty($vectorContext['projects'])) {
-                $prompt .= "\nProjets : " . implode(', ', array_column($vectorContext['projects'], 'name'));
-            }
-            
-            if (!empty($vectorContext['analytics'])) {
-                $analytics = $vectorContext['analytics'];
-                if (!empty($analytics['niveau_maturite'])) {
-                    $prompt .= "\nNiveau maturité : " . $analytics['niveau_maturite'];
-                }
-                if (!empty($analytics['forces'])) {
-                    $prompt .= "\nForces identifiées : " . implode(', ', array_slice($analytics['forces'], 0, 3));
-                }
-                if (!empty($analytics['besoins'])) {
-                    $prompt .= "\nBesoins prioritaires : " . implode(', ', array_slice($analytics['besoins'], 0, 2));
-                }
+        // Page context for relevance
+        $prompt .= $this->getPageSpecificContext($activePage);
+        
+        // Analytics insights if available
+        if (!empty($vectorContext['analytics'])) {
+            $analytics = $vectorContext['analytics'];
+            if (!empty($analytics['besoins'])) {
+                $topNeeds = array_slice($analytics['besoins'], 0, 2);
+                $prompt .= "Besoins identifiés: " . implode(', ', $topNeeds) . "\n";
             }
         }
 
-        $prompt .= "\n\nGénère maintenant 5 questions pertinentes que cet entrepreneur poserait à Agent O :";
+        $prompt .= "\nGénère 5 questions business percutantes, variées (canvas, cible, vente, financement, growth) :";
 
         return $prompt;
     }
@@ -216,22 +207,22 @@ STYLE DES QUESTIONS :
     {
         switch ($activePage) {
             case 'diagnostic':
-                return "\nContexte : Il vient de consulter son diagnostic. Questions sur optimisation, axes d'amélioration, actions concrètes.";
+                return "Focus: Diagnostic réalisé - questions sur canvas, KPIs, optimisation\n";
             
             case 'chat':
-                return "\nContexte : Il est prêt à discuter. Questions variées selon ses besoins entrepreneuriaux actuels.";
+                return "Focus: Discussion ouverte - mix stratégie, financement, growth\n";
             
             case 'conversations':
-                return "\nContexte : Il revient après avoir consulté ses conversations. Questions d'approfondissement ou nouveaux sujets.";
+                return "Focus: Historique conversations - questions approfondissement, nouveaux angles\n";
             
             case 'profile':
-                return "\nContexte : Il vient de voir son profil. Questions sur mise à jour, optimisation de ses données.";
+                return "Focus: Profil entrepreneur - questions sur parcours, objectifs, croissance\n";
             
             case 'opportunities':
-                return "\nContexte : Il cherche des opportunités. Questions sur financements, concours, partenariats adaptés.";
+                return "Focus: Recherche opportunités - questions sur financement, programmes, deadlines\n";
             
             default:
-                return "\nContexte : Navigation générale. Questions équilibrées sur tous les aspects entrepreneuriaux.";
+                return "Focus: Général - mix opportunités, stratégie, financement, growth\n";
         }
     }
 
@@ -277,37 +268,50 @@ STYLE DES QUESTIONS :
     protected function generateContextualSuggestion(int $index, array $userContext): string
     {
         $baseSuggestions = [
-            "Comment formaliser mon entreprise en Côte d'Ivoire ?",
-            "Quels financements sont disponibles pour mon secteur ?",
-            "Comment développer mon réseau professionnel ?",
-            "Quelles sont mes obligations légales ?",
-            "Comment améliorer ma stratégie marketing ?"
+            "Donne-moi mon business lean canvas",
+            "Qui est ma cible idéale ?",
+            "Comment obtenir un RDV avec un corporate ?",
+            "Quel montage juridique OHADA pour ma SAS ?",
+            "Comment pitcher en 60 secondes ?"
         ];
 
         // Customize based on user context
-        if (!empty($userContext['business_sector'])) {
-            $sectorSuggestions = [
-                "Opportunités de financement dans mon secteur",
-                "Partenaires stratégiques pour mon domaine",
-                "Réglementations spécifiques à mon activité"
+        if (!empty($userContext['business_stage'])) {
+            $stageSuggestions = [
+                'IDEE' => [
+                    "Comment valider mon idée rapidement ?",
+                    "Quel MVP développer en premier ?",
+                    "Comment tester mon marché cible ?"
+                ],
+                'STARTUP' => [
+                    "Comment lever mes premiers fonds ?",
+                    "Quelle stratégie d'acquisition clients ?",
+                    "Comment structurer mon équipe ?"
+                ],
+                'CROISSANCE' => [
+                    "Comment scaler mes opérations ?",
+                    "Quelle stratégie internationale adopter ?",
+                    "Comment optimiser ma rentabilité ?"
+                ]
             ];
             
-            if ($index < count($sectorSuggestions)) {
-                return $sectorSuggestions[$index];
+            $suggestions = $stageSuggestions[$userContext['business_stage']] ?? $baseSuggestions;
+            if ($index < count($suggestions)) {
+                return $suggestions[$index];
             }
         }
 
-        return $baseSuggestions[$index] ?? "Comment optimiser mon entreprise ?";
+        return $baseSuggestions[$index] ?? "Quelles opportunités disponibles maintenant ?";
     }
 
     protected function getFallbackSuggestions(array $userContext): array
     {
         $fallbacks = [
-            "Comment créer mon entreprise en Côte d'Ivoire ?",
-            "Quels financements pour mon projet ?",
-            "Comment trouver des partenaires ?",
-            "Aide pour mon business plan",
-            "Obligations légales à respecter"
+            "Donne-moi mon business lean canvas",
+            "Qui est ma cible idéale ?",
+            "Comment calculer mon prix de vente ?",
+            "Quelle stratégie pour mes premiers clients ?",
+            "Comment pitcher en 60 secondes ?"
         ];
 
         // Customize first suggestion based on business stage if available

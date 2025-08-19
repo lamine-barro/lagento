@@ -10,12 +10,11 @@ class VectorMemory extends Model
     use HasUuids;
 
     protected $fillable = [
-        'user_id',
-        'content',
+        'memory_type',
+        'source_id',
+        'chunk_content',
         'embedding',
-        'metadata',
-        'source_type',
-        'source_id'
+        'metadata'
     ];
 
     protected $casts = [

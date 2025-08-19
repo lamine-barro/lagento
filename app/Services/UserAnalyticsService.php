@@ -6,17 +6,20 @@ use App\Models\User;
 use App\Models\UserAnalytics;
 use App\Models\Projet;
 use App\Models\UserMessage;
-use App\Services\MemoryManagerService;
+use App\Models\VectorMemory;
+use App\Models\Opportunite;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class UserAnalyticsService
 {
-    protected MemoryManagerService $memoryManager;
+    protected VoyageVectorService $vectorService;
+    protected VectorAccessService $vectorAccess;
 
-    public function __construct(MemoryManagerService $memoryManager)
+    public function __construct(VoyageVectorService $vectorService, VectorAccessService $vectorAccess)
     {
-        $this->memoryManager = $memoryManager;
+        $this->vectorService = $vectorService;
+        $this->vectorAccess = $vectorAccess;
     }
 
     /**
@@ -127,7 +130,7 @@ Réponds UNIQUEMENT ce JSON.";
             ];
 
             $lm = app(\App\Services\LanguageModelService::class);
-            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 25000, ['response_format' => ['type' => 'json_object']]);
+            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 30000, ['response_format' => ['type' => 'json_object']]);
             
             Log::info('UserAnalyticsService: Enhanced LLM response received', [
                 'raw_length' => strlen($raw), 
@@ -342,6 +345,24 @@ Réponds UNIQUEMENT ce JSON.";
             Log::error("Failed to generate dashboard analytics for user {$user->id}: " . $e->getMessage());
         }
     }
+
+    /**
+     * Helper function to filter out "non disponible" values
+     */
+    private function filterNonDisponible($value) 
+    {
+        if (is_array($value)) {
+            return array_filter($value, function($item) {
+                return $item !== 'non disponible' && !empty($item);
+            });
+        }
+        
+        if ($value === 'non disponible' || empty($value)) {
+            return null;
+        }
+        
+        return $value;
+    }
     
     private function mapDashboardStructureToAnalytics(UserAnalytics $analytics, array $structure): void
     {
@@ -370,37 +391,73 @@ Réponds UNIQUEMENT ce JSON.";
         // 2. Diagnostic Projet
         if (isset($structure['diagnostic_projet'])) {
             $diagnostic = $structure['diagnostic_projet'];
-            $updateData = array_merge($updateData, [
-                'score_sante' => $diagnostic['score_sante'] ?? null,
-                'niveau_maturite' => $diagnostic['niveau_maturite'] ?? null,
-                'viabilite' => $diagnostic['viabilite'] ?? null,
-                'prochaines_etapes' => $diagnostic['prochaines_etapes'] ?? [],
-            ]);
+            
+            // Filtrer les données du diagnostic
+            $cleanDiagnostic = [];
+            
+            if (($score = $this->filterNonDisponible($diagnostic['score_sante'] ?? null)) !== null) {
+                $cleanDiagnostic['score_sante'] = $score;
+            }
+            if (($niveau = $this->filterNonDisponible($diagnostic['niveau_maturite'] ?? null)) !== null) {
+                $cleanDiagnostic['niveau_maturite'] = $niveau;
+            }
+            if (($viabilite = $this->filterNonDisponible($diagnostic['viabilite'] ?? null)) !== null) {
+                $cleanDiagnostic['viabilite'] = $viabilite;
+            }
+            if (($etapes = $this->filterNonDisponible($diagnostic['prochaines_etapes'] ?? [])) !== null && !empty($etapes)) {
+                $cleanDiagnostic['prochaines_etapes'] = array_values($etapes);
+            }
+            
+            $updateData = array_merge($updateData, $cleanDiagnostic);
             
             // Indicateurs clés
             if (isset($diagnostic['indicateurs_cles'])) {
                 $indicateurs = $diagnostic['indicateurs_cles'];
                 
                 if (isset($indicateurs['formalisation'])) {
-                    $updateData['statut_formalisation'] = $indicateurs['formalisation']['statut'] ?? null;
-                    $updateData['actions_formalisation'] = $indicateurs['formalisation']['actions'] ?? [];
-                    $updateData['urgence_formalisation'] = $indicateurs['formalisation']['urgence'] ?? null;
+                    $form = $indicateurs['formalisation'];
+                    if (($statut = $this->filterNonDisponible($form['statut'] ?? null)) !== null) {
+                        $updateData['statut_formalisation'] = $statut;
+                    }
+                    if (($actions = $this->filterNonDisponible($form['actions'] ?? [])) !== null && !empty($actions)) {
+                        $updateData['actions_formalisation'] = array_values($actions);
+                    }
+                    if (($urgence = $this->filterNonDisponible($form['urgence'] ?? null)) !== null) {
+                        $updateData['urgence_formalisation'] = $urgence;
+                    }
                 }
                 
                 if (isset($indicateurs['finance'])) {
-                    $updateData['statut_finance'] = $indicateurs['finance']['statut'] ?? null;
-                    $updateData['besoin_financement'] = $indicateurs['finance']['besoin_financement'] ?? null;
-                    $updateData['montant_suggere'] = $indicateurs['finance']['montant_suggere'] ?? null;
+                    $finance = $indicateurs['finance'];
+                    if (($statut = $this->filterNonDisponible($finance['statut'] ?? null)) !== null) {
+                        $updateData['statut_finance'] = $statut;
+                    }
+                    if (($besoin = $this->filterNonDisponible($finance['besoin_financement'] ?? null)) !== null) {
+                        $updateData['besoin_financement'] = $besoin;
+                    }
+                    if (($montant = $this->filterNonDisponible($finance['montant_suggere'] ?? null)) !== null) {
+                        $updateData['montant_suggere'] = $montant;
+                    }
                 }
                 
                 if (isset($indicateurs['equipe'])) {
-                    $updateData['equipe_complete'] = $indicateurs['equipe']['complete'] ?? null;
-                    $updateData['besoins_equipe'] = $indicateurs['equipe']['besoins'] ?? [];
+                    $equipe = $indicateurs['equipe'];
+                    if (($complete = $this->filterNonDisponible($equipe['complete'] ?? null)) !== null) {
+                        $updateData['equipe_complete'] = $complete;
+                    }
+                    if (($besoins = $this->filterNonDisponible($equipe['besoins'] ?? [])) !== null && !empty($besoins)) {
+                        $updateData['besoins_equipe'] = array_values($besoins);
+                    }
                 }
                 
                 if (isset($indicateurs['marche'])) {
-                    $updateData['position_marche'] = $indicateurs['marche']['position'] ?? null;
-                    $updateData['potentiel_marche'] = $indicateurs['marche']['potentiel'] ?? null;
+                    $marche = $indicateurs['marche'];
+                    if (($position = $this->filterNonDisponible($marche['position'] ?? null)) !== null) {
+                        $updateData['position_marche'] = $position;
+                    }
+                    if (($potentiel = $this->filterNonDisponible($marche['potentiel'] ?? null)) !== null) {
+                        $updateData['potentiel_marche'] = $potentiel;
+                    }
                 }
             }
         }
@@ -421,28 +478,69 @@ Réponds UNIQUEMENT ce JSON.";
         // 4. Insights Marché
         if (isset($structure['insights_marche'])) {
             $marche = $structure['insights_marche'];
-            $updateData = array_merge($updateData, [
-                'taille_marche_local' => $marche['taille_marche']['local'] ?? null,
-                'taille_marche_potentiel' => $marche['taille_marche']['potentiel'] ?? null,
-                'croissance_marche' => $marche['taille_marche']['croissance'] ?? null,
-                'position_concurrentielle' => $marche['position_concurrentielle']['votre_place'] ?? null,
-                'principaux_concurrents' => $marche['position_concurrentielle']['principaux_concurrents'] ?? [],
-                'avantage_cle' => $marche['position_concurrentielle']['avantage_cle'] ?? null,
-                'tendances' => $marche['tendances'] ?? [],
-                'zones_opportunites' => $marche['zones_opportunites'] ?? [],
-                'conseil_strategique' => $marche['conseil_strategique'] ?? null,
-            ]);
+            $cleanMarche = [];
+            
+            // Taille marché
+            if (isset($marche['taille_marche'])) {
+                $taille = $marche['taille_marche'];
+                if (($local = $this->filterNonDisponible($taille['local'] ?? null)) !== null) {
+                    $cleanMarche['taille_marche_local'] = $local;
+                }
+                if (($potentiel = $this->filterNonDisponible($taille['potentiel'] ?? null)) !== null) {
+                    $cleanMarche['taille_marche_potentiel'] = $potentiel;
+                }
+                if (($croissance = $this->filterNonDisponible($taille['croissance'] ?? null)) !== null) {
+                    $cleanMarche['croissance_marche'] = $croissance;
+                }
+            }
+            
+            // Position concurrentielle
+            if (isset($marche['position_concurrentielle'])) {
+                $position = $marche['position_concurrentielle'];
+                if (($place = $this->filterNonDisponible($position['votre_place'] ?? null)) !== null) {
+                    $cleanMarche['position_concurrentielle'] = $place;
+                }
+                if (($concurrents = $this->filterNonDisponible($position['principaux_concurrents'] ?? [])) !== null && !empty($concurrents)) {
+                    $cleanMarche['principaux_concurrents'] = array_values($concurrents);
+                }
+                if (($avantage = $this->filterNonDisponible($position['avantage_cle'] ?? null)) !== null) {
+                    $cleanMarche['avantage_cle'] = $avantage;
+                }
+            }
+            
+            // Tendances et opportunités
+            if (($tendances = $this->filterNonDisponible($marche['tendances'] ?? [])) !== null && !empty($tendances)) {
+                $cleanMarche['tendances'] = array_values($tendances);
+            }
+            if (($zones = $this->filterNonDisponible($marche['zones_opportunites'] ?? [])) !== null && !empty($zones)) {
+                $cleanMarche['zones_opportunites'] = array_values($zones);
+            }
+            if (($conseil = $this->filterNonDisponible($marche['conseil_strategique'] ?? null)) !== null) {
+                $cleanMarche['conseil_strategique'] = $conseil;
+            }
+            
+            $updateData = array_merge($updateData, $cleanMarche);
         }
         
         // 5. Réglementations
         if (isset($structure['regulations'])) {
             $regulations = $structure['regulations'];
-            $updateData = array_merge($updateData, [
-                'conformite_globale' => $regulations['conformite_globale'] ?? null,
-                'urgent_regulations' => $regulations['urgent'] ?? [],
-                'a_prevoir_regulations' => $regulations['a_prevoir'] ?? [],
-                'avantages_disponibles' => $regulations['avantages_disponibles'] ?? [],
-            ]);
+            $cleanRegulations = [];
+            
+            if (($conformite = $this->filterNonDisponible($regulations['conformite_globale'] ?? null)) !== null) {
+                $cleanRegulations['conformite_globale'] = $conformite;
+            }
+            if (($urgent = $this->filterNonDisponible($regulations['urgent'] ?? [])) !== null && !empty($urgent)) {
+                $cleanRegulations['urgent_regulations'] = array_values($urgent);
+            }
+            if (($prevoir = $this->filterNonDisponible($regulations['a_prevoir'] ?? [])) !== null && !empty($prevoir)) {
+                $cleanRegulations['a_prevoir_regulations'] = array_values($prevoir);
+            }
+            if (($avantages = $this->filterNonDisponible($regulations['avantages_disponibles'] ?? [])) !== null && !empty($avantages)) {
+                $cleanRegulations['avantages_disponibles'] = array_values($avantages);
+            }
+            
+            $updateData = array_merge($updateData, $cleanRegulations);
         }
         
         // 6. Partenaires Suggérés
@@ -460,13 +558,60 @@ Réponds UNIQUEMENT ce JSON.";
         // 7. Résumé Exécutif
         if (isset($structure['resume_executif'])) {
             $resume = $structure['resume_executif'];
-            $updateData = array_merge($updateData, [
-                'message_principal' => $resume['message_principal'] ?? null,
-                'trois_actions_cles' => $resume['trois_actions_cles'] ?? [],
-                'opportunite_du_mois' => $resume['opportunite_du_mois'] ?? null,
-                'alerte_importante' => $resume['alerte_importante'] ?? null,
-                'score_progression' => $resume['score_progression'] ?? null,
-            ]);
+            
+            // Traiter l'opportunité du mois - garder la structure JSON pour le template
+            $opportuniteData = null;
+            if (isset($resume['opportunite_du_mois'])) {
+                $opp = $resume['opportunite_du_mois'];
+                if (is_array($opp) || is_object($opp)) {
+                    $opp = (array) $opp;
+                    // Filtrer les données "non disponible"
+                    $cleanOpp = [];
+                    foreach ($opp as $key => $value) {
+                        if ($value !== 'non disponible' && !empty($value)) {
+                            $cleanOpp[$key] = $value;
+                        }
+                    }
+                    $opportuniteData = !empty($cleanOpp) ? $cleanOpp : null;
+                } else if ($opp !== 'non disponible' && !empty($opp)) {
+                    $opportuniteData = $opp;
+                }
+            }
+            
+            // Filtrer les données pour éviter "non disponible"
+            $cleanData = [];
+            
+            // Message principal - seulement si différent de "non disponible"
+            if (isset($resume['message_principal']) && $resume['message_principal'] !== 'non disponible' && !empty($resume['message_principal'])) {
+                $cleanData['message_principal'] = $resume['message_principal'];
+            }
+            
+            // Actions clés - filtrer les "non disponible"
+            if (isset($resume['trois_actions_cles']) && is_array($resume['trois_actions_cles'])) {
+                $actions = array_filter($resume['trois_actions_cles'], function($action) {
+                    return $action !== 'non disponible' && !empty($action);
+                });
+                if (!empty($actions)) {
+                    $cleanData['trois_actions_cles'] = array_values($actions);
+                }
+            }
+            
+            // Opportunité du mois
+            if ($opportuniteData !== null) {
+                $cleanData['opportunite_du_mois'] = $opportuniteData;
+            }
+            
+            // Alerte importante - seulement si différente de "non disponible"
+            if (isset($resume['alerte_importante']) && $resume['alerte_importante'] !== 'non disponible' && !empty($resume['alerte_importante'])) {
+                $cleanData['alerte_importante'] = $resume['alerte_importante'];
+            }
+            
+            // Score progression - seulement si différent de "non disponible"
+            if (isset($resume['score_progression']) && $resume['score_progression'] !== 'non disponible' && !empty($resume['score_progression'])) {
+                $cleanData['score_progression'] = $resume['score_progression'];
+            }
+            
+            $updateData = array_merge($updateData, $cleanData);
         }
         
         Log::info('UserAnalyticsService: Mapping dashboard structure to analytics', [
@@ -481,6 +626,61 @@ Réponds UNIQUEMENT ce JSON.";
         Log::info('UserAnalyticsService: Analytics updated successfully', [
             'message_principal_after' => $analytics->fresh()->message_principal ?? 'NULL'
         ]);
+    }
+
+    /**
+     * Récupérer les opportunités depuis la base de données (inspiré de AgentPrincipal)
+     */
+    private function getOpportunitiesFromDatabase(array $data): array
+    {
+        try {
+            $query = \App\Models\Opportunite::query();
+            
+            // Filtrer par secteur si disponible
+            if (isset($data['projet_data']['secteurs']) && !empty($data['projet_data']['secteurs'])) {
+                $secteurs = $data['projet_data']['secteurs'];
+                if (is_array($secteurs) && count($secteurs) > 0) {
+                    $query->where(function($q) use ($secteurs) {
+                        foreach ($secteurs as $secteur) {
+                            $q->orWhereJsonContains('secteurs', $secteur);
+                        }
+                    });
+                }
+            }
+            
+            // Filtrer par région si disponible
+            $region = $data['projet_data']['region'] ?? 'Abidjan';
+            if ($region) {
+                $query->where(function($q) use ($region) {
+                    $q->whereJsonContains('regions_cibles', 'National')
+                      ->orWhereJsonContains('regions_cibles', $region)
+                      ->orWhere('ville', $region);
+                });
+            }
+            
+            // Filtrer par statut ouvert en priorité
+            $query->orderByRaw("CASE WHEN statut = 'ouvert' THEN 1 WHEN statut = 'en_cours' THEN 2 ELSE 3 END");
+            
+            // Limiter à 8 opportunités
+            $opportunities = $query->limit(8)->get();
+            
+            return $opportunities->map(function($opp) {
+                return [
+                    'titre' => $opp->titre,
+                    'type' => $opp->type,
+                    'description' => $opp->description,
+                    'date_limite' => $opp->date_limite,
+                    'lien_externe' => $opp->lien_externe,
+                    'secteurs' => $opp->secteurs,
+                    'regions_cibles' => $opp->regions_cibles,
+                    'criteres_eligibilite' => $opp->criteres_eligibilite
+                ];
+            })->toArray();
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching opportunities from database: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -542,29 +742,40 @@ Réponds UNIQUEMENT ce JSON.";
             // Construire une requête de recherche enrichie
             $query = implode(' ', array_filter($searchTerms)) . ' startup entrepreneur financement accompagnement';
             
+            // S'assurer que $user est un User model, pas un array
+            $userModel = null;
+            if ($user instanceof User) {
+                $userModel = $user;
+            } elseif (is_array($user) && isset($user['id'])) {
+                $userModel = User::find($user['id']);
+            } else {
+                $userModel = User::first(); // Fallback
+            }
+            
             // Rechercher les institutions pertinentes
-            $institutions = $this->memoryManager->searchAcrossMemories(
+            $institutions = $this->vectorAccess->searchWithAccess(
                 $query,
+                $userModel,
                 ['institution'],
-                null,
                 8
             );
             
             // Rechercher les opportunités pertinentes  
-            $opportunities = $this->memoryManager->searchAcrossMemories(
+            $opportunities = $this->vectorAccess->searchWithAccess(
                 $query,
+                $userModel,
                 ['opportunite'],
-                null,
                 12
             );
             
-            // Rechercher les textes officiels pertinents
-            $officialTexts = $this->memoryManager->searchAcrossMemories(
-                $query,
-                ['texte_officiel'],
-                null,
-                6
-            );
+            // Rechercher les textes officiels pertinents - NON ACCESSIBLE selon logs
+            // $officialTexts = $this->vectorAccess->searchWithAccess(
+            //     $query,
+            //     $userModel,
+            //     ['texte_officiel'],
+            //     6
+            // );
+            $officialTexts = [];
             
             return [
                 'institutions' => $this->formatInstitutionsForContext($institutions),
@@ -802,26 +1013,52 @@ Réponds UNIQUEMENT ce JSON.";
             $user = $data['user_info'] ?? null;
             $vectorContext = $this->getVectorContextForDiagnostic($data, $user);
             
+            // Récupérer aussi les opportunités depuis la base de données
+            $dbOpportunities = $this->getOpportunitiesFromDatabase($data);
+            
             // Formater le contexte vectoriel pour le prompt
             $contextualInfo = $this->formatVectorContextForPrompt($vectorContext);
             
+            // Ajouter les opportunités de la base de données au contexte
+            if (!empty($dbOpportunities)) {
+                $contextualInfo .= "\n=== OPPORTUNITÉS DISPONIBLES (BASE DE DONNÉES) ===\n";
+                foreach ($dbOpportunities as $opp) {
+                    $contextualInfo .= "- **{$opp['titre']}** ({$opp['type']})\n";
+                    $contextualInfo .= "  Description: {$opp['description']}\n";
+                    if ($opp['date_limite']) {
+                        $contextualInfo .= "  Date limite: {$opp['date_limite']}\n";
+                    }
+                    if ($opp['lien_externe']) {
+                        $contextualInfo .= "  Lien: {$opp['lien_externe']}\n";
+                    }
+                    $contextualInfo .= "\n";
+                }
+            }
+            
             $prompt = "DIAGNOSTIC ENTREPRENEURIAL IVOIRIEN - EXPERT SENIOR
 
-Tu es Dr. Kouame N'Guessan, consultant senior avec 15+ ans d'expérience dans l'écosystème entrepreneurial ivoirien. Ton expertise couvre l'analyse stratégique, les financements startup, et la réglementation OHADA.
+Tu es un consultant expert de l'écosystème entrepreneurial ivoirien avec 15+ ans d'expérience.
 
-🎯 MISSION : Générer un diagnostic complet, précis et actionnable avec insights contextualisés Côte d'Ivoire.
+RÈGLE ABSOLUE POUR LES OPPORTUNITÉS :
+- Tu as accès à une section === OPPORTUNITÉS DISPONIBLES (BASE DE DONNÉES) === avec de vraies opportunités
+- Tu DOIS utiliser UNIQUEMENT ces opportunités réelles (titre exact, type, description)
+- Pour opportunite_du_mois : Sélectionne LA MEILLEURE opportunité avec son titre EXACT
+- Pour top_opportunites : Sélectionne les 8 meilleures qui correspondent au projet
+- NE JAMAIS inventer d'opportunités fictives
 
-📊 CONTEXTE TEMPS RÉEL DISPONIBLE :
+🎯 MISSION : Générer un diagnostic complet et actionnable basé UNIQUEMENT sur les données disponibles.
+
+📊 DONNÉES DISPONIBLES :
 {$contextualInfo}
 
-📊 FOCUS RENDU OPTIMISÉ :
-- Messages concis mais informatifs (max 2-3 phrases par insight)
-- Actions spécifiques avec timeframes réalistes
-- Opportunités réelles avec deadlines précises (utilise UNIQUEMENT les opportunités du contexte ci-dessus)
-- Métriques quantifiées (montants FCFA, pourcentages)
-- Recommandations hiérarchisées par urgence/impact
-- Partenaires réels (utilise UNIQUEMENT les institutions du contexte ci-dessus)
-- Références juridiques précises (utilise UNIQUEMENT les textes officiels du contexte ci-dessus)
+🚨 RÈGLES STRICTES :
+- Utilise UNIQUEMENT les institutions, opportunites et donnees du contexte ci-dessus
+- AUCUNE invention d'opportunites, montants, ou partenaires fictifs  
+- Si pas de donnees disponibles -> indique 'non disponible' ou 'a completer'
+- Reste factuel et base toutes recommendations sur le contexte fourni
+- Focus sur l'analyse du projet utilisateur avec les vraies ressources disponibles
+- Limite les opportunites aux 77 reelles importees dans la base de donnees
+- References juridiques precises (utilise UNIQUEMENT les textes officiels du contexte ci-dessus)
 
 📋 CONTRAINTES ÉNUMÉRATIONS (RESPECT STRICT) :
 NIVEAU_ENTREPRENEUR: débutant, confirmé, expert
@@ -844,7 +1081,7 @@ TYPE_SYNERGIE: strategique, operationnelle, commerciale
     \"score_progression\": 75,
     \"message_principal\": \"Projet à fort potentiel avec 3 axes d'amélioration prioritaires. Marché addressable de 150M FCFA identifié.\",
     \"trois_actions_cles\": [\"Finaliser formalisation RCCM (30j - 25K FCFA)\", \"Structurer pitch investisseurs (14j)\", \"Lancer pilot client (45j)\"],
-    \"opportunite_du_mois\": \"Appel à projets Orange Digital Ventures - deadline 15/09 - jusqu'à 50M FCFA + mentorat\",
+    \"opportunite_du_mois\": \"[Sélectionne LA MEILLEURE opportunité depuis === OPPORTUNITÉS DISPONIBLES === avec son titre EXACT et deadline]\",
     \"alerte_importante\": \"Conformité OHADA requise avant candidature aux financements publics\"
   },
   \"profil_entrepreneur\": {
@@ -870,17 +1107,16 @@ TYPE_SYNERGIE: strategique, operationnelle, commerciale
   \"opportunites_matchees\": {
     \"nombre_total\": 8,
     \"top_opportunites\": [
-      {\"titre\": \"Programme Innovation Numérique CI 2025\", \"institution\": \"Ministère de l'Économie Numérique\", \"score_compatibilite\": 92, \"pourquoi_vous\": \"Votre expertise en IA et data analytics correspond parfaitement aux priorités gouvernementales de transformation numérique. Votre modèle B2G est un atout majeur.\", \"montant_ou_valeur\": \"75 000 000 FCFA\", \"urgence\": \"candidater_avant_7j\", \"lien\": \"https://min-numerique.gouv.ci/appels-projets\"},
-      {\"titre\": \"Fonds d'Amorçage Orange Digital Ventures\", \"institution\": \"Orange Côte d'Ivoire\", \"score_compatibilite\": 88, \"pourquoi_vous\": \"Votre focus EdTech et solutions B2B dans l'écosystème numérique ivoirien aligne avec leur stratégie d'investissement.\", \"montant_ou_valeur\": \"50 000 000 FCFA + mentorat\", \"urgence\": \"candidater_avant_14j\", \"lien\": \"https://orange-ci.com/ventures\"}
+      // UTILISE les opportunités depuis === OPPORTUNITÉS DISPONIBLES (BASE DE DONNÉES) ===
+      // Sélectionne les 8 MEILLEURES opportunités qui correspondent au projet
+      // Format OBLIGATOIRE: {\"titre\": \"[titre exact de l'opportunité]\", \"institution\": \"[depuis les données]\", \"score_compatibilite\": [70-100], \"pourquoi_vous\": \"[analyse basée sur le projet]\", \"montant_ou_valeur\": \"[montant ou remuneration si disponible]\", \"urgence\": \"[date_limite si disponible]\", \"lien\": \"[lien_externe si disponible]\"}
     ]
   },
   \"insights_marche\": {
-    \"taille_marche\": {\"local\": \"Le marché des solutions numériques B2B en CI représente 180+ milliards FCFA avec 350+ startups actives\", \"potentiel\": \"Croissance projetée de 25% annuel grâce aux initiatives gouvernementales de digitalisation\", \"croissance\": \"Taux de croissance annuel de 22% dans le secteur numérique ivoirien (2020-2024)\"},
-    \"position_concurrentielle\": {\"votre_place\": \"Nouveau entrant avec différenciation forte sur l'IA appliquée à l'éducation et au secteur public\", \"principaux_concurrents\": [\"CinetPay (fintech)\", \"Julaya (e-commerce)\", \"Akendewa (EdTech)\"], \"avantage_cle\": \"Spécialisation data/IA unique sur le marché B2G éducatif ivoirien\"},
+    \"taille_marche\": {\"local\": \"[Utilise les donnees du contexte lagento_context si disponibles, sinon 'Donnees de marche a completer']\", \"potentiel\": \"[Base sur le contexte fourni]\", \"croissance\": \"[Utilise les insights du contexte fourni]\"},
+    \"position_concurrentielle\": {\"votre_place\": \"[Analyse basee sur le projet utilisateur]\", \"principaux_concurrents\": [\"[Utilise les donnees du contexte ou indique 'A identifier']\"], \"avantage_cle\": \"[Base sur les forces du projet utilisateur]\"},
     \"zones_opportunites\": [
-      {\"region\": \"Abidjan (Plateau/Cocody)\", \"raison\": \"Concentration des ministères, directions générales et entreprises tech. Hub économique avec 60% des décideurs publics.\"},
-      {\"region\": \"Yamoussoukro\", \"raison\": \"Capitale politique, siège des institutions et universités publiques. Marché B2G prioritaire.\"},
-      {\"region\": \"San Pedro\", \"raison\": \"Pôle économique en développement, besoins croissants en solutions numériques pour l'administration portuaire.\"}
+      // UTILISE les donnees regionales du contexte fourni ou indique 'Analyse geographique a completer'
     ]
   },
   \"regulations\": {
@@ -982,7 +1218,7 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             
             Log::info('UserAnalyticsService: Starting dashboard analytics generation', ['prompt_size' => strlen($prompt)]);
             
-            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 18000, [
+            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 25000, [
                 'response_format' => ['type' => 'json_object']
             ]);
             
@@ -1720,11 +1956,183 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             'recommendations' => [[
                 'type' => 'getting_started',
                 'priority' => 'high',
-                'title' => 'Bienvenue sur LAgentO',
+                'title' => 'Bienvenue sur LagentO',
                 'description' => 'Commencez par compléter votre profil entrepreneur.',
                 'action' => 'complete_profile'
             ]],
             'generated_at' => now()->format('d/m/Y à H:i')
         ];
+    }
+
+    /**
+     * Generate simplified summary data for the main agent
+     * Only includes: lagento_context, opportunities, user projects, and analytics
+     */
+    public function getAgentSummaryData(User $user): array
+    {
+        try {
+            $analytics = $this->getOrCreateUserAnalytics($user);
+            $projet = $user->projets()->latest()->first();
+
+            return [
+                // 1. Contexte Lagento (vectorisé)
+                'lagento_context' => $this->getLagentoContextSummary(),
+                
+                // 2. Opportunités pertinentes pour l'utilisateur
+                'opportunities' => $this->getRelevantOpportunities($user, $projet),
+                
+                // 3. Projet utilisateur actuel
+                'user_project' => $projet ? [
+                    'id' => $projet->id,
+                    'nom' => $projet->nom_projet,
+                    'secteurs' => $projet->secteurs,
+                    'stade' => $projet->stade_financement,
+                    'maturite' => $projet->maturite,
+                    'region' => $projet->region,
+                    'formalise' => $projet->formalise,
+                    'revenus' => $projet->revenus
+                ] : null,
+                
+                // 4. Analytics utilisateur essentielles
+                'user_analytics' => [
+                    'niveau_global' => $analytics->niveau_global,
+                    'score_potentiel' => $analytics->score_potentiel,
+                    'forces' => $analytics->forces ?? [],
+                    'axes_progression' => $analytics->axes_progression ?? [],
+                    'message_principal' => $analytics->message_principal,
+                    'trois_actions_cles' => $analytics->trois_actions_cles ?? [],
+                    'opportunite_du_mois' => $analytics->opportunite_du_mois
+                ],
+                
+                // 5. Métadonnées
+                'summary_metadata' => [
+                    'user_id' => $user->id,
+                    'generated_at' => now()->toISOString(),
+                    'context_vectors_count' => VectorMemory::where('memory_type', 'lagento_context')->count(),
+                    'opportunities_count' => Opportunite::count(),
+                    'has_project' => !is_null($projet)
+                ]
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to generate agent summary data', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return [
+                'error' => 'Unable to generate summary data',
+                'lagento_context' => $this->getLagentoContextSummary(),
+                'opportunities' => [],
+                'user_project' => null,
+                'user_analytics' => [],
+                'summary_metadata' => [
+                    'user_id' => $user->id,
+                    'generated_at' => now()->toISOString(),
+                    'error' => true
+                ]
+            ];
+        }
+    }
+
+    /**
+     * Get Lagento context summary from vectorized corpus
+     */
+    private function getLagentoContextSummary(): array
+    {
+        try {
+            $totalVectors = VectorMemory::where('memory_type', 'lagento_context')->count();
+            
+            // Sample some context chunks for overview
+            $sampleChunks = VectorMemory::where('memory_type', 'lagento_context')
+                ->inRandomOrder()
+                ->limit(3)
+                ->pluck('chunk_content')
+                ->map(function($content) {
+                    return substr($content, 0, 200) . '...';
+                });
+
+            return [
+                'status' => 'available',
+                'total_chunks' => $totalVectors,
+                'coverage' => $totalVectors > 170 ? 'complete' : 'partial',
+                'sample_content' => $sampleChunks->toArray(),
+                'description' => 'Corpus complet du contexte légal et réglementaire ivoirien'
+            ];
+            
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'total_chunks' => 0,
+                'coverage' => 'unavailable',
+                'description' => 'Erreur lors de l\'accès au contexte vectorisé'
+            ];
+        }
+    }
+
+    /**
+     * Get relevant opportunities for the user
+     */
+    private function getRelevantOpportunities(User $user, ?Projet $projet): array
+    {
+        try {
+            $query = Opportunite::query();
+            
+            // If no project, get general opportunities (all types)
+            if (!$projet) {
+                $query->where('statut', 'ouvert')
+                      ->orderBy('created_at', 'desc');
+            } else {
+                // Filter by user's project characteristics
+                $query->where('statut', 'ouvert');
+                
+                // Filter by region if available  
+                if ($projet->region) {
+                    $query->where(function($q) use ($projet) {
+                        $q->whereJsonContains('regions_cibles', $projet->region)
+                          ->orWhereJsonContains('regions_cibles', 'National');
+                    });
+                }
+                
+                // Filter by sector if available (secteurs is array in projet)
+                if ($projet->secteurs && is_array($projet->secteurs)) {
+                    $query->where(function($q) use ($projet) {
+                        $secteurQuery = $q;
+                        foreach ($projet->secteurs as $secteur) {
+                            $secteurQuery->orWhereJsonContains('secteurs', $secteur);
+                        }
+                        $secteurQuery->orWhereJsonContains('secteurs', 'TOUS_SECTEURS')
+                                    ->orWhere('description', 'ILIKE', '%NUMERIQUE%')
+                                    ->orWhere('titre', 'ILIKE', '%digital%')
+                                    ->orWhere('titre', 'ILIKE', '%tech%');
+                    });
+                }
+            }
+            
+            $opportunities = $query->limit(5)->get()->map(function($opp) {
+                return [
+                    'id' => $opp->id,
+                    'titre' => $opp->titre,
+                    'type' => $opp->type,
+                    'description' => substr($opp->description, 0, 150) . '...',
+                    'remuneration' => $opp->remuneration,
+                    'regions_cibles' => $opp->regions_cibles,
+                    'secteurs' => $opp->secteurs,
+                    'date_limite' => $opp->date_limite?->format('Y-m-d'),
+                    'statut' => $opp->statut,
+                    'lien_externe' => $opp->lien_externe
+                ];
+            });
+
+            return $opportunities->toArray();
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to get relevant opportunities', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return [];
+        }
     }
 }

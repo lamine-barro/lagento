@@ -1,11 +1,11 @@
 <?php $__env->startSection('title', 'Mon Profil Entrepreneur'); ?>
-<?php $__env->startSection('seo_title', 'Profil Entrepreneur - Gérez vos Informations Business | LAgentO'); ?>
-<?php $__env->startSection('meta_description', 'Gérez votre profil entrepreneur sur LAgentO : informations personnelles, projets d\'entreprise, préférences et paramètres de votre assistant IA business personnalisé.'); ?>
+<?php $__env->startSection('seo_title', 'Profil Entrepreneur - Gérez vos Informations Business | LagentO'); ?>
+<?php $__env->startSection('meta_description', 'Gérez votre profil entrepreneur sur LagentO : informations personnelles, projets d\'entreprise, préférences et paramètres de votre assistant IA business personnalisé.'); ?>
 <?php $__env->startSection('meta_keywords', 'profil entrepreneur, gestion compte business, paramètres assistant IA, profil startup, dashboard entrepreneur'); ?>
 <?php $__env->startSection('meta_robots', 'noindex, nofollow'); ?>
 <?php $__env->startSection('canonical_url', route('profile')); ?>
-<?php $__env->startSection('og_title', 'Mon Profil Entrepreneur - LAgentO'); ?>
-<?php $__env->startSection('og_description', 'Gérez votre profil et paramètres sur LAgentO, votre assistant IA entrepreneurial personnalisé.'); ?>
+<?php $__env->startSection('og_title', 'Mon Profil Entrepreneur - LagentO'); ?>
+<?php $__env->startSection('og_description', 'Gérez votre profil et paramètres sur LagentO, votre assistant IA entrepreneurial personnalisé.'); ?>
 <?php $__env->startSection('page_title', 'Mon Profil Entrepreneur'); ?>
 
 <?php $__env->startSection('schema_org'); ?>
@@ -13,8 +13,8 @@
 {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    "name": "Profil Entrepreneur LAgentO",
-    "description": "Page de profil pour entrepreneurs utilisant l'assistant IA LAgentO",
+    "name": "Profil Entrepreneur LagentO",
+    "description": "Page de profil pour entrepreneurs utilisant l'assistant IA LagentO",
     "mainEntity": {
         "@type": "Person",
         "name": "Entrepreneur"

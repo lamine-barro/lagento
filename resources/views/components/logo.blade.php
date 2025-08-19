@@ -16,13 +16,13 @@
 <div class="flex items-center justify-center {{ $classes }}">
     <!-- Logo light (visible en mode light) -->
     <img src="/logo-light.png" 
-         alt="LAgentO" 
+         alt="LagentO" 
          class="{{ $logoClass }} dark:hidden"
          style="display: var(--logo-light-display, block);">
     
     <!-- Logo dark (visible en mode dark) -->
     <img src="/logo-dark.png" 
-         alt="LAgentO" 
+         alt="LagentO" 
          class="{{ $logoClass }} hidden dark:block"
          style="display: var(--logo-dark-display, none);">
 </div>

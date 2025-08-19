@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Log;
 
 class VectorAccessService
 {
-    private MemoryManagerService $memoryManager;
+    private VoyageVectorService $voyageService;
 
-    public function __construct(MemoryManagerService $memoryManager)
+    public function __construct(VoyageVectorService $voyageService)
     {
-        $this->memoryManager = $memoryManager;
+        $this->voyageService = $voyageService;
     }
 
     /**
@@ -61,10 +61,10 @@ class VectorAccessService
             ? $user->id 
             : null;
 
-        $results = $this->memoryManager->searchAcrossMemories(
+        $results = $this->voyageService->semanticSearch(
             $query,
             $allowedTypes,
-            $userId,
+            $userId ? ['user_id' => $userId] : [],
             $limit
         );
 
@@ -108,6 +108,7 @@ class VectorAccessService
     private function getAdminMemoryTypes(): array
     {
         return [
+            'lagento_context',
             'opportunite',
             'texte_officiel', 
             'institution',
@@ -127,6 +128,7 @@ class VectorAccessService
     private function getPremiumMemoryTypes(): array
     {
         return [
+            'lagento_context',
             'opportunite',
             'texte_officiel',
             'institution', 
@@ -144,6 +146,7 @@ class VectorAccessService
     private function getStandardMemoryTypes(): array
     {
         return [
+            'lagento_context',
             'opportunite',
             'institution',
             'user_project',
@@ -160,6 +163,7 @@ class VectorAccessService
     private function getBasicMemoryTypes(): array
     {
         return [
+            'lagento_context',
             'opportunite',
             'institution',
             'timeline_gov',

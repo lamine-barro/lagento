@@ -43,7 +43,7 @@ class AgentPrincipal extends BaseAgent
         return [
             'model' => 'gpt-4.1-mini',
             'temperature' => 0.3,
-            'max_tokens' => 1500,
+            'max_tokens' => 2500,
             'tools' => [
                 'gestion_base_donnees',
                 'recherche_semantique', 
@@ -240,42 +240,44 @@ STYLE DE RÉPONSE :
 - PRIVILÉGIER la simplicité et la clarté
 - Commencer TOUJOURS par une réponse directe et concise
 - Utiliser un français naturel et bien formulé
-- Éviter l'abus de composants visuels
-- Maximiser l'impact avec un minimum d'éléments
+- Format compact optimisé pour mobile
+- Interlignes serrés, pas d'espaces excessifs
 
-FORMAT DE SORTIE : Markdown structuré avec composants personnalisés :
+FORMAT DE SORTIE : Markdown propre et compact :
 
-ÉLÉMENTS DE BASE (à privilégier) :
-- Titres : ## (h2), ### (h3) - seulement si nécessaire
+ÉLÉMENTS DE BASE (seuls autorisés) :
+- Titres : ## (h2), ### (h3) - seulement si nécessaire, collés au contenu
 - Formatage : **gras** pour les points clés, *italique* pour l'emphase légère
-- Listes : ordonnées (1.) et non-ordonnées (-) - concises
-- Paragraphes courts et lisibles
+- Listes : ordonnées (1.) et non-ordonnées (-) - format serré, pas d'espaces
+- Paragraphes courts et lisibles avec interlignes compacts
 
-RÈGLES D'USAGE DES COMPOSANTS :
+COMPOSANTS AUTORISÉS :
 
-ALERTES (MAXIMUM 1 par réponse) :
+ALERTES UNIQUEMENT (MAXIMUM 1 par réponse) :
 - :::info → Informations complémentaires importantes
 - :::success → Validation d'une démarche réussie
 - :::warning → Attention requise, points de vigilance
 - :::danger → Risques majeurs, erreurs à éviter
 
-CARTES PERSONNALISÉES (utiliser avec parcimonie) :
-- [carte-institution:Nom|Description|Téléphone|URL] → Institutions officielles uniquement
-- [carte-opportunite:Titre|Description|Échéance|URL] → Opportunités concrètes avec deadline
-- [carte-texte-officiel:Référence|Description|Source|URL] → Lois, décrets, textes légaux
-- [carte-partenaire:Nom projet|Description|Synergie|URL] → Partenaires stratégiques identifiés
+LIENS ET URLs (OBLIGATOIRE si disponible) :
+- Pour CHAQUE opportunité mentionnée : inclure [Voir détails](url){target=\"_blank\"} si URL existe
+- Pour CHAQUE institution mentionnée : inclure [Site web](url){target=\"_blank\"} si URL existe
+- Format markdown : [texte du lien](url){target=\"_blank\"}
+- TOUJOURS utiliser target=\"_blank\" pour ouvrir dans nouvel onglet
+- NE JAMAIS inventer d'URLs - utiliser UNIQUEMENT celles retournées par les outils
 
-QUAND UTILISER LES COMPOSANTS :
-- Questions simples → Réponse textuelle uniquement
-- Conseils généraux → Texte + 1 alerte si critique
-- Opportunités spécifiques → Texte + cartes opportunités/institutions
-- Aspects légaux → Texte + cartes textes officiels
-- Recherche de partenaires → Texte + cartes partenaires
+INTERDICTIONS STRICTES :
+- AUCUNE carte personnalisée (opportunités, institutions, textes officiels)
+- AUCUN composant [carte-*] dans les réponses
+- AUCUN espacement excessif entre éléments
+- AUCUNE sur-structuration
+- AUCUNE URL inventée ou fictive
 
-ÉVITER :
-- Multiplication des alertes et cartes
-- Composants pour des informations basiques
-- Sur-structuration des réponses simples
+FORMATAGE MOBILE :
+- Listes avec espacement minimal
+- Titres collés au contenu (pas de grandes marges)
+- Paragraphes compacts mais lisibles
+- Structure claire sans fioritures
 
 CONTEXTE IVOIRIEN :
 - Connaissance approfondie de l'écosystème entrepreneurial ivoirien
@@ -284,44 +286,61 @@ CONTEXTE IVOIRIEN :
 - Compréhension des défis spécifiques aux entrepreneurs locaux
 
 OUTILS ET QUAND LES UTILISER :
-- gestion_base_donnees : lorsque l'utilisateur parle d'opportunités, financements, institutions, partenaires, ou de ses projets. Par défaut lecture; si l'utilisateur le demande explicitement, proposer la mise à jour du projet et/ou des analytics.
-- recherche_semantique : pour les lois, réglementations, procédures OHADA, textes officiels et références légales.
-- recherche_vectorielle : pour conseils personnalisés, exemples, recommandations, expériences similaires, cas d'usage. Accède aux MÉMOIRES VECTORISÉES suivantes (chaque type recherché INDÉPENDAMMENT pour garantir diversité) :
+- gestion_base_donnees : Recherche dans les DONNÉES RÉELLES de la plateforme (max 8 résultats par requête) :
+  * 77 opportunités réelles importées avec secteurs/régions/URLs
+  * Projets utilisateur avec statut public/vérifié uniquement 
+  * Institutions partenaires existantes
+  → IMPORTANT: Utilise UNIQUEMENT les donnees retournees par cet outil, AUCUNE invention
+  → FORMAT OBLIGATOIRE: Pour chaque opportunité/institution avec URL, ajouter [Voir détails](url){target=\"_blank\"}
+
+- recherche_semantique : Recherche dans textes officiels juridiques pour questions OHADA/légales
   
-  * 'opportunite' (83 entrées) : Opportunités de financement, concours, subventions, fonds d'investissement CI
-    → Utiliser pour : recherche de financements, bourses, concours entrepreneuriaux, levées de fonds
-    → Mots-clés déclencheurs : financement, subvention, bourse, concours, capital, investissement, aide financière
+- recherche_vectorielle : Accès aux MÉMOIRES VECTORISÉES suivantes (max 8 chunks pertinents total) :
+  
+  **MÉMOIRES ACCESSIBLES À TOUS UTILISATEURS :**
+  * 'lagento_context' : Corpus vectorisé 173/177 chunks (3.3MB) - Contexte complet Agent O
+    → Conseils entrepreneuriaux, meilleures pratiques, exemples concrets CI
+    → REGLE : Utilise UNIQUEMENT les chunks retournes, AUCUNE extrapolation
     
-  * 'institution' (189 entrées) : Institutions d'accompagnement entrepreneurial ivoiriennes
-    → Utiliser pour : recherche d'incubateurs, accélérateurs, cabinets conseil, associations, espaces coworking
-    → Mots-clés déclencheurs : accompagnement, incubateur, accélérateur, mentor, conseil, partenaire, structure
+  * 'opportunite' : Opportunités vectorisées (backup des 77 en base)
+    → Recherche sémantique dans descriptions d'opportunités
     
-  * 'texte_officiel' (1765 entrées) : Corpus juridique complet OHADA et réglementation ivoirienne
-    → Utiliser pour : questions légales, procédures administratives, obligations réglementaires
-    → Mots-clés déclencheurs : loi, réglementation, juridique, OHADA, procédure, obligation, statut légal
+  * 'institution' : Institutions d'accompagnement CI vectorisées
+    → Incubateurs, accélérateurs, structures d'appui réelles
     
-  * 'user_project' : Projets entrepreneuriaux spécifiques de l'utilisateur (secteur, maturité, besoins)
-    → Utiliser pour : analyse personnalisée du projet, recommandations contextualisées
-    → Mots-clés déclencheurs : mon projet, ma startup, mon entreprise, Etudesk, analyser mon activité
+  * 'user_project' : Projet spécifique de CET utilisateur seulement
+    → Analyse personnalisée du projet Etudesk ou autre
     
-  * 'user_analytics' : Profil entrepreneurial et diagnostic personnalisé (forces, axes progression)
-    → Utiliser pour : conseils basés sur le niveau de maturité, recommandations de formation
-    → Mots-clés déclencheurs : mes forces, mes faiblesses, mon profil, diagnostic, développement personnel
+  * 'user_analytics' : Diagnostic personnalisé de CET utilisateur
+    → Forces, axes progression, recommandations personnelles
     
-  * 'presentation' : Documentation LagentO/Horizon-O (fonctionnalités, missions, services)
-    → Utiliser pour : questions sur l'outil, ses capacités, son utilisation
-    → Mots-clés déclencheurs : LagentO, Agent O, fonctionnalités, comment utiliser, que peux-tu faire
-    
-  * 'faq' : Questions fréquentes entrepreneuriat CI et utilisation LagentO
-    → Utiliser pour : réponses aux questions courantes, guides pratiques
-    → Mots-clés déclencheurs : comment créer, étapes de, procédures courantes, questions fréquentes
-    
-  * 'timeline_gov' : Chronologie des actions gouvernementales et politiques d'appui CI
-    → Utiliser pour : contexte politique économique, programmes gouvernementaux
-    → Mots-clés déclencheurs : gouvernement, politique, État, programme officiel, initiatives publiques
-- generation_fichier (docx, csv, txt, md) : quand un document est demandé (business plan, CV, rapport, plan, résumé). Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
-- generation_image : pour logos/visuels/maquettes. Utilise exclusivement gpt-image-1. Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
-- web search (intégré au modèle) : si besoin d'actualités/informations récentes (mots-clés : actualité, récent, 2024, 2025, prix, taux). Le modèle l'activera automatiquement.
+  **MÉMOIRES DESCRIPTIVES (contexte général) :**
+  * 'presentation' : Documentation Agent O/Horizon-O
+  * 'faq' : Questions fréquentes utilisation
+  * 'timeline_gov' : Actions gouvernementales CI
+
+  **RÈGLES STRICTES RAG :**
+  - Retourne UNIQUEMENT le top 8 des chunks les plus pertinents
+  - AUCUNE invention d'opportunites, institutions ou donnees
+  - Si pas de resultats RAG -> dire 'aucune donnee disponible sur ce sujet'
+  - Citer uniquement les sources trouvees dans les chunks
+  
+  **PRÉSENTATION DES RÉSULTATS (OBLIGATOIRE) :**
+  Pour CHAQUE opportunité dans gestion_base_donnees->opportunities :
+  1. Regarde le champ 'lien_externe' dans les données
+  2. Si lien_externe existe et non vide : **{titre}** - {description}. [Voir détails](https://{lien_externe}){target=\"_blank\"}
+  3. Si lien_externe vide ou null : **{titre}** - {description}
+  
+  EXEMPLES CONCRETS :
+  - Données: {\"titre\":\"Orange Corners CI\",\"lien_externe\":\"orangecorners.com\"}
+    → **Orange Corners CI** - [Description]. [Voir détails](https://orangecorners.com){target=\"_blank\"}
+  - Données: {\"titre\":\"Programme X\",\"lien_externe\":null}
+    → **Programme X** - [Description]
+  
+  RÈGLE ABSOLUE : Utilise EXACTEMENT la valeur de lien_externe, ajoute juste https:// devant
+- generation_fichier (docx, csv, txt, md) : quand un document est demande (business plan, CV, rapport, plan, resume). Tu renvoies uniquement le lien de telechargement fourni par l'outil.
+- generation_image : pour logos/visuels/maquettes. Utilise exclusivement gpt-image-1. Tu renvoies uniquement le lien de telechargement fourni par l'outil.
+- web search (integre au modele) : si besoin d'actualites/informations recentes (mots-cles : actualite, recent, 2024, 2025, prix, taux). Le modele l'activera automatiquement.
 
 STYLE :
 - Bienveillant et encourageant
@@ -352,8 +371,9 @@ STYLE :
             $tools[] = 'gestion_base_donnees';
         }
 
-        // Base de données pour opportunités/institutions
-        if (preg_match('/(opportunité|financement|subvention|incubateur|partenaire|institution)/i', $message)) {
+        // Base de données pour opportunités/institutions - toujours chercher les opportunités
+        if (preg_match('/(opportunité|financement|subvention|incubateur|partenaire|institution|cherche|trouve|recherche|aide|besoin)/i', $message) || 
+            preg_match('/(opportunites?|chance|possibilite|option)/i', $message)) {
             $tools[] = 'gestion_base_donnees';
         }
 
@@ -397,12 +417,54 @@ STYLE :
     {
         $results = [];
 
-        // Opportunités (filtre simple sur description/type)
+        // Opportunités - recherche améliorée avec filtres multiples
         $keyword = $this->extractKeywords($message);
-        $opportunities = Opportunite::where('description', 'like', '%' . $keyword . '%')
-            ->orWhere('type', 'like', '%' . $keyword . '%')
-            ->limit(5)
-            ->get();
+        
+        $opportunitiesQuery = Opportunite::query();
+        
+        // Détecter les requêtes générales sur les opportunités
+        $isGeneralOpportunityQuery = preg_match('/(opportunité|opportunites?|financement|aide|subvention|fond|capital)/i', $message);
+        
+        // Détecter la localisation (Abidjan, régions, etc.)
+        $location = $this->extractLocation($message);
+        if (!empty($location)) {
+            if ($location === 'Abidjan') {
+                // Chercher opportunités disponibles à Abidjan (National ou région Abidjan)
+                $opportunitiesQuery->where(function($query) {
+                    $query->whereJsonContains('regions_cibles', 'National')
+                          ->orWhereJsonContains('regions_cibles', 'Abidjan')
+                          ->orWhere('ville', 'Abidjan');
+                });
+            } else {
+                // Autres régions
+                $opportunitiesQuery->whereJsonContains('regions_cibles', $location);
+            }
+        }
+        
+        // Si c'est une recherche générale d'opportunités sans localisation spécifique, montrer toutes
+        if ($isGeneralOpportunityQuery && empty($location)) {
+            // Pas de filtre supplémentaire, montrer toutes les opportunités
+        }
+        
+        // Recherche par mots-clés spécifiques (autres que "opportunites")
+        if (!empty($keyword) && !preg_match('/(opportunité|opportunites?)/i', $keyword)) {
+            $opportunitiesQuery->where(function($query) use ($keyword) {
+                $query->where('titre', 'like', '%' . $keyword . '%')
+                      ->orWhere('description', 'like', '%' . $keyword . '%')
+                      ->orWhere('type', 'like', '%' . $keyword . '%');
+            });
+        }
+        
+        // Filtrer par secteur si détecté dans le message
+        $secteur = $this->extractSector($message);
+        if (!empty($secteur)) {
+            $opportunitiesQuery->whereJsonContains('secteurs', $secteur);
+        }
+        
+        // Filtrer les opportunités ouvertes en priorité
+        $opportunitiesQuery->orderByRaw("CASE WHEN statut = 'ouvert' THEN 1 WHEN statut = 'en_cours' THEN 2 ELSE 3 END");
+        
+        $opportunities = $opportunitiesQuery->limit(8)->get();
 
         if ($opportunities->count() > 0) {
             $results['opportunities'] = $opportunities->toArray();
@@ -504,28 +566,8 @@ STYLE :
         $message = strtolower($message);
         $types = [];
 
-        // Always include core memories for general queries
-        $types[] = 'presentation'; // LagentO info
-
-        // OPPORTUNITÉ : financement, bourses, concours, investissement
-        if (preg_match('/(opportunité|financement|bourse|subvention|concours|fonds|capital|investissement|levée|aide financière|crowdfunding|startup boost)/i', $message)) {
-            $types[] = 'opportunite';
-        }
-
-        // TEXTE_OFFICIEL : lois, réglementation, OHADA, procédures
-        if (preg_match('/(loi|réglementation|texte|officiel|juridique|ohada|procédure|obligation|statut légal|décret|arrêté|formalisation)/i', $message)) {
-            $types[] = 'texte_officiel';
-        }
-
-        // INSTITUTION : accompagnement, incubateurs, mentors, conseils
-        if (preg_match('/(institution|organisme|structure|accompagnement|incubateur|accélérateur|cabinet|conseil|association|partenaire|mentor|coworking|coaching)/i', $message)) {
-            $types[] = 'institution';
-        }
-
-        // TIMELINE_GOV : gouvernement, politiques, programmes officiels
-        if (preg_match('/(gouvernement|état|politique|timeline|action|programme officiel|initiative publique|ministère|cepici|cgeci)/i', $message)) {
-            $types[] = 'timeline_gov';
-        }
+        // LAGENTO_CONTEXT : Toujours inclure - corpus principal avec conseils entrepreneuriaux
+        $types[] = 'lagento_context';
 
         // USER_PROJECT : projets personnels, startup, entreprise spécifique
         if (preg_match('/(projet|entreprise|startup|business|entrepreneuriat|etudesk|décris|décrire|présente|analyser|mon projet|ma startup|mon entreprise|mon activité)/i', $message)) {
@@ -542,34 +584,23 @@ STYLE :
             $types[] = 'user_analytics';
         }
 
-        // FAQ : questions courantes, guides pratiques
-        if (preg_match('/(comment créer|étapes de|procédures courantes|questions fréquentes|guide|comment faire|tutoriel)/i', $message)) {
-            $types[] = 'faq';
-        }
-        
-        // PRESENTATION : fonctionnalités LagentO, utilisation de l'outil
+        // Pour les questions spécifiques sur l'outil Agent O
         if (preg_match('/(lagento|agent o|fonctionnalités|comment utiliser|que peux-tu faire|tes capacités|horizon-o)/i', $message)) {
-            // Remove default presentation if specific LagentO question
-            $types = array_diff($types, ['presentation']);
-            $types[] = 'presentation';
+            // Lagento_context contient déjà ces infos, pas besoin de presentation séparé
         }
 
-        if (preg_match('/(document|fichier|upload|pdf)/i', $message)) {
-            $types[] = 'documents';
-            $types[] = 'attachments';
+        // OHADA/juridique : rechercher dans lagento_context pour conseils sur formalisation
+        if (preg_match('/(loi|réglementation|ohada|juridique|formalisation|procédure|statut)/i', $message)) {
+            // lagento_context déjà inclus
         }
 
-        if (preg_match('/(conversation|historique|contexte|précédent)/i', $message)) {
-            $types[] = 'conversations';
-        }
-
-        // If no specific types detected, search all
-        if (empty($types) || count($types) == 1) {
+        // Questions générales entrepreneuriales : lagento_context déjà inclus
+        
+        // Si aucun type spécifique détecté, utiliser les types disponibles
+        if (count($types) == 1) { // Seulement lagento_context
             $types = [
-                'presentation',
-                'opportunite',
-                'institution',
-                'user_project',
+                'lagento_context',
+                'user_project', 
                 'user_analytics'
             ];
         }
@@ -729,6 +760,32 @@ STYLE :
         return implode(' ', array_slice($keywords, 0, 3));
     }
 
+    protected function extractLocation(string $message): string
+    {
+        $message = strtolower($message);
+        
+        // Vérifier les principales villes/régions de Côte d'Ivoire
+        $locations = [
+            'abidjan' => 'Abidjan',
+            'yamoussoukro' => 'Yamoussoukro', 
+            'bouake' => 'Bouaké',
+            'daloa' => 'Daloa',
+            'korhogo' => 'Korhogo',
+            'san pedro' => 'San Pedro',
+            'man' => 'Man',
+            'bassam' => 'Grand-Bassam',
+            'national' => 'National'
+        ];
+        
+        foreach ($locations as $search => $region) {
+            if (strpos($message, $search) !== false) {
+                return $region;
+            }
+        }
+        
+        return '';
+    }
+
     protected function detectFileType(string $message): string
     {
         if (preg_match('/business plan/i', $message)) return 'business_plan';
@@ -744,20 +801,10 @@ STYLE :
 
     protected function formatMarkdownResponse(string $response, array $toolResults = []): string
     {
-        // Ensure response starts with proper formatting
+        // Only preserve alert components, remove all custom cards (opportunities, institutions, official texts)
         $formattedResponse = $response;
-        
-        // Add custom cards based on tool results
-        if (isset($toolResults['gestion_base_donnees'])) {
-            $formattedResponse = $this->appendDataCards($formattedResponse, $toolResults['gestion_base_donnees']);
-        }
-        
-        // Add custom cards for vector search results
-        if (isset($toolResults['recherche_vectorielle'])) {
-            $formattedResponse = $this->appendVectorCards($formattedResponse, $toolResults['recherche_vectorielle']);
-        }
 
-        // Ensure proper markdown structure
+        // Ensure proper markdown structure with compact formatting
         $formattedResponse = $this->ensureMarkdownStructure($formattedResponse);
         
         return $formattedResponse;
@@ -872,14 +919,21 @@ STYLE :
         $titre = $opportunity['titre'] ?? ($opportunity['title'] ?? 'Opportunité');
         $dateLimite = $opportunity['date_limite'] ?? ($opportunity['application_deadline'] ?? null);
         $regions = $opportunity['regions_cibles'] ?? [];
+        $url = $opportunity['lien_externe'] ?? '';
 
-        return "\n\n:::opportunity\n" .
-               "**{$titre}**\n\n" .
-               ($opportunity['description'] ?? '') . "\n\n" .
-               (isset($opportunity['type']) ? "💰 **Type:** {$opportunity['type']}\n" : '') .
-               ($dateLimite ? "📅 **Date limite:** {$dateLimite}\n" : '') .
-               (!empty($regions) ? "📍 **Régions cibles:** " . implode(', ', $regions) . "\n" : '') .
-               ":::\n";
+        // Utiliser le format carte personnalisée pour contrôler l'affichage du bouton Detail
+        if (!empty($url) && strlen(trim($url)) > 0) {
+            return "\n\n[carte-opportunite:{$titre}|" . ($opportunity['description'] ?? '') . "|" . ($dateLimite ?? 'Non définie') . "|{$url}]\n";
+        } else {
+            // Format standard sans bouton Detail
+            return "\n\n:::opportunity\n" .
+                   "**{$titre}**\n\n" .
+                   ($opportunity['description'] ?? '') . "\n\n" .
+                   (isset($opportunity['type']) ? "💰 **Type:** {$opportunity['type']}\n" : '') .
+                   ($dateLimite ? "📅 **Date limite:** {$dateLimite}\n" : '') .
+                   (!empty($regions) ? "📍 **Régions cibles:** " . implode(', ', $regions) . "\n" : '') .
+                   ":::\n";
+        }
     }
 
     protected function createOfficialTextCard(array $text): string
@@ -936,6 +990,7 @@ STYLE :
         $description = '';
         $type = $metadata['type'] ?? '';
         $deadline = $metadata['deadline'] ?? '';
+        $url = $metadata['url'] ?? '';
         
         // Parser le contenu pour extraire titre et description
         if (preg_match('/Titre:\s*([^\n]+)/i', $content, $matches)) {
@@ -950,7 +1005,12 @@ STYLE :
             return null; // Pas assez d'informations
         }
 
-        return "\n\n[carte-opportunite:{$titre}|{$description}|{$deadline}|]\n";
+        // Seulement inclure l'URL si elle existe pour afficher le bouton Detail
+        if (!empty($url)) {
+            return "\n\n[carte-opportunite:{$titre}|{$description}|{$deadline}|{$url}]\n";
+        } else {
+            return "\n\n[carte-opportunite:{$titre}|{$description}|{$deadline}|]\n";
+        }
     }
 
     /**
@@ -1040,11 +1100,19 @@ STYLE :
 
     protected function ensureMarkdownStructure(string $content): string
     {
-        // Ensure proper spacing between sections
+        // Compact formatting for mobile - reduce excessive line breaks
         $content = preg_replace('/\n\n\n+/', "\n\n", $content);
         
-        // Ensure headers have proper spacing
-        $content = preg_replace('/\n(#{2,3})\s/', "\n\n$1 ", $content);
+        // Compact spacing for headers - no extra line before headers
+        $content = preg_replace('/\n\n+(#{1,6})\s/', "\n\n$1 ", $content);
+        
+        // Ensure proper list formatting with tight spacing
+        $content = preg_replace('/\n\n([*-])\s/', "\n$1 ", $content);
+        $content = preg_replace('/\n\n(\d+\.)\s/', "\n$1 ", $content);
+        
+        // Remove excessive spacing between list items
+        $content = preg_replace('/([*-] .+)\n\n([*-] )/', '$1' . "\n" . '$2', $content);
+        $content = preg_replace('/(\d+\. .+)\n\n(\d+\. )/', '$1' . "\n" . '$2', $content);
         
         return trim($content);
     }

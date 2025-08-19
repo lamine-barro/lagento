@@ -1,8 +1,8 @@
-<?php $__env->startSection('seo_title', 'LAgentO - Assistant IA Entrepreneurial N°1 en Côte d\'Ivoire'); ?>
-<?php $__env->startSection('meta_description', 'Découvrez LAgentO, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens. Conseils personnalisés, opportunités de financement, réseau d\'affaires et accompagnement 24/7 pour réussir votre entreprise en Côte d\'Ivoire.'); ?>
+<?php $__env->startSection('seo_title', 'LagentO - Assistant IA Entrepreneurial N°1 en Côte d\'Ivoire'); ?>
+<?php $__env->startSection('meta_description', 'Découvrez LagentO, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens. Conseils personnalisés, opportunités de financement, réseau d\'affaires et accompagnement 24/7 pour réussir votre entreprise en Côte d\'Ivoire.'); ?>
 <?php $__env->startSection('meta_keywords', 'assistant IA côte ivoire, entrepreneur abidjan, startup CI, financement pme, conseil business, innovation afrique, lamine barro, etudesk'); ?>
-<?php $__env->startSection('og_title', 'LAgentO - Votre Assistant IA Entrepreneurial en Côte d\'Ivoire'); ?>
-<?php $__env->startSection('og_description', 'Rejoignez plus de 15M+ entrepreneurs qui font confiance à LAgentO pour développer leur business en Afrique. Gratuit et disponible 24/7.'); ?>
+<?php $__env->startSection('og_title', 'LagentO - Votre Assistant IA Entrepreneurial en Côte d\'Ivoire'); ?>
+<?php $__env->startSection('og_description', 'Rejoignez plus de 15M+ entrepreneurs qui font confiance à LagentO pour développer leur business en Afrique. Gratuit et disponible 24/7.'); ?>
 <?php $__env->startSection('canonical_url', route('landing')); ?>
 <?php $__env->startSection('title', 'Agent O - Assistant IA Entrepreneurial'); ?>
 
@@ -23,7 +23,7 @@
 {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "LAgentO",
+    "name": "LagentO",
     "alternateName": "Agent O",
     "description": "Premier assistant IA entrepreneurial pour la Côte d'Ivoire",
 
@@ -31,7 +31,7 @@
 
     "sameAs": [
         "https://linkedin.com/company/lagento",
-        "https://twitter.com/LAgentO_CI"
+        "https://twitter.com/LagentO_CI"
     ],
     "offers": {
         "@type": "Offer",

@@ -1,3 +1,83 @@
+/* === MOBILE INPUT ZOOM PREVENTION === */
+/* Empêche le zoom automatique sur mobile lors du focus sur les inputs */
+input, textarea, select {
+  font-size: 16px !important;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+/* Styles responsifs pour iOS Safari */
+@supports (-webkit-appearance: none) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    line-height: 1.4;
+  }
+}
+
+/* Correction pour les petits écrans */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px !important;
+    padding: 12px 16px;
+    line-height: 1.4;
+  }
+  
+  /* Empêcher le scroll horizontal */
+  .form-input, .form-textarea, .form-select {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* === CHAT MESSAGES OPTIMIZATION === */
+/* Optimisation de l'espace pour les messages agent sur mobile */
+@media (max-width: 767px) {
+  /* Messages agent sans icône - utilisation complète de l'espace */
+  .chat-message.assistant {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  
+  /* Prose plus compacte pour mobile */
+  .prose.prose-sm {
+    line-height: 1.5 !important;
+  }
+  
+  .prose.prose-sm p {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .prose.prose-sm ul,
+  .prose.prose-sm ol {
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .prose.prose-sm li {
+    margin-top: 0 !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .prose.prose-sm h2,
+  .prose.prose-sm h3 {
+    margin-top: 1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Actions des messages plus compactes */
+  .message-actions {
+    margin-top: 0.5rem !important;
+  }
+}
+
 /* === TOAST NOTIFICATIONS === */
 .toast-notification {
   backdrop-filter: blur(8px);

@@ -6,17 +6,17 @@
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     
     <!-- SEO Meta Tags -->
-    <title><?php echo $__env->yieldContent('seo_title', 'LAgentO - Assistant IA Entrepreneurial Côte d\'Ivoire'); ?></title>
-    <meta name="description" content="<?php echo $__env->yieldContent('meta_description', 'LAgentO, le premier assistant IA entrepreneurial de Côte d\'Ivoire. Conseils personnalisés, opportunités de financement, diagnostic d\'entreprise et accompagnement business 24/7 pour entrepreneurs ivoiriens.'); ?>">
+    <title><?php echo $__env->yieldContent('seo_title', 'LagentO - Assistant IA Entrepreneurial Côte d\'Ivoire'); ?></title>
+    <meta name="description" content="<?php echo $__env->yieldContent('meta_description', 'LagentO, le premier assistant IA entrepreneurial de Côte d\'Ivoire. Conseils personnalisés, opportunités de financement, diagnostic d\'entreprise et accompagnement business 24/7 pour entrepreneurs ivoiriens.'); ?>">
     <meta name="keywords" content="<?php echo $__env->yieldContent('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, conseil business, diagnostic entreprise, innovation afrique, lamine barro'); ?>">
-    <meta name="author" content="LAgentO - Lamine Barro">
+    <meta name="author" content="LagentO - Lamine Barro">
     <meta name="robots" content="<?php echo $__env->yieldContent('meta_robots', 'index, follow'); ?>">
     <link rel="canonical" href="<?php echo $__env->yieldContent('canonical_url', url()->current()); ?>">
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:site_name" content="LAgentO">
-    <meta property="og:title" content="<?php echo $__env->yieldContent('og_title', 'LAgentO - Assistant IA Entrepreneurial'); ?>">
-    <meta property="og:description" content="<?php echo $__env->yieldContent('og_description', 'LAgentO, le premier assistant IA entrepreneurial de Côte d\'Ivoire. Conseils personnalisés, opportunités de financement et accompagnement business 24/7.'); ?>">
+    <meta property="og:site_name" content="LagentO">
+    <meta property="og:title" content="<?php echo $__env->yieldContent('og_title', 'LagentO - Assistant IA Entrepreneurial'); ?>">
+    <meta property="og:description" content="<?php echo $__env->yieldContent('og_description', 'LagentO, le premier assistant IA entrepreneurial de Côte d\'Ivoire. Conseils personnalisés, opportunités de financement et accompagnement business 24/7.'); ?>">
     <meta property="og:type" content="<?php echo $__env->yieldContent('og_type', 'website'); ?>">
     <meta property="og:url" content="<?php echo $__env->yieldContent('og_url', url()->current()); ?>">
     <meta property="og:image" content="<?php echo $__env->yieldContent('og_image', asset('images/lagento-social-preview.jpg')); ?>">
@@ -27,17 +27,17 @@
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@LAgentO_CI">
+    <meta name="twitter:site" content="@LagentO_CI">
     <meta name="twitter:creator" content="@LamBarro">
-    <meta name="twitter:title" content="<?php echo $__env->yieldContent('twitter_title', 'LAgentO - Assistant IA Entrepreneurial'); ?>">
+    <meta name="twitter:title" content="<?php echo $__env->yieldContent('twitter_title', 'LagentO - Assistant IA Entrepreneurial'); ?>">
     <meta name="twitter:description" content="<?php echo $__env->yieldContent('twitter_description', 'Assistant IA entrepreneurial pour la Côte d\'Ivoire'); ?>">
     <meta name="twitter:image" content="<?php echo $__env->yieldContent('twitter_image', asset('images/lagento-social-preview.jpg')); ?>">
     
     <!-- Additional Meta Tags -->
     <meta name="theme-color" content="#ff6b35">
     <meta name="msapplication-TileColor" content="#ff6b35">
-    <meta name="application-name" content="LAgentO">
-    <meta name="apple-mobile-web-app-title" content="LAgentO">
+    <meta name="application-name" content="LagentO">
+    <meta name="apple-mobile-web-app-title" content="LagentO">
     <meta name="format-detection" content="telephone=no">
     
     <!-- Preconnect for Performance -->
@@ -82,7 +82,7 @@
         <footer style="padding: 12px; border-top: 1px solid var(--gray-200); background: var(--surface-elevated, var(--white));">
             <div class="text-center">
                 <p class="text-sm mb-1" style="color: var(--gray-600);">
-                    © 2025 LAgentO - <a href="<?php echo e(route('legal')); ?>" class="hover:underline" style="color: var(--gray-600);">Mentions légales</a>
+                    © 2025 LagentO - <a href="<?php echo e(route('legal')); ?>" class="hover:underline" style="color: var(--gray-600);">Mentions légales</a>
                 </p>
                 <p class="text-xs" style="color: var(--gray-500);">
                     Développé avec ❤️ pour l'écosystème entrepreneurial ivoirien

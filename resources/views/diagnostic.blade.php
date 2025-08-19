@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'Diagnostic Entreprise')
-@section('page_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | LAgentO')
-@section('seo_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | LAgentO')
+@section('page_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | LagentO')
+@section('seo_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | LagentO')
 @section('meta_description', 'Obtenez un diagnostic complet et gratuit de votre entreprise avec l\'intelligence artificielle. Analyse des forces, faiblesses, opportunités de financement et conseils personnalisés pour entrepreneurs ivoiriens.')
 @section('meta_keywords', 'diagnostic entreprise gratuit, analyse startup, conseil business CI, diagnostic IA, évaluation entreprise côte ivoire, audit business abidjan')
 @section('canonical_url', route('diagnostic'))
-@section('og_title', 'Diagnostic Entreprise IA Gratuit - LAgentO Côte d\'Ivoire')
+@section('og_title', 'Diagnostic Entreprise IA Gratuit - LagentO Côte d\'Ivoire')
 @section('og_description', 'Diagnostic IA complet de votre entreprise : forces, faiblesses, opportunités de financement et plan d\'action personnalisé. Gratuit pour entrepreneurs ivoiriens.')
 @section('schema_org')
 @verbatim
@@ -17,7 +17,7 @@
     "description": "Service de diagnostic d'entreprise par intelligence artificielle pour entrepreneurs ivoiriens",
     "provider": {
         "@type": "Organization",
-        "name": "LAgentO",
+        "name": "LagentO",
         "url": "@endverbatim{{ url('/') }}@verbatim"
     },
     "areaServed": {
@@ -185,18 +185,19 @@ document.addEventListener('alpine:init', () => {
             <div class="card-body">
                 <div class="flex items-center justify-center py-8">
                     <div class="text-center">
-                        <div class="smooth-spin w-8 h-8 border-2 border-orange border-t-transparent rounded-full mx-auto mb-4"></div>
-                        <h3 class="text-lg font-medium text-primary mb-2 shimmer-text">Régénération du diagnostic en cours</h3>
-                        <p class="text-muted shimmer-text">L'IA analyse vos nouvelles données entrepreneuriales...</p>
+                        <div class="smooth-spin w-8 h-8 border-2 rounded-full mx-auto mb-4" style="border-color: var(--orange-primary); border-top-color: transparent;"></div>
+                        <h3 class="text-lg font-medium mb-2 shimmer-text" style="color: var(--gray-900);">Régénération du diagnostic en cours</h3>
+                        <p class="shimmer-text" style="color: var(--gray-600);">L'IA analyse vos nouvelles données entrepreneuriales...</p>
                         
                         <!-- Progress indicator avec étapes -->
                         <div class="mt-6 space-y-3">
                             <template x-for="(step, index) in progressSteps" :key="index">
-                                <div class="flex items-center justify-center gap-2 text-sm text-gray-600">
-                                    <div class="w-2 h-2 rounded-full" 
-                                         :class="index <= progressStep ? 'bg-orange animate-pulse' : 'bg-gray-300'"></div>
+                                <div class="flex items-center justify-center gap-2 text-sm">
+                                    <div class="w-2 h-2 rounded-full animate-pulse" 
+                                         :style="index <= progressStep ? 'background-color: var(--orange-primary)' : 'background-color: var(--gray-300)'"></div>
                                     <span x-text="step" 
-                                          :class="index <= progressStep ? 'shimmer-text' : ''"></span>
+                                          :class="index <= progressStep ? 'shimmer-text' : ''"
+                                          :style="'color: var(--gray-' + (index <= progressStep ? '700' : '500') + ')'"></span>
                                 </div>
                             </template>
                         </div>
@@ -227,13 +228,13 @@ document.addEventListener('alpine:init', () => {
             
             <div x-show="sectionsState.resume" x-transition class="card-body">
                 <div class="mb-3 p-3 rounded-lg message-principal">
-                    <h4 class="font-medium text-orange mb-1">Message Principal</h4>
+                    <h4 class="font-medium text-orange mb-1">Message principal</h4>
                     <p class="text-sm">{{ $analytics->executive_summary['message_principal'] ?? 'Analyse en cours...' }}</p>
                 </div>
                 
                 <div class="grid lg:grid-cols-2 gap-4 mt-4">
                     <div>
-                        <h4 class="font-medium mb-3">3 Actions Clés</h4>
+                        <h4 class="font-medium mb-3">3 actions clés</h4>
                         <div class="space-y-4">
                             @foreach(($analytics->executive_summary['trois_actions_cles'] ?? []) as $action)
                             <div class="flex items-start gap-2">
@@ -245,10 +246,84 @@ document.addEventListener('alpine:init', () => {
                     </div>
                     
                     <div>
-                        <h4 class="font-medium mb-3">Opportunité du Mois</h4>
-                        <p class="text-sm p-3 rounded" style="background: var(--success-100); color: var(--success-700);">
-                            {{ $analytics->executive_summary['opportunite_du_mois'] ?? 'Aucune opportunité identifiée' }}
-                        </p>
+                        <h4 class="font-medium mb-3">Opportunité du mois</h4>
+                        @php
+                            $opportunite = $analytics->opportunite_du_mois ?? $analytics->executive_summary['opportunite_du_mois'] ?? null;
+                            
+                            // Si c'est du JSON, le parser
+                            if (is_string($opportunite) && str_starts_with($opportunite, '{')) {
+                                try {
+                                    $opportuniteData = json_decode($opportunite, true);
+                                    if (json_last_error() === JSON_ERROR_NONE && is_array($opportuniteData)) {
+                                        $opportunite = $opportuniteData;
+                                    }
+                                } catch (Exception $e) {
+                                    // Garder la string originale si erreur
+                                }
+                            }
+                        @endphp
+                        
+                        @if(is_array($opportunite))
+                            <div class="text-sm p-4 rounded-lg border-l-4 border-green-500" style="background: var(--success-100); color: var(--success-700);">
+                                @if(!empty($opportunite['titre']) && $opportunite['titre'] !== 'non disponible')
+                                    <div class="font-semibold text-base mb-2 text-green-800">{{ $opportunite['titre'] }}</div>
+                                @endif
+                                
+                                {{-- Description ou montant --}}
+                                @if(!empty($opportunite['description']) && $opportunite['description'] !== 'non disponible')
+                                    <div class="mb-3 text-gray-700">{{ $opportunite['description'] }}</div>
+                                @elseif(!empty($opportunite['montant']) && $opportunite['montant'] !== 'non disponible')
+                                    <div class="mb-3 text-gray-700">{{ $opportunite['montant'] }}</div>
+                                @endif
+                                
+                                <div class="flex flex-wrap gap-4 text-xs text-gray-600 mb-3">
+                                    @if(!empty($opportunite['institution']) && $opportunite['institution'] !== 'non disponible')
+                                        <div class="flex items-center gap-1">
+                                            <i data-lucide="building-2" class="w-3 h-3"></i>
+                                            <span>{{ $opportunite['institution'] }}</span>
+                                        </div>
+                                    @endif
+                                    
+                                    @if(!empty($opportunite['type']) && $opportunite['type'] !== 'non disponible')
+                                        <div class="flex items-center gap-1">
+                                            <i data-lucide="tag" class="w-3 h-3"></i>
+                                            <span>{{ $opportunite['type'] }}</span>
+                                        </div>
+                                    @endif
+                                    
+                                    @if(!empty($opportunite['deadline']) && $opportunite['deadline'] !== 'non disponible')
+                                        <div class="flex items-center gap-1">
+                                            <i data-lucide="calendar" class="w-3 h-3"></i>
+                                            <span>{{ $opportunite['deadline'] }}</span>
+                                        </div>
+                                    @endif
+                                </div>
+                                
+                                @if(!empty($opportunite['lien']) && $opportunite['lien'] !== 'non disponible')
+                                    @php
+                                        $lien = $opportunite['lien'];
+                                        // Ajouter https:// si pas de protocole
+                                        if (!str_starts_with($lien, 'http')) {
+                                            $lien = 'https://' . ltrim($lien, '/');
+                                        }
+                                    @endphp
+                                    <div class="mt-2">
+                                        <a href="{{ $lien }}" target="_blank" class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
+                                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                                            Voir détails
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @elseif($opportunite && $opportunite !== 'non disponible')
+                            <p class="text-sm p-3 rounded" style="background: var(--success-100); color: var(--success-700);">
+                                {{ $opportunite }}
+                            </p>
+                        @else
+                            <p class="text-sm p-3 rounded" style="background: var(--gray-50); color: var(--gray-600);">
+                                Aucune opportunité identifiée pour ce mois
+                            </p>
+                        @endif
                         
                         @if(isset($analytics->executive_summary['alerte_importante']))
                         <div class="mt-4">
@@ -288,7 +363,7 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                             <i data-lucide="zap" class="w-4 h-4 text-orange"></i>
-                            Forces Identifiées
+                            Forces identifiées
                         </h4>
                         <div class="space-y-3">
                             @foreach(($analytics->entrepreneur_profile['forces'] ?? []) as $force)
@@ -303,7 +378,7 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                             <i data-lucide="trending-up" class="w-4 h-4 text-blue-500"></i>
-                            Axes de Progression
+                            Axes de progression
                         </h4>
                         <div class="space-y-3">
                             @foreach(($analytics->entrepreneur_profile['axes_progression'] ?? []) as $axe)
@@ -343,7 +418,7 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                             <i data-lucide="bar-chart-3" class="w-4 h-4 text-green-500"></i>
-                            Indicateurs Clés
+                            Indicateurs clés
                         </h4>
                         <div class="space-y-3">
                             @if(isset($analytics->project_diagnostic['indicateurs_cles']))
@@ -365,7 +440,7 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                             <i data-lucide="arrow-right" class="w-4 h-4 text-orange"></i>
-                            Prochaines Étapes
+                            Prochaines étapes
                         </h4>
                         <div class="space-y-3">
                             @foreach(($analytics->project_diagnostic['prochaines_etapes'] ?? []) as $etape)
@@ -418,7 +493,14 @@ document.addEventListener('alpine:init', () => {
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-orange">{{ $opportunite['montant_ou_valeur'] ?? 'N/A' }}</span>
                             @if(isset($opportunite['lien']))
-                            <a href="{{ $opportunite['lien'] }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">Candidater</a>
+                                @php
+                                    $lien = $opportunite['lien'];
+                                    // Ajouter https:// si pas de protocole
+                                    if (!str_starts_with($lien, 'http')) {
+                                        $lien = 'https://' . ltrim($lien, '/');
+                                    }
+                                @endphp
+                                <a href="{{ $lien }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">Candidater</a>
                             @endif
                         </div>
                     </div>
@@ -449,7 +531,7 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                             <i data-lucide="dollar-sign" class="w-4 h-4 text-green-500"></i>
-                            Taille du Marché
+                            Taille du marché
                         </h4>
                         <div class="space-y-3">
                             <!-- Marché Local -->
@@ -481,7 +563,7 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                             <i data-lucide="map-pin" class="w-4 h-4 text-purple-500"></i>
-                            Zones d'Opportunités
+                            Zones d'opportunités
                         </h4>
                         <div class="space-y-3">
                             @foreach(($analytics->market_insights['zones_opportunites'] ?? []) as $zone)
@@ -534,7 +616,7 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <h4 class="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-gray-100">
                             <i data-lucide="calendar" class="w-4 h-4 text-blue-500"></i>
-                            À Prévoir
+                            À prévoir
                         </h4>
                         <div class="space-y-3">
                             @foreach(($analytics->regulations['a_prevoir'] ?? []) as $prevoir)
@@ -597,18 +679,19 @@ document.addEventListener('alpine:init', () => {
         <!-- État de génération avec shimmer amélioré -->
         <div class="card-body py-12" x-show="isGenerating" style="display: none;">
             <div class="text-center mb-8">
-                <div class="smooth-spin w-8 h-8 border-2 border-orange border-t-transparent rounded-full mx-auto mb-4"></div>
-                <h3 class="text-lg font-medium text-primary mb-2 shimmer-text">Diagnostic en cours de génération</h3>
-                <p class="text-muted shimmer-text">L'IA analyse vos données entrepreneuriales pour la première fois...</p>
+                <div class="smooth-spin w-8 h-8 border-2 rounded-full mx-auto mb-4" style="border-color: var(--orange-primary); border-top-color: transparent;"></div>
+                <h3 class="text-lg font-medium mb-2 shimmer-text" style="color: var(--gray-900);">Diagnostic en cours de génération</h3>
+                <p class="shimmer-text" style="color: var(--gray-600);">L'IA analyse vos données entrepreneuriales pour la première fois...</p>
                 
                 <!-- Progress indicator avec étapes dynamiques -->
                 <div class="mt-6 space-y-3">
                     <template x-for="(step, index) in progressSteps" :key="index">
-                        <div class="flex items-center justify-center gap-2 text-sm text-gray-600">
-                            <div class="w-2 h-2 rounded-full" 
-                                 :class="index <= progressStep ? 'bg-orange animate-pulse' : 'bg-gray-300'"></div>
+                        <div class="flex items-center justify-center gap-2 text-sm">
+                            <div class="w-2 h-2 rounded-full animate-pulse" 
+                                 :style="index <= progressStep ? 'background-color: var(--orange-primary)' : 'background-color: var(--gray-300)'"></div>
                             <span x-text="step" 
-                                  :class="index <= progressStep ? 'shimmer-text' : ''"></span>
+                                  :class="index <= progressStep ? 'shimmer-text' : ''"
+                                  :style="'color: var(--gray-' + (index <= progressStep ? '700' : '500') + ')'"></span>
                         </div>
                     </template>
                 </div>
@@ -791,6 +874,16 @@ document.addEventListener('alpine:init', () => {
     border: 1px solid var(--gray-200) !important;
 }
 
+/* Corrections spécifiques pour dark mode - cartes internes */
+.diagnostic-cards .bg-gray-50 {
+    background: var(--gray-50) !important;
+    border-color: var(--gray-200) !important;
+}
+
+.diagnostic-cards .border-gray-200 {
+    border-color: var(--gray-200) !important;
+}
+
 /* Messages et alertes - couleurs système */
 .diagnostic-cards div[style*="background: var(--orange-100)"] {
     background: var(--orange-100) !important;
@@ -807,7 +900,7 @@ document.addEventListener('alpine:init', () => {
     color: var(--orange) !important;
 }
 
-/* Message Principal - bordure subtile */
+/* Message principal - bordure subtile */
 .diagnostic-cards .message-principal {
     background: var(--orange-100);
     border: 1px solid rgba(255, 107, 53, 0.3);

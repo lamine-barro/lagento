@@ -1,9 +1,9 @@
-<?php $__env->startSection('seo_title', 'Assistant IA pour entrepreneurs en Côte d\'Ivoire - LAgentO'); ?>
-<?php $__env->startSection('meta_description', 'LAgentO est le premier assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business personnalisés, opportunités de financement, diagnostic d\'entreprise et accompagnement 24/7. Gratuit pour startups en Côte d\'Ivoire.'); ?>
+<?php $__env->startSection('seo_title', 'Assistant IA pour entrepreneurs en Côte d\'Ivoire - LagentO'); ?>
+<?php $__env->startSection('meta_description', 'LagentO est le premier assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business personnalisés, opportunités de financement, diagnostic d\'entreprise et accompagnement 24/7. Gratuit pour startups en Côte d\'Ivoire.'); ?>
 <?php $__env->startSection('meta_keywords', 'assistant IA entrepreneur, côte ivoire startup, conseiller business abidjan, assistant entrepreneur ivoirien, IA business africaine, lamine barro etudesk'); ?>
 <?php $__env->startSection('canonical_url', route('seo.assistant-ia')); ?>
 
-<?php $__env->startSection('og_title', 'Assistant IA Entrepreneur Côte d\'Ivoire - LAgentO'); ?>
+<?php $__env->startSection('og_title', 'Assistant IA Entrepreneur Côte d\'Ivoire - LagentO'); ?>
 <?php $__env->startSection('og_description', 'Premier assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, financement, diagnostic et accompagnement 24/7.'); ?>
 <?php $__env->startSection('og_type', 'website'); ?>
 
@@ -13,13 +13,13 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Assistant IA Entrepreneur Côte d'Ivoire",
-    "description": "LAgentO est le premier assistant IA spécialisé pour entrepreneurs ivoiriens",
+    "description": "LagentO est le premier assistant IA spécialisé pour entrepreneurs ivoiriens",
 
     "url": "<?php echo e(route('seo.assistant-ia')); ?>",
 
     "mainEntity": {
         "@type": "SoftwareApplication",
-        "name": "LAgentO",
+        "name": "LagentO",
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web",
         "offers": {
@@ -76,7 +76,7 @@
     <section class="py-20" style="background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-light) 100%);">
         <div class="container max-w-4xl mx-auto px-4 text-center text-white">
             <h1 class="text-4xl font-bold mb-6">
-                LAgentO - Assistant IA pour entrepreneurs ivoiriens
+                LagentO - Assistant IA pour entrepreneurs ivoiriens
             </h1>
             <p class="text-xl mb-8 opacity-90">
                 Un assistant intelligence artificielle conçu pour accompagner les entrepreneurs et startups en Côte d'Ivoire
@@ -97,7 +97,7 @@
         <div class="container max-w-6xl mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4" style="color: var(--gray-900);">
-                    Pourquoi choisir LAgentO en Côte d'Ivoire ?
+                    Pourquoi choisir LagentO en Côte d'Ivoire ?
                 </h2>
                 <p class="text-lg" style="color: var(--gray-700);">
                     Une expertise IA adaptée aux défis des entrepreneurs en Côte d'Ivoire
@@ -156,7 +156,7 @@
     <section class="py-16" style="background: var(--gray-100);">
         <div class="container max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold mb-12" style="color: var(--gray-900);">
-                LAgentO en chiffres
+                LagentO en chiffres
             </h2>
             <div class="grid md:grid-cols-4 gap-8">
                 <div>
@@ -186,7 +186,7 @@
                 Prêt à faire grandir votre entreprise ?
             </h2>
             <p class="text-lg mb-8" style="color: var(--gray-700);">
-                Rejoignez les milliers d'entrepreneurs ivoiriens qui font confiance à LAgentO
+                Rejoignez les milliers d'entrepreneurs ivoiriens qui font confiance à LagentO
             </p>
             <a href="<?php echo e(route('landing')); ?>" class="btn btn-primary btn-lg px-8 py-4 text-lg">
                 🚀 Démarrer maintenant - C'est gratuit !

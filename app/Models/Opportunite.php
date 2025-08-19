@@ -40,6 +40,8 @@ class Opportunite extends Model
         'email_contact',
         'telephone_contact',
         'lien_externe',
+        // Secteurs
+        'secteurs',
     ];
 
     protected $casts = [
@@ -51,6 +53,7 @@ class Opportunite extends Model
         'places' => 'integer',
         'criteres_eligibilite' => 'array',
         'documents_requis' => 'array',
+        'secteurs' => 'array',
     ];
 
     public function institution(): BelongsTo

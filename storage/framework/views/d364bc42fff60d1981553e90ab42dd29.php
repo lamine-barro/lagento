@@ -1,18 +1,18 @@
 <?php $__env->startSection('title', 'Chat Assistant IA'); ?>
-<?php $__env->startSection('page_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LAgentO'); ?>
-<?php $__env->startSection('seo_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LAgentO'); ?>
+<?php $__env->startSection('page_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LagentO'); ?>
+<?php $__env->startSection('seo_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | LagentO'); ?>
 <?php $__env->startSection('meta_description', 'Chattez avec votre assistant IA entrepreneurial 24/7. Conseils business personnalisés, opportunités de financement, stratégie d\'entreprise et accompagnement pour entrepreneurs ivoiriens.'); ?>
 <?php $__env->startSection('meta_keywords', 'chat assistant IA, conseil business 24/7, assistant entrepreneur, aide startup, conseil IA côte ivoire'); ?>
 <?php $__env->startSection('meta_robots', 'noindex, nofollow'); ?>
 <?php $__env->startSection('canonical_url', route('chat.index')); ?>
-<?php $__env->startSection('og_title', 'Chat Assistant IA Entrepreneurial - LAgentO'); ?>
+<?php $__env->startSection('og_title', 'Chat Assistant IA Entrepreneurial - LagentO'); ?>
 <?php $__env->startSection('og_description', 'Obtenez des conseils business instantanés avec votre assistant IA entrepreneurial personnalisé.'); ?>
 <?php $__env->startSection('schema_org'); ?>
 
 {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "Chat Assistant IA LAgentO",
+    "name": "Chat Assistant IA LagentO",
     "applicationCategory": "BusinessApplication",
     "description": "Assistant IA conversationnel pour entrepreneurs et startups",
     "operatingSystem": "Web Browser",
@@ -66,7 +66,7 @@
         
         <!-- Welcome Message -->
         <div x-show="messages.length === 0">
-            <p class="text-sm" style="color: var(--gray-700);">Je suis LAgentO, votre assistant IA entrepreneurial. Comment puis-je vous aider aujourd'hui ?</p>
+            <p class="text-sm" style="color: var(--gray-700);">Je suis LagentO, votre assistant IA entrepreneurial. Comment puis-je vous aider aujourd'hui ?</p>
         </div>
         
         <!-- Messages dynamiques -->
@@ -102,16 +102,12 @@
                 </div>
                 
                 <!-- Assistant Message -->
-                <div x-show="message.role === 'assistant'" class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background: var(--orange-lightest);">
-                        <i data-lucide="brain" class="w-4 h-4" style="color: var(--orange-primary);"></i>
-                    </div>
-                    
+                <div x-show="message.role === 'assistant'" class="flex items-start chat-message assistant">
                     <div class="flex-1">
                         <div class="prose prose-sm max-w-none" x-html="processMarkdown(message.content)"></div>
                         
                         <!-- Message Actions -->
-                        <div class="flex items-center gap-2 mt-3">
+                        <div class="flex items-center gap-2 mt-3 message-actions">
                             <button 
                                 @click="copyMessage(message.content, $event)"
                                 class="copy-button p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 relative"
@@ -130,12 +126,15 @@
         </template>
         
         <!-- Typing Indicator -->
-        <div x-show="isTyping" class="flex items-start gap-3" style="display: none;">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center">
-                <i data-lucide="brain" class="w-4 h-4 pulse-icon" style="color: var(--orange-primary);"></i>
-            </div>
-            <div class="flex items-center gap-2 py-2">
-                <span class="text-sm shimmer-text font-medium">LagentO réfléchit...</span>
+        <div x-show="isTyping" class="flex items-start" style="display: none;">
+            <div class="flex items-center gap-3 py-2">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-600 dark:text-orange-400 pulse-icon">
+                        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+                        <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+                    </svg>
+                </div>
+                <span class="text-sm shimmer-text font-medium" style="color: var(--gray-700);">LagentO réfléchit...</span>
             </div>
         </div>
     </div>
@@ -842,7 +841,9 @@ function chatInterface() {
                 .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold" style="color: var(--gray-900);">$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
                 
-                // Links (target blank + orange style)
+                // Links with explicit target="_blank" format
+                .replace(/\[([^\]]+)\]\(([^)]+)\)\{target="_blank"\}/g, '<a href="$2" target="_blank" class="text-orange-600 hover:text-orange-700 underline">$1</a>')
+                // Regular links (also with target blank by default)
                 .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-orange-600 hover:text-orange-700 underline">$1</a>');
             
             // Process lists with proper numbering and compact spacing

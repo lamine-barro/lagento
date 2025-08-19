@@ -6,7 +6,8 @@ use App\Models\User;
 use App\Models\Projet;
 use App\Observers\UserActivityObserver;
 use App\Services\UserAnalyticsService;
-use App\Services\MemoryManagerService;
+use App\Services\VoyageVectorService;
+use App\Services\VectorAccessService;
 use Illuminate\Support\ServiceProvider;
 
 class AnalyticsServiceProvider extends ServiceProvider
@@ -17,7 +18,10 @@ class AnalyticsServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(UserAnalyticsService::class, function ($app) {
-            return new UserAnalyticsService($app->make(MemoryManagerService::class));
+            return new UserAnalyticsService(
+                $app->make(VoyageVectorService::class),
+                $app->make(VectorAccessService::class)
+            );
         });
     }
 

@@ -1,10 +1,10 @@
-<?php $__env->startSection('seo_title', 'Réseau d\'entrepreneurs ivoiriens - LAgentO'); ?>
-<?php $__env->startSection('meta_description', 'Rejoignez le plus grand réseau d\'entrepreneurs ivoiriens avec LAgentO. Networking, partenariats, mentoring et collaborations business en Côte d\'Ivoire. Connectez-vous avec Lamine Barro et la communauté Ci20.'); ?>
+<?php $__env->startSection('seo_title', 'Réseau d\'entrepreneurs ivoiriens - LagentO'); ?>
+<?php $__env->startSection('meta_description', 'Rejoignez le plus grand réseau d\'entrepreneurs ivoiriens avec LagentO. Networking, partenariats, mentoring et collaborations business en Côte d\'Ivoire. Connectez-vous avec Lamine Barro et la communauté Ci20.'); ?>
 <?php $__env->startSection('meta_keywords', 'réseau entrepreneur ivoirien, networking business ci, communauté startup abidjan, partenariats entrepreneurs, mentoring business côte ivoire'); ?>
 <?php $__env->startSection('canonical_url', route('seo.reseau')); ?>
 
-<?php $__env->startSection('og_title', 'Réseau Entrepreneurs Ivoiriens - LAgentO Community'); ?>
-<?php $__env->startSection('og_description', 'Le plus grand réseau d\'entrepreneurs ivoiriens. Networking, partenariats et collaborations business avec LAgentO Community.'); ?>
+<?php $__env->startSection('og_title', 'Réseau Entrepreneurs Ivoiriens - LagentO Community'); ?>
+<?php $__env->startSection('og_description', 'Le plus grand réseau d\'entrepreneurs ivoiriens. Networking, partenariats et collaborations business avec LagentO Community.'); ?>
 <?php $__env->startSection('og_type', 'website'); ?>
 
 <?php $__env->startSection('schema_org'); ?>
@@ -13,13 +13,13 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Réseau Entrepreneurs Ivoiriens",
-    "description": "Communauté et réseau d'entrepreneurs ivoiriens avec LAgentO",
+    "description": "Communauté et réseau d'entrepreneurs ivoiriens avec LagentO",
 
     "url": "<?php echo e(route('seo.reseau')); ?>",
 
     "mainEntity": {
         "@type": "Organization",
-        "name": "LAgentO Community",
+        "name": "LagentO Community",
         "description": "Réseau d'entrepreneurs ivoiriens et africains",
         "founder": {
             "@type": "Person",
@@ -80,7 +80,7 @@
                     🚀 Rejoindre la Communauté
                 </a>
                 <a href="<?php echo e(route('seo.assistant-ia')); ?>" class="btn btn-lg px-8 py-4 text-lg" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">
-                    🤖 Découvrir LAgentO
+                    🤖 Découvrir LagentO
                 </a>
             </div>
         </div>
@@ -169,7 +169,7 @@
     <section class="py-16" style="background: var(--gray-100);">
         <div class="container max-w-6xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-12 text-center" style="color: var(--gray-900);">
-                Avantages du réseau LAgentO
+                Avantages du réseau LagentO
             </h2>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -344,7 +344,7 @@
                             <p class="text-sm" style="color: var(--gray-600);">CEO TechStart CI</p>
                         </div>
                     </div>
-                    <p style="color: var(--gray-700);">"Le réseau LAgentO a été déterminant pour lever 100M FCFA. L'accès aux investisseurs et le mentoring de Lamine ont fait la différence."</p>
+                    <p style="color: var(--gray-700);">"Le réseau LagentO a été déterminant pour lever 100M FCFA. L'accès aux investisseurs et le mentoring de Lamine ont fait la différence."</p>
                 </div>
                 
                 <div class="bg-white rounded-lg p-6 shadow-sm">
@@ -372,7 +372,7 @@
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="<?php echo e(route('landing')); ?>" class="btn btn-primary btn-lg px-8 py-4 text-lg">
-                    🤝 Rejoindre le Réseau LAgentO
+                    🤝 Rejoindre le Réseau LagentO
                 </a>
                 <a href="<?php echo e(route('seo.diagnostic')); ?>" class="btn btn-outline-primary btn-lg px-8 py-4 text-lg">
                     📊 Évaluer mon Profil
