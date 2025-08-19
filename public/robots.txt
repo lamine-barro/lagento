@@ -1,13 +1,13 @@
 # Robots.txt optimisé pour LagentO
-# Assistant IA Entrepreneurial Côte d'Ivoire
-# https://lagento.ci
+# Assistant IA développé par le Think Tank Horizon O
+# https://horizon-o.ci
 
 User-agent: *
 Allow: /
 
 # Sitemaps (XML et autres)
-Sitemap: https://lagento.ci/sitemap.xml
-Sitemap: https://lagento.ci/sitemap-news.xml
+Sitemap: https://horizon-o.ci/sitemap.xml
+Sitemap: https://horizon-o.ci/sitemap-news.xml
 
 # Disallow des zones privées et sensibles
 Disallow: /auth/
@@ -80,4 +80,4 @@ User-agent: DotBot
 Disallow: /
 
 # Informations de contact pour les webmasters
-# Contact: hello@lagento.ci
+# Contact: info@horizon-o.ci

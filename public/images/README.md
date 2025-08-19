@@ -1,4 +1,4 @@
-# Images LagentO
+# Images Horizon O
 
 ## Images SEO requises
 
@@ -6,7 +6,7 @@
 - **Fichier**: `lagento-social-preview.jpg`
 - **Dimensions**: 1200x630px
 - **Format**: JPEG
-- **Contenu suggéré**: Logo LagentO + texte "Assistant IA Entrepreneurial Côte d'Ivoire" sur fond moderne
+- **Contenu suggéré**: Logo Horizon O + texte "Assistant IA Entrepreneurial Côte d'Ivoire" sur fond moderne
 
 ### Favicons
 - Déjà présents: `favicon-light.png`, `favicon-dark.png`

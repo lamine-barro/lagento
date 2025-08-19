@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('seo_title', 'Annuaire des Projets Entrepreneuriaux - Côte d\'Ivoire | LagentO')
+@section('seo_title', 'Annuaire des Projets Entrepreneuriaux - Côte d\'Ivoire | Horizon O')
 @section('meta_description', 'Découvrez les projets innovants d\'entrepreneurs ivoiriens. Trouvez des partenaires, investisseurs et opportunités de collaboration dans l\'écosystème startup de Côte d\'Ivoire.')
 @section('meta_keywords', 'projets startup côte ivoire, entrepreneurs ivoiriens, annuaire entreprises ci, innovation abidjan, partenaires business afrique')
 @section('meta_robots', 'index, follow')

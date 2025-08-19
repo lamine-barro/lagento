@@ -1,12 +1,12 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'Réseau d\'entrepreneurs ivoiriens - LagentO')
-@section('meta_description', 'Rejoignez le plus grand réseau d\'entrepreneurs ivoiriens avec LagentO. Networking, partenariats, mentoring et collaborations business en Côte d\'Ivoire. Connectez-vous avec L'équipe LagentO Tech et la communauté Ci20.')
+@section('seo_title', 'Réseau d\'entrepreneurs ivoiriens - Horizon O')
+@section('meta_description', 'Rejoignez le plus grand réseau d\'entrepreneurs ivoiriens avec Horizon O. Networking, partenariats, mentoring et collaborations business en Côte d\'Ivoire. Connectez-vous avec L'équipe Horizon O et la communauté Ci20.')
 @section('meta_keywords', 'réseau entrepreneur ivoirien, networking business ci, communauté startup abidjan, partenariats entrepreneurs, mentoring business côte ivoire')
 @section('canonical_url', route('seo.reseau'))
 
-@section('og_title', 'Réseau Entrepreneurs Ivoiriens - LagentO Community')
-@section('og_description', 'Le plus grand réseau d\'entrepreneurs ivoiriens. Networking, partenariats et collaborations business avec LagentO Community.')
+@section('og_title', 'Réseau Entrepreneurs Ivoiriens - Horizon O Community')
+@section('og_description', 'Le plus grand réseau d\'entrepreneurs ivoiriens. Networking, partenariats et collaborations business avec Horizon O Community.')
 @section('og_type', 'website')
 
 @section('schema_org')
@@ -15,17 +15,17 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Réseau Entrepreneurs Ivoiriens",
-    "description": "Communauté et réseau d'entrepreneurs ivoiriens avec LagentO",
+    "description": "Communauté et réseau d'entrepreneurs ivoiriens avec Horizon O",
 @endverbatim
     "url": "{{ route('seo.reseau') }}",
 @verbatim
     "mainEntity": {
         "@type": "Organization",
-        "name": "LagentO Community",
+        "name": "Horizon O Community",
         "description": "Réseau d'entrepreneurs ivoiriens et africains",
         "founder": {
             "@type": "Person",
-            "name": "L'équipe LagentO Tech",
+            "name": "L'équipe Horizon O",
             "jobTitle": "Président Ci20"
         },
         "memberOf": {
@@ -75,14 +75,14 @@
                 🤝 Réseau d'entrepreneurs ivoiriens
             </h1>
             <p class="text-xl mb-8 opacity-90">
-                Rejoignez la communauté d'entrepreneurs ivoiriens avec L'équipe LagentO Tech et le réseau Ci20
+                Rejoignez la communauté d'entrepreneurs ivoiriens avec L'équipe Horizon O et le réseau Ci20
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: white; color: var(--indigo-600);">
                     🚀 Rejoindre la Communauté
                 </a>
                 <a href="{{ route('seo.assistant-ia') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">
-                    🤖 Découvrir LagentO
+                    🤖 Découvrir Horizon O
                 </a>
             </div>
         </div>
@@ -96,7 +96,7 @@
                     Réseau entrepreneurial en Côte d'Ivoire
                 </h2>
                 <p class="text-lg" style="color: var(--gray-700);">
-                    Animé par L'équipe LagentO Tech, Président du Collège Ci20 et Ambassadeur Innovation
+                    Animé par L'équipe Horizon O, Président du Collège Ci20 et Ambassadeur Innovation
                 </p>
             </div>
 
@@ -151,7 +151,7 @@
                 <div class="text-center">
                     <div class="bg-white rounded-lg shadow-lg p-8">
                         <div class="text-6xl mb-4">🌟</div>
-                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">L'équipe LagentO Tech</h4>
+                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">L'équipe Horizon O</h4>
                         <p class="text-sm mb-6" style="color: var(--gray-700);">
                             Président Ci20<br>
                             Ambassadeur Innovation CI<br>
@@ -171,7 +171,7 @@
     <section class="py-16" style="background: var(--gray-100);">
         <div class="container max-w-6xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-12 text-center" style="color: var(--gray-900);">
-                Avantages du réseau LagentO
+                Avantages du réseau Horizon O
             </h2>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -346,7 +346,7 @@
                             <p class="text-sm" style="color: var(--gray-600);">CEO TechStart CI</p>
                         </div>
                     </div>
-                    <p style="color: var(--gray-700);">"Le réseau LagentO a été déterminant pour lever 100M FCFA. L'accès aux investisseurs et le mentoring de l'équipe LagentO ont fait la différence."</p>
+                    <p style="color: var(--gray-700);">"Le réseau Horizon O a été déterminant pour lever 100M FCFA. L'accès aux investisseurs et le mentoring de l'équipe Horizon O ont fait la différence."</p>
                 </div>
                 
                 <div class="bg-white rounded-lg p-6 shadow-sm">
@@ -370,11 +370,11 @@
                 Prêt à rejoindre le réseau ?
             </h2>
             <p class="text-lg mb-8" style="color: var(--gray-700);">
-                Rejoignez L'équipe LagentO Tech et la communauté d'entrepreneurs de Côte d'Ivoire
+                Rejoignez L'équipe Horizon O et la communauté d'entrepreneurs de Côte d'Ivoire
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg">
-                    🤝 Rejoindre le Réseau LagentO
+                    🤝 Rejoindre le Réseau Horizon O
                 </a>
                 <a href="{{ route('seo.diagnostic') }}" class="btn btn-outline-primary btn-lg px-8 py-4 text-lg">
                     📊 Évaluer mon Profil

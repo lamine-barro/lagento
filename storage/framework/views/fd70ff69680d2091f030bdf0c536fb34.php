@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" prefix="og: https://ogp.me/ns#">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     
     <!-- SEO Meta Tags -->
-    <title>@yield('page_title')</title>
-    <meta name="description" content="@yield('meta_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement, diagnostic d\'entreprise et accompagnement personnalisé 24/7.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, diagnostic entreprise, conseil business, innovation afrique')">
+    <title><?php echo $__env->yieldContent('page_title'); ?></title>
+    <meta name="description" content="<?php echo $__env->yieldContent('meta_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement, diagnostic d\'entreprise et accompagnement personnalisé 24/7.'); ?>">
+    <meta name="keywords" content="<?php echo $__env->yieldContent('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, diagnostic entreprise, conseil business, innovation afrique'); ?>">
     <meta name="author" content="Horizon O - L'équipe Horizon O">
-    <meta name="robots" content="@yield('meta_robots', 'index, follow')">
-    <link rel="canonical" href="@yield('canonical_url', url()->current())">
+    <meta name="robots" content="<?php echo $__env->yieldContent('meta_robots', 'index, follow'); ?>">
+    <link rel="canonical" href="<?php echo $__env->yieldContent('canonical_url', url()->current()); ?>">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:site_name" content="LagentO">
-    <meta property="og:title" content="@yield('og_title', 'Horizon O - Assistant IA Entrepreneurial Côte d\'Ivoire')">
-    <meta property="og:description" content="@yield('og_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement et accompagnement personnalisé.')">
-    <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:url" content="@yield('og_url', url()->current())">
-    <meta property="og:image" content="@yield('og_image', asset('images/lagento-social-preview.jpg'))">
+    <meta property="og:title" content="<?php echo $__env->yieldContent('og_title', 'Horizon O - Assistant IA Entrepreneurial Côte d\'Ivoire'); ?>">
+    <meta property="og:description" content="<?php echo $__env->yieldContent('og_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement et accompagnement personnalisé.'); ?>">
+    <meta property="og:type" content="<?php echo $__env->yieldContent('og_type', 'website'); ?>">
+    <meta property="og:url" content="<?php echo $__env->yieldContent('og_url', url()->current()); ?>">
+    <meta property="og:image" content="<?php echo $__env->yieldContent('og_image', asset('images/lagento-social-preview.jpg')); ?>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:locale" content="fr_CI">
@@ -29,9 +29,9 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@Horizon O_CI">
     <meta name="twitter:creator" content="@LamBarro">
-    <meta name="twitter:title" content="@yield('twitter_title', 'Horizon O - Assistant IA Entrepreneurial')">
-    <meta name="twitter:description" content="@yield('twitter_description', 'Assistant IA pour entrepreneurs ivoiriens')">
-    <meta name="twitter:image" content="@yield('twitter_image', asset('images/lagento-social-preview.jpg'))">
+    <meta name="twitter:title" content="<?php echo $__env->yieldContent('twitter_title', 'Horizon O - Assistant IA Entrepreneurial'); ?>">
+    <meta name="twitter:description" content="<?php echo $__env->yieldContent('twitter_description', 'Assistant IA pour entrepreneurs ivoiriens'); ?>">
+    <meta name="twitter:image" content="<?php echo $__env->yieldContent('twitter_image', asset('images/lagento-social-preview.jpg')); ?>">
     
     <!-- Additional Meta Tags -->
     <meta name="theme-color" content="#ff6b35">
@@ -49,12 +49,12 @@
     <link rel="apple-touch-icon" href="/favicon-light.png">
     <link rel="manifest" href="/site.webmanifest">
     
-    @hasSection('schema_org')
+    <?php if (! empty(trim($__env->yieldContent('schema_org')))): ?>
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
-        @yield('schema_org')
+        <?php echo $__env->yieldContent('schema_org'); ?>
     </script>
-    @endif
+    <?php endif; ?>
     
     <!-- Theme Script (doit être avant les styles) -->
     <script>
@@ -73,23 +73,23 @@
     </script>
     
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('styles')
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body x-data="{}" style="background: var(--gray-50);">
     <div class="page">
         <!-- Header -->
-        @include('components.navbar')
+        <?php echo $__env->make('components.navbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <!-- Sidebar mobile supprimé -->
         
         <!-- Contenu principal -->
         <main class="main" style="padding-bottom: var(--chat-height);">
-            @yield('content')
+            <?php echo $__env->yieldContent('content'); ?>
         </main>
 
         <!-- Suggestions tooltip flottant (détaché du chat) -->
-        @auth
+        <?php if(auth()->guard()->check()): ?>
         <div x-data="suggestions()" 
                      x-show="showSuggestions" 
                      x-transition:enter="transition ease-out duration-200"
@@ -155,10 +155,10 @@
                         </div>
                     </div>
                 </div>
-        @endauth
+        <?php endif; ?>
         
         <!-- Chat fixe -->
-        @auth
+        <?php if(auth()->guard()->check()): ?>
         <div class="fixed bottom-0 left-0 right-0 z-sticky" 
              style="background: var(--white); border-top: 1px solid var(--gray-200);" x-data="fixedChat()">
             <div class="container max-w-4xl mx-auto p-4">
@@ -248,12 +248,12 @@
                 </form>
             </div>
         </div>
-        @endauth
+        <?php endif; ?>
     </div>
     
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 
-    @auth
+    <?php if(auth()->guard()->check()): ?>
     <script>
     function fixedChat() {
         return {
@@ -289,7 +289,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                         }
                     })
                     .then(response => response.json())
@@ -334,10 +334,10 @@
                     formData.append('file', file);
                 }
                 
-                fetch('{{ route("chat.save-user-message") }}', {
+                fetch('<?php echo e(route("chat.save-user-message")); ?>', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                     },
                     body: formData
                 })
@@ -345,7 +345,7 @@
                 .then(data => {
                     if (data.success) {
                         // Si on n'est pas sur la page chat ou si le composant chat n'existe pas, rediriger
-                        window.location.href = '{{ route("chat.index") }}?conversation=' + data.conversation_id;
+                        window.location.href = '<?php echo e(route("chat.index")); ?>?conversation=' + data.conversation_id;
                     }
                 })
                 .catch(error => {
@@ -441,7 +441,7 @@
                 this.isRefreshed = false;
                 
                 try {
-                    const response = await fetch('{{ route("chat.suggestions") }}?active_page=' + encodeURIComponent(window.location.pathname));
+                    const response = await fetch('<?php echo e(route("chat.suggestions")); ?>?active_page=' + encodeURIComponent(window.location.pathname));
                     const data = await response.json();
                     
                     if (data.success && Array.isArray(data.suggestions)) {
@@ -483,11 +483,11 @@
                 this.isRefreshed = false;
                 
                 try {
-                    const response = await fetch('{{ route("chat.suggestions.refresh") }}', {
+                    const response = await fetch('<?php echo e(route("chat.suggestions.refresh")); ?>', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                         },
                         body: JSON.stringify({
                             active_page: window.location.pathname
@@ -564,7 +564,7 @@
         
         // Activer les suggestions avant la redirection si on est déjà sur la page chat
         const currentPath = window.location.pathname;
-        if (currentPath === '{{ route("chat.index") }}' || currentPath.includes('/chat')) {
+        if (currentPath === '<?php echo e(route("chat.index")); ?>' || currentPath.includes('/chat')) {
             const suggestionsComponent = document.querySelector('[x-data*="suggestions"]');
             if (suggestionsComponent && suggestionsComponent._x_dataStack) {
                 const suggestionsData = suggestionsComponent._x_dataStack[0];
@@ -574,7 +574,7 @@
                 }
             }
         }
-        window.location.href = '{{ route("chat.index") }}';
+        window.location.href = '<?php echo e(route("chat.index")); ?>';
     }
     </script>
     
@@ -633,9 +633,29 @@
             </div>
         </div>
     </div>
-    @endauth
+    <?php endif; ?>
     
     <!-- Global Toast Notifications -->
-    <x-toast />
+    <?php if (isset($component)) { $__componentOriginal7cfab914afdd05940201ca0b2cbc009b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal7cfab914afdd05940201ca0b2cbc009b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.toast','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('toast'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal7cfab914afdd05940201ca0b2cbc009b)): ?>
+<?php $attributes = $__attributesOriginal7cfab914afdd05940201ca0b2cbc009b; ?>
+<?php unset($__attributesOriginal7cfab914afdd05940201ca0b2cbc009b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal7cfab914afdd05940201ca0b2cbc009b)): ?>
+<?php $component = $__componentOriginal7cfab914afdd05940201ca0b2cbc009b; ?>
+<?php unset($__componentOriginal7cfab914afdd05940201ca0b2cbc009b); ?>
+<?php endif; ?>
 </body>
 </html>
+<?php /**PATH /Users/laminebarro/agent-O/resources/views/layouts/app.blade.php ENDPATH**/ ?>

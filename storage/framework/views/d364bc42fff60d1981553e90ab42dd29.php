@@ -1,16 +1,14 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Chat Assistant IA'); ?>
+<?php $__env->startSection('page_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | Horizon O'); ?>
+<?php $__env->startSection('seo_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | Horizon O'); ?>
+<?php $__env->startSection('meta_description', 'Chattez avec votre assistant IA entrepreneurial 24/7. Conseils business personnalisés, opportunités de financement, stratégie d\'entreprise et accompagnement pour entrepreneurs ivoiriens.'); ?>
+<?php $__env->startSection('meta_keywords', 'chat assistant IA, conseil business 24/7, assistant entrepreneur, aide startup, conseil IA côte ivoire'); ?>
+<?php $__env->startSection('meta_robots', 'noindex, nofollow'); ?>
+<?php $__env->startSection('canonical_url', route('chat.index')); ?>
+<?php $__env->startSection('og_title', 'Chat Assistant IA Entrepreneurial - Horizon O'); ?>
+<?php $__env->startSection('og_description', 'Obtenez des conseils business instantanés avec votre assistant IA entrepreneurial personnalisé.'); ?>
+<?php $__env->startSection('schema_org'); ?>
 
-@section('title', 'Chat Assistant IA')
-@section('page_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | Horizon O')
-@section('seo_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | Horizon O')
-@section('meta_description', 'Chattez avec votre assistant IA entrepreneurial 24/7. Conseils business personnalisés, opportunités de financement, stratégie d\'entreprise et accompagnement pour entrepreneurs ivoiriens.')
-@section('meta_keywords', 'chat assistant IA, conseil business 24/7, assistant entrepreneur, aide startup, conseil IA côte ivoire')
-@section('meta_robots', 'noindex, nofollow')
-@section('canonical_url', route('chat.index'))
-@section('og_title', 'Chat Assistant IA Entrepreneurial - Horizon O')
-@section('og_description', 'Obtenez des conseils business instantanés avec votre assistant IA entrepreneurial personnalisé.')
-@section('schema_org')
-@verbatim
 {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -24,11 +22,11 @@
         "priceCurrency": "XOF"
     }
 }
-@endverbatim
-@endsection
 
-@section('content')
-<div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="{{ $conversation->id ?? '' }}">
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="<?php echo e($conversation->id ?? ''); ?>">
     <!-- Chat Header with Tabs -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
         <div class="max-w-4xl mx-auto">
@@ -142,23 +140,32 @@
     </div>
 
     <!-- Modal de confirmation de suppression -->
-    <x-modal.confirm 
-        show="showDeleteModal"
-        title="Supprimer la conversation"
-        confirm-text="Supprimer"
-        cancel-text="Annuler"
-        on-confirm="deleteConversation()"
-        on-cancel="showDeleteModal = false"
-        :danger="true"
-        loading="isDeleting"
-        loading-text="Suppression...">
+    <?php if (isset($component)) { $__componentOriginale9f572557820c4cd5a6bbfd15f332f84 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale9f572557820c4cd5a6bbfd15f332f84 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modal.confirm','data' => ['show' => 'showDeleteModal','title' => 'Supprimer la conversation','confirmText' => 'Supprimer','cancelText' => 'Annuler','onConfirm' => 'deleteConversation()','onCancel' => 'showDeleteModal = false','danger' => true,'loading' => 'isDeleting','loadingText' => 'Suppression...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('modal.confirm'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['show' => 'showDeleteModal','title' => 'Supprimer la conversation','confirm-text' => 'Supprimer','cancel-text' => 'Annuler','on-confirm' => 'deleteConversation()','on-cancel' => 'showDeleteModal = false','danger' => true,'loading' => 'isDeleting','loading-text' => 'Suppression...']); ?>
         Êtes-vous sûr de vouloir supprimer la conversation "<span x-text="conversationToDelete.title" style="font-weight: var(--font-weight-medium);"></span>" ? 
         Cette action est irréversible et supprimera tous les messages de cette conversation.
-    </x-modal.confirm>
+     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale9f572557820c4cd5a6bbfd15f332f84)): ?>
+<?php $attributes = $__attributesOriginale9f572557820c4cd5a6bbfd15f332f84; ?>
+<?php unset($__attributesOriginale9f572557820c4cd5a6bbfd15f332f84); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale9f572557820c4cd5a6bbfd15f332f84)): ?>
+<?php $component = $__componentOriginale9f572557820c4cd5a6bbfd15f332f84; ?>
+<?php unset($__componentOriginale9f572557820c4cd5a6bbfd15f332f84); ?>
+<?php endif; ?>
 
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <style>
 /* Hide scrollbar but keep functionality */
 .scrollbar-hidden {
@@ -364,9 +371,9 @@
 function chatInterface() {
     return {
         isTyping: false,
-        conversations: @json($conversations ?? []),
-        messages: @json($messages ?? []),
-        currentConversationId: '{{ $conversation->id ?? '' }}',
+        conversations: <?php echo json_encode($conversations ?? [], 15, 512) ?>,
+        messages: <?php echo json_encode($messages ?? [], 15, 512) ?>,
+        currentConversationId: '<?php echo e($conversation->id ?? ''); ?>',
         showDeleteModal: false,
         isDeleting: false,
         conversationToDelete: { id: null, title: '' },
@@ -947,5 +954,7 @@ function chatInterface() {
 
 // Icons are already initialized by app.js, no need to do it here
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/chat.blade.php ENDPATH**/ ?>

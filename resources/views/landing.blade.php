@@ -1,10 +1,10 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'LagentO - Assistant IA Entrepreneurial N°1 en Côte d\'Ivoire')
-@section('meta_description', 'Découvrez LagentO, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens. Conseils personnalisés, opportunités de financement, réseau d\'affaires et accompagnement 24/7 pour réussir votre entreprise en Côte d\'Ivoire.')
+@section('seo_title', 'Horizon O - Assistant IA Entrepreneurial N°1 en Côte d\'Ivoire')
+@section('meta_description', 'Découvrez Horizon O, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens. Conseils personnalisés, opportunités de financement, réseau d\'affaires et accompagnement 24/7 pour réussir votre entreprise en Côte d\'Ivoire.')
 @section('meta_keywords', 'assistant IA côte ivoire, entrepreneur abidjan, startup CI, financement pme, conseil business, innovation afrique, lamine barro, etudesk')
-@section('og_title', 'LagentO - Votre Assistant IA Entrepreneurial en Côte d\'Ivoire')
-@section('og_description', 'Rejoignez plus de 15M+ entrepreneurs qui font confiance à LagentO pour développer leur business en Afrique. Gratuit et disponible 24/7.')
+@section('og_title', 'Horizon O - Votre Assistant IA Entrepreneurial en Côte d\'Ivoire')
+@section('og_description', 'Rejoignez plus de 15M+ entrepreneurs qui font confiance à Horizon O pour développer leur business en Afrique. Gratuit et disponible 24/7.')
 @section('canonical_url', route('landing'))
 @section('title', 'Agent O - Assistant IA Entrepreneurial')
 
@@ -25,7 +25,7 @@
 {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "LagentO",
+    "name": "Horizon O",
     "alternateName": "Agent O",
     "description": "Premier assistant IA entrepreneurial pour la Côte d'Ivoire",
 @endverbatim
@@ -33,7 +33,7 @@
 @verbatim
     "sameAs": [
         "https://linkedin.com/company/lagento",
-        "https://twitter.com/LagentO_CI"
+        "https://twitter.com/Horizon O_CI"
     ],
     "offers": {
         "@type": "Offer",
@@ -75,7 +75,7 @@
             
             <!-- Subtitle -->
             <p class="text-lg mb-8 mt-4" style="color: var(--gray-700);">
-                LagentO a cartographié plus de 2000 milliards de Fcfa d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire a travers les initiatives gouvernementales et écosystèmes. Il est disposé 24h/7 pour vous accompagner à les saisir.
+                Horizon O a cartographié plus de 2000 milliards de Fcfa d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire a travers les initiatives gouvernementales et écosystèmes. Il est disposé 24h/7 pour vous accompagner à les saisir.
             </p>
 
             <!-- Email Form -->

@@ -13,10 +13,10 @@ class TestUserSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'test@lagento.ci'],
+            ['email' => 'test@horizon-o.ci'],
             [
                 'name' => 'Entrepreneur Test',
-                'email' => 'test@lagento.ci',
+                'email' => 'test@horizon-o.ci',
                 'email_verified_at' => now(),
                 'phone' => '+225 07 12 34 56 78',
                 'profile_type' => 'entrepreneur',
@@ -24,6 +24,6 @@ class TestUserSeeder extends Seeder
             ]
         );
 
-        $this->command->info('Test user created: test@lagento.ci (sans mot de passe - connexion par OTP uniquement)');
+        $this->command->info('Test user created: test@horizon-o.ci (sans mot de passe - connexion par OTP uniquement)');
     }
 }

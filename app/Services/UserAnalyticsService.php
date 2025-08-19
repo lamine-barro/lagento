@@ -1956,7 +1956,7 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             'recommendations' => [[
                 'type' => 'getting_started',
                 'priority' => 'high',
-                'title' => 'Bienvenue sur LagentO',
+                'title' => 'Bienvenue sur Horizon O',
                 'description' => 'Commencez par compléter votre profil entrepreneur.',
                 'action' => 'complete_profile'
             ]],

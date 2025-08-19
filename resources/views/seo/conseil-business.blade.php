@@ -1,12 +1,12 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'Conseil business et innovation en Côte d\'Ivoire - LagentO')
-@section('meta_description', 'Conseil business expert pour entrepreneurs africains avec LagentO. Stratégie d\'innovation, développement commercial, transformation digitale et croissance en Afrique. Expertise L'équipe LagentO Tech.')
+@section('seo_title', 'Conseil business et innovation en Côte d\'Ivoire - Horizon O')
+@section('meta_description', 'Conseil business expert pour entrepreneurs africains avec Horizon O. Stratégie d\'innovation, développement commercial, transformation digitale et croissance en Afrique. Expertise L'équipe Horizon O.')
 @section('meta_keywords', 'conseil business afrique, innovation entrepreneur, stratégie commerciale ci, consultant business abidjan, développement entreprise ivoirienne')
 @section('canonical_url', route('seo.conseil'))
 
-@section('og_title', 'Conseil Business Innovation Afrique - LagentO')
-@section('og_description', 'Conseil business expert et innovation pour entrepreneurs africains. Stratégie, croissance et transformation digitale avec LagentO.')
+@section('og_title', 'Conseil Business Innovation Afrique - Horizon O')
+@section('og_description', 'Conseil business expert et innovation pour entrepreneurs africains. Stratégie, croissance et transformation digitale avec Horizon O.')
 @section('og_type', 'website')
 
 @section('schema_org')
@@ -24,10 +24,10 @@
         "name": "Conseil Business Innovation",
         "provider": {
             "@type": "Organization",
-            "name": "LagentO",
+            "name": "Horizon O",
             "founder": {
                 "@type": "Person",
-                "name": "L'équipe LagentO Tech",
+                "name": "L'équipe Horizon O",
                 "jobTitle": "Expert Business & Innovation",
                 "description": "Expert Innovation & Tech, Ambassadeur Innovation Côte d'Ivoire"
             }
@@ -76,7 +76,7 @@
                 🚀 Conseil business et innovation en Côte d'Ivoire
             </h1>
             <p class="text-xl mb-8 opacity-90">
-                L'expertise de L'équipe LagentO Tech et LagentO pour développer votre entreprise en Côte d'Ivoire et en Afrique
+                L'expertise de L'équipe Horizon O et Horizon O pour développer votre entreprise en Côte d'Ivoire et en Afrique
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: white; color: var(--purple-600);">
@@ -94,7 +94,7 @@
         <div class="container max-w-6xl mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4" style="color: var(--gray-900);">
-                    L'expérience de L'équipe LagentO Tech au service des entrepreneurs
+                    L'expérience de L'équipe Horizon O au service des entrepreneurs
                 </h2>
                 <p class="text-lg" style="color: var(--gray-700);">
                     Expert Business & Tech, Ambassadeur Innovation CI, 15M+ entrepreneurs accompagnés en Afrique
@@ -136,7 +136,7 @@
                 <div class="text-center">
                     <div class="bg-white rounded-lg shadow-lg p-8">
                         <div class="text-6xl mb-4">👨‍💼</div>
-                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">L'équipe LagentO Tech</h4>
+                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">L'équipe Horizon O</h4>
                         <p class="text-sm mb-4" style="color: var(--gray-700);">
                             Entrepreneur Tech, Expert Innovation<br>
                             Ambassadeur Innovation Côte d'Ivoire
@@ -234,7 +234,7 @@
     <section class="py-20">
         <div class="container max-w-4xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-12 text-center" style="color: var(--gray-900);">
-                Méthodologie d'Accompagnement LagentO
+                Méthodologie d'Accompagnement Horizon O
             </h2>
             
             <div class="grid md:grid-cols-5 gap-6">
@@ -315,7 +315,7 @@
                 Prêt à transformer votre entreprise ?
             </h2>
             <p class="text-lg mb-8" style="color: var(--gray-700);">
-                Bénéficiez de l'expertise de L'équipe LagentO Tech et de l'intelligence artificielle LagentO pour accélérer votre croissance
+                Bénéficiez de l'expertise de L'équipe Horizon O et de l'intelligence artificielle Horizon O pour accélérer votre croissance
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg">

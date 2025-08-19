@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'Diagnostic Entreprise')
-@section('page_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | LagentO')
-@section('seo_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | LagentO')
+@section('page_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Horizon O')
+@section('seo_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Horizon O')
 @section('meta_description', 'Obtenez un diagnostic complet et gratuit de votre entreprise avec l\'intelligence artificielle. Analyse des forces, faiblesses, opportunités de financement et conseils personnalisés pour entrepreneurs ivoiriens.')
 @section('meta_keywords', 'diagnostic entreprise gratuit, analyse startup, conseil business CI, diagnostic IA, évaluation entreprise côte ivoire, audit business abidjan')
 @section('canonical_url', route('diagnostic'))
-@section('og_title', 'Diagnostic Entreprise IA Gratuit - LagentO Côte d\'Ivoire')
+@section('og_title', 'Diagnostic Entreprise IA Gratuit - Horizon O Côte d\'Ivoire')
 @section('og_description', 'Diagnostic IA complet de votre entreprise : forces, faiblesses, opportunités de financement et plan d\'action personnalisé. Gratuit pour entrepreneurs ivoiriens.')
 @section('schema_org')
 @verbatim
@@ -17,7 +17,7 @@
     "description": "Service de diagnostic d'entreprise par intelligence artificielle pour entrepreneurs ivoiriens",
     "provider": {
         "@type": "Organization",
-        "name": "LagentO",
+        "name": "Horizon O",
         "url": "@endverbatim{{ url('/') }}@verbatim"
     },
     "areaServed": {

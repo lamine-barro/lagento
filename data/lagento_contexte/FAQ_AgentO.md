@@ -205,7 +205,7 @@ Oui, AgentO maintient sa base à jour via :
 - **Partenariats institutionnels** pour informations de première main
 - **Web search temps réel** via Responses API
 - **Feedback communauté** pour signaler changements
-- **Validation experte** par l'équipe LagentO
+- **Validation experte** par l'équipe Horizon O
 
 ---
 
@@ -351,12 +351,12 @@ La fiabilité du diagnostic repose sur :
 
 **🤖 IA de Pointe**
 - Modèles OpenAI GPT-4/5 fine-tunés
-- Algorithmes propriétaires LagentO
+- Algorithmes propriétaires Horizon O
 - Machine learning sur patterns de réussite
 - Validation croisée avec experts métier
 
 **🎯 Expertise Terrain**
-- 10+ ans d'expérience LagentO Tech
+- 10+ ans d'expérience Horizon O
 - Connaissance écosystème ivoirien
 - Partenariats institutionnels actifs
 - Mise à jour continue via feedback utilisateurs
@@ -443,7 +443,7 @@ Comme toute IA, AgentO peut occasionnellement commettre des erreurs. C'est pourq
 - **Invitation validation experte** pour décisions importantes
 
 **📞 Support Expert**
-- **Équipe LagentO** disponible pour questions complexes
+- **Équipe Horizon O** disponible pour questions complexes
 - **Partenaires institutionnels** pour validation officielle
 - **Communauté entrepreneurs** pour retours d'expérience
 - **Mises à jour continues** basées sur feedback
@@ -589,7 +589,7 @@ La roadmap premium d'AgentO prévoit :
 - **Intégrations API** : connexions avec outils métier
 - **White-label** : interface aux couleurs de votre organisation
 - **Formation équipe** : sessions personnalisées
-- **Consultant dédié** : expert LagentO assigné
+- **Consultant dédié** : expert Horizon O assigné
 - **SLA garanti** : 99.9% uptime et support 24/7
 - **Custom development** : fonctionnalités sur mesure
 
@@ -849,14 +849,14 @@ Plusieurs canaux sont disponibles selon vos besoins :
 **📧 Contact Direct**
 - **Support général** : [support@agento.ci]
 - **Questions business** : [hello@agento.ci]  
-- **Partenariats** : [hello@lagento.ci]
-- **Presse et médias** : [hello@lagento.ci]
+- **Partenariats** : [info@horizon-o.ci]
+- **Presse et médias** : [info@horizon-o.ci]
 
 **🏢 Contact Professionnel**
-- **Équipe LagentO Tech** : [hello@lagento.ci]
-- **LinkedIn** : [www.lagento.ci]
-- **Téléphone** : +225 05 74 63 11 48
-- **Adresse** : Abidjan, Côte d'Ivoire
+- **Équipe Horizon O** : [info@horizon-o.ci]
+- **LinkedIn** : [www.horizon-o.ci]
+- **Téléphone** : 01 72 939 595 / 07 47 94 42 22
+- **Adresse** : CHU d'Angré, Abidjan, Côte d'Ivoire
 
 ### **Quel est le délai de réponse du support ?**
 
@@ -881,7 +881,7 @@ Les délais varient selon le canal et la criticité :
 
 ### **AgentO propose-t-il de la formation ?**
 
-Oui, AgentO s'intègre dans l'écosystème formation d'LagentO :
+Oui, AgentO s'intègre dans l'écosystème formation d'Horizon O :
 
 **📚 Formation Intégrée**
 - **Onboarding guidé** : 4 étapes avec explications détaillées
@@ -889,7 +889,7 @@ Oui, AgentO s'intègre dans l'écosystème formation d'LagentO :
 - **Tutoriels vidéo** : capsules courtes pour chaque fonctionnalité
 - **Best practices** : recommandations usage optimal
 
-**🎓 Formations Avancées (LagentO)**
+**🎓 Formations Avancées (Horizon O)**
 - **Entrepreneuriat digital** : programmes certifiants 3-6 mois
 - **Création d'entreprise** : accompagnement complet formalisation
 - **Levée de fonds** : préparation dossiers et pitch investors
@@ -956,7 +956,7 @@ AgentO est unique car il combine :
 **🇨🇮 Expertise Locale Inégalée**
 - **100% focus Côte d'Ivoire** : connaissance approfondie écosystème
 - **Base légale exhaustive** : 25 documents OHADA + réglementations nationales
-- **Données terrain** : 10+ ans expérience LagentO avec 500+ organisations
+- **Données terrain** : 10+ ans expérience Horizon O avec 500+ organisations
 - **Réseau institutionnel** : partenariats directs avec acteurs clés
 
 **🤖 IA de Pointe Adaptée**

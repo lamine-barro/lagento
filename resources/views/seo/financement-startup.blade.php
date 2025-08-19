@@ -1,12 +1,12 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'Financement pour startups et PME à Abidjan - LagentO')
-@section('meta_description', 'Trouvez le financement parfait pour votre startup en Côte d\'Ivoire avec LagentO. Subventions, prêts, investisseurs, concours - toutes les opportunités de financement à Abidjan et en Afrique.')
+@section('seo_title', 'Financement pour startups et PME à Abidjan - Horizon O')
+@section('meta_description', 'Trouvez le financement parfait pour votre startup en Côte d\'Ivoire avec Horizon O. Subventions, prêts, investisseurs, concours - toutes les opportunités de financement à Abidjan et en Afrique.')
 @section('meta_keywords', 'financement startup abidjan, pme côte ivoire, investisseur ivoirien, subvention entreprise ci, prêt startup, concours entrepreneur, levée fonds afrique')
 @section('canonical_url', route('seo.financement'))
 
-@section('og_title', 'Financement Startup PME Abidjan - LagentO')
-@section('og_description', 'Toutes les solutions de financement pour startups et PME en Côte d\'Ivoire. LagentO vous guide vers les bonnes opportunités.')
+@section('og_title', 'Financement Startup PME Abidjan - Horizon O')
+@section('og_description', 'Toutes les solutions de financement pour startups et PME en Côte d\'Ivoire. Horizon O vous guide vers les bonnes opportunités.')
 @section('og_type', 'website')
 
 @section('schema_org')
@@ -15,7 +15,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Financement Startup PME Abidjan",
-    "description": "Solutions de financement pour startups et PME en Côte d'Ivoire avec LagentO",
+    "description": "Solutions de financement pour startups et PME en Côte d'Ivoire avec Horizon O",
 @endverbatim
     "url": "{{ route('seo.financement') }}",
 @verbatim
@@ -24,10 +24,10 @@
         "name": "Solutions de Financement Startup",
         "provider": {
             "@type": "Organization",
-            "name": "LagentO",
+            "name": "Horizon O",
             "founder": {
                 "@type": "Person",
-                "name": "L'équipe LagentO Tech"
+                "name": "L'équipe Horizon O"
             }
         },
         "serviceType": "Business Financing",
@@ -83,7 +83,7 @@
                 💰 Financement pour startups et PME en Côte d'Ivoire
             </h1>
             <p class="text-xl mb-8 opacity-90">
-                LagentO vous aide à trouver les bonnes opportunités de financement pour développer votre entreprise en Côte d'Ivoire
+                Horizon O vous aide à trouver les bonnes opportunités de financement pour développer votre entreprise en Côte d'Ivoire
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: white; color: var(--green-600);">
@@ -190,7 +190,7 @@
     <section class="py-16" style="background: var(--gray-100);">
         <div class="container max-w-4xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-12 text-center" style="color: var(--gray-900);">
-                Comment LagentO vous aide à obtenir votre financement
+                Comment Horizon O vous aide à obtenir votre financement
             </h2>
             
             <div class="grid md:grid-cols-4 gap-6">
@@ -225,7 +225,7 @@
                 Besoin d'aide pour votre financement ?
             </h2>
             <p class="text-lg mb-8" style="color: var(--gray-700);">
-                Laissez LagentO vous accompagner dans votre recherche de financement en Côte d'Ivoire
+                Laissez Horizon O vous accompagner dans votre recherche de financement en Côte d'Ivoire
             </p>
             <a href="{{ route('landing') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg">
                 💰 Commencer ma recherche de financement

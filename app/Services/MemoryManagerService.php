@@ -405,12 +405,12 @@ class MemoryManagerService
     }
 
     /**
-     * Index LagentO presentation
+     * Index Horizon O presentation
      */
     private function indexPresentation(): void
     {
         $content = "
-        LagentO - Assistant IA Entrepreneurial pour la Côte d'Ivoire
+        Horizon O - Assistant IA Entrepreneurial pour la Côte d'Ivoire
         
         Mission: Accompagner les entrepreneurs ivoiriens dans leur parcours de création et développement d'entreprise.
         
@@ -431,10 +431,10 @@ class MemoryManagerService
         - Analyse réglementaire OHADA
         - Matching avec institutions et partenaires
         
-        Horizon-O: Extension de LagentO pour l'accompagnement à l'international et la croissance des entreprises.
+        Horizon-O: Extension de Horizon O pour l'accompagnement à l'international et la croissance des entreprises.
         ";
 
-        $context = "Présentation LagentO/Horizon-O - Assistant IA entrepreneurial";
+        $context = "Présentation Horizon O/Horizon-O - Assistant IA entrepreneurial";
         $chunks = $this->vectorService->intelligentChunk($content, $context, 400);
         $embeddings = $this->vectorService->embedWithContext($chunks, $context);
 
@@ -452,14 +452,14 @@ class MemoryManagerService
                     $embeddings[$index]['embedding'],
                     [
                         'type' => 'presentation',
-                        'produit' => 'LagentO',
+                        'produit' => 'Horizon O',
                         'source' => 'internal'
                     ]
                 );
             }
         }
 
-        Log::info("Indexed LagentO presentation", ['chunks' => count($chunks)]);
+        Log::info("Indexed Horizon O presentation", ['chunks' => count($chunks)]);
     }
 
     /**
@@ -475,7 +475,7 @@ class MemoryManagerService
         }
 
         $content = file_get_contents($filePath);
-        $context = "FAQ LagentO - Questions fréquentes";
+        $context = "FAQ Horizon O - Questions fréquentes";
         
         $chunks = $this->vectorService->intelligentChunk($content, $context, 400);
         $embeddings = $this->vectorService->embedWithContext($chunks, $context);
@@ -494,7 +494,7 @@ class MemoryManagerService
                     $embeddings[$index]['embedding'],
                     [
                         'type' => 'documentation',
-                        'produit' => 'LagentO',
+                        'produit' => 'Horizon O',
                         'source' => 'markdown'
                     ]
                 );

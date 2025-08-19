@@ -30,7 +30,7 @@ class OtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Code de vérification LagentO',
+            subject: 'Code de vérification Horizon O',
         );
     }
 

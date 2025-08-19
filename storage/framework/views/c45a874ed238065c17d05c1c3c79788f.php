@@ -1,4 +1,4 @@
-@php
+<?php
     $size = $size ?? 'md';
     $classes = $class ?? '';
     
@@ -11,19 +11,19 @@
     ];
     
     $logoClass = $sizeClasses[$size] ?? $sizeClasses['md'];
-@endphp
+?>
 
-<div class="flex items-center justify-center {{ $classes }}">
+<div class="flex items-center justify-center <?php echo e($classes); ?>">
     <!-- Logo light (visible en mode light) -->
     <img src="/logo-light.png" 
          alt="Horizon O" 
-         class="{{ $logoClass }} dark:hidden"
+         class="<?php echo e($logoClass); ?> dark:hidden"
          style="display: var(--logo-light-display, block);">
     
     <!-- Logo dark (visible en mode dark) -->
     <img src="/logo-dark.png" 
          alt="Horizon O" 
-         class="{{ $logoClass }} hidden dark:block"
+         class="<?php echo e($logoClass); ?> hidden dark:block"
          style="display: var(--logo-dark-display, none);">
 </div>
 
@@ -37,4 +37,4 @@
     --logo-light-display: block;
     --logo-dark-display: none;
 }
-</style>
+</style><?php /**PATH /Users/laminebarro/agent-O/resources/views/components/logo.blade.php ENDPATH**/ ?>
