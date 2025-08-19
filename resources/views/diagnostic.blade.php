@@ -264,19 +264,20 @@ document.addEventListener('alpine:init', () => {
                         @endphp
                         
                         @if(is_array($opportunite))
-                            <div class="text-sm p-4 rounded-lg border-l-4 border-green-500" style="background: var(--success-100); color: var(--success-700);">
+                            <div class="text-sm p-3 rounded" style="background: var(--success-100); color: var(--success-700);">
                                 @if(!empty($opportunite['titre']) && $opportunite['titre'] !== 'non disponible')
-                                    <div class="font-semibold text-base mb-2 text-green-800">{{ $opportunite['titre'] }}</div>
+                                    <div class="font-medium mb-2" style="color: var(--gray-900);">{{ $opportunite['titre'] }}</div>
                                 @endif
                                 
                                 {{-- Description ou montant --}}
                                 @if(!empty($opportunite['description']) && $opportunite['description'] !== 'non disponible')
-                                    <div class="mb-3 text-gray-700">{{ $opportunite['description'] }}</div>
+                                    <div class="mb-3">{{ $opportunite['description'] }}</div>
                                 @elseif(!empty($opportunite['montant']) && $opportunite['montant'] !== 'non disponible')
-                                    <div class="mb-3 text-gray-700">{{ $opportunite['montant'] }}</div>
+                                    <div class="mb-3">{{ $opportunite['montant'] }}</div>
                                 @endif
                                 
-                                <div class="flex flex-wrap gap-4 text-xs text-gray-600 mb-3">
+                                {{-- Métadonnées --}}
+                                <div class="flex flex-wrap gap-4 text-xs mb-3" style="color: var(--gray-600);">
                                     @if(!empty($opportunite['institution']) && $opportunite['institution'] !== 'non disponible')
                                         <div class="flex items-center gap-1">
                                             <i data-lucide="building-2" class="w-3 h-3"></i>
@@ -299,6 +300,7 @@ document.addEventListener('alpine:init', () => {
                                     @endif
                                 </div>
                                 
+                                {{-- Lien --}}
                                 @if(!empty($opportunite['lien']) && $opportunite['lien'] !== 'non disponible')
                                     @php
                                         $lien = $opportunite['lien'];
@@ -308,9 +310,8 @@ document.addEventListener('alpine:init', () => {
                                         }
                                     @endphp
                                     <div class="mt-2">
-                                        <a href="{{ $lien }}" target="_blank" class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
-                                            <i data-lucide="external-link" class="w-3 h-3"></i>
-                                            Voir détails
+                                        <a href="{{ $lien }}" target="_blank" class="text-orange hover:underline text-xs font-medium">
+                                            Voir détails →
                                         </a>
                                     </div>
                                 @endif

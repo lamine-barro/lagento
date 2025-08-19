@@ -254,19 +254,20 @@ document.addEventListener('alpine:init', () => {
                         ?>
                         
                         <?php if(is_array($opportunite)): ?>
-                            <div class="text-sm p-4 rounded-lg border-l-4 border-green-500" style="background: var(--success-100); color: var(--success-700);">
+                            <div class="text-sm p-3 rounded" style="background: var(--success-100); color: var(--success-700);">
                                 <?php if(!empty($opportunite['titre']) && $opportunite['titre'] !== 'non disponible'): ?>
-                                    <div class="font-semibold text-base mb-2 text-green-800"><?php echo e($opportunite['titre']); ?></div>
+                                    <div class="font-medium mb-2" style="color: var(--gray-900);"><?php echo e($opportunite['titre']); ?></div>
                                 <?php endif; ?>
                                 
                                 
                                 <?php if(!empty($opportunite['description']) && $opportunite['description'] !== 'non disponible'): ?>
-                                    <div class="mb-3 text-gray-700"><?php echo e($opportunite['description']); ?></div>
+                                    <div class="mb-3"><?php echo e($opportunite['description']); ?></div>
                                 <?php elseif(!empty($opportunite['montant']) && $opportunite['montant'] !== 'non disponible'): ?>
-                                    <div class="mb-3 text-gray-700"><?php echo e($opportunite['montant']); ?></div>
+                                    <div class="mb-3"><?php echo e($opportunite['montant']); ?></div>
                                 <?php endif; ?>
                                 
-                                <div class="flex flex-wrap gap-4 text-xs text-gray-600 mb-3">
+                                
+                                <div class="flex flex-wrap gap-4 text-xs mb-3" style="color: var(--gray-600);">
                                     <?php if(!empty($opportunite['institution']) && $opportunite['institution'] !== 'non disponible'): ?>
                                         <div class="flex items-center gap-1">
                                             <i data-lucide="building-2" class="w-3 h-3"></i>
@@ -289,6 +290,7 @@ document.addEventListener('alpine:init', () => {
                                     <?php endif; ?>
                                 </div>
                                 
+                                
                                 <?php if(!empty($opportunite['lien']) && $opportunite['lien'] !== 'non disponible'): ?>
                                     <?php
                                         $lien = $opportunite['lien'];
@@ -298,9 +300,8 @@ document.addEventListener('alpine:init', () => {
                                         }
                                     ?>
                                     <div class="mt-2">
-                                        <a href="<?php echo e($lien); ?>" target="_blank" class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
-                                            <i data-lucide="external-link" class="w-3 h-3"></i>
-                                            Voir détails
+                                        <a href="<?php echo e($lien); ?>" target="_blank" class="text-orange hover:underline text-xs font-medium">
+                                            Voir détails →
                                         </a>
                                     </div>
                                 <?php endif; ?>
