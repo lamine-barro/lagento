@@ -20,18 +20,19 @@ return new class extends Migration
             // Pas de mot de passe (OTP only)
             // Profile extended fields
             $table->string('phone')->nullable();
-            $table->string('profile_type')->nullable();
             $table->string('verification_status')->default('unverified');
-            // Onboarding snapshot fields (legacy; main data lives in projects)
-            $table->string('company_name')->nullable();
-            $table->string('business_sector')->nullable();
-            $table->string('business_stage')->nullable();
-            $table->string('team_size')->nullable();
-            $table->string('monthly_revenue')->nullable();
+            // Onboarding snapshot fields (main data lives in projects)
             $table->json('main_challenges')->nullable();
             $table->json('objectives')->nullable();
             $table->json('preferred_support')->nullable();
             $table->boolean('onboarding_completed')->default(false);
+            // Profile settings
+            $table->boolean('is_public')->default(true);
+            $table->boolean('email_notifications')->default(true);
+            // Diagnostic usage tracking
+            $table->integer('diagnostics_used_this_month')->default(0);
+            $table->date('diagnostics_month_reset')->nullable();
+            $table->timestamp('last_diagnostic_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

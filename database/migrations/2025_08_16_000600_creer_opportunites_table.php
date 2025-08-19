@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -16,6 +17,7 @@ return new class extends Migration
             $table->string('statut')->nullable();
             $table->string('titre');
             $table->string('type')->nullable();
+            $table->json('secteurs')->nullable();
             $table->longText('description')->nullable();
             $table->string('illustration_url')->nullable();
             // Localisation
@@ -43,7 +45,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('opportunities');
+        Schema::dropIfExists('opportunites');
     }
 };
 

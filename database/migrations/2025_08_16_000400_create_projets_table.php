@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -45,6 +46,10 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('site_web')->nullable();
             $table->json('reseaux_sociaux')->nullable();
+            
+            // Représentant
+            $table->string('nom_representant')->nullable();
+            $table->string('role_representant')->nullable();
 
             // Équipe
             $table->integer('nombre_fondateurs')->nullable();

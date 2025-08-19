@@ -28,8 +28,8 @@ return new class extends Migration
             $table->index('created_at');
         });
         
-        // Add vector column after table creation
-        DB::statement('ALTER TABLE vector_memories ADD COLUMN embedding vector(1024)');
+        // Add vector column after table creation (voyage-large-2 uses 1536 dimensions)
+        DB::statement('ALTER TABLE vector_memories ADD COLUMN embedding vector(1536)');
         
         // Create HNSW index optimized for Voyage embeddings (cosine similarity)
         DB::statement('CREATE INDEX ON vector_memories USING hnsw (embedding vector_cosine_ops)');
