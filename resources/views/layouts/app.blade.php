@@ -233,10 +233,10 @@
                             <!-- Send button -->
                             <button 
                                 type="submit"
-                                :disabled="!message.trim() || isLoading"
+                                :disabled="(!message.trim() && !attachedFile) || isLoading"
                                 class="p-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
-                                :class="!message.trim() || isLoading ? 'cursor-not-allowed' : ''"
-                                :style="!message.trim() || isLoading ? 'background: var(--gray-300); color: var(--gray-500);' : 'background: var(--orange-primary); color: white;'"
+                                :class="((!message.trim() && !attachedFile) || isLoading) ? 'cursor-not-allowed' : ''"
+                                :style="((!message.trim() && !attachedFile) || isLoading) ? 'background: var(--gray-300); color: var(--gray-500);' : 'background: var(--orange-primary); color: white;'"
                                 onmouseover="if (!this.disabled) this.style.background='var(--orange-dark)'"
                                 onmouseout="if (!this.disabled) this.style.background='var(--orange-primary)'"
                             >
@@ -262,7 +262,15 @@
             attachedFile: null,
             
             sendMessage() {
-                if (!this.message.trim() || this.isLoading) return;
+                // Validation: message requis si pas de fichier, fichier requis un message
+                if (this.isLoading) return;
+                if (this.attachedFile && !this.message.trim()) {
+                    if (typeof window.showWarningToast === 'function') {
+                        window.showWarningToast('Veuillez ajouter un message avec votre fichier');
+                    }
+                    return;
+                }
+                if (!this.message.trim() && !this.attachedFile) return;
                 
                 const userMessage = this.message;
                 const file = this.attachedFile;
