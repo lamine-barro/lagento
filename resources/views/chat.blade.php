@@ -68,7 +68,7 @@
         
         <!-- Welcome Message -->
         <div x-show="messages.length === 0">
-            <p class="text-sm" style="color: var(--gray-700);">Je suis Horizon O, votre assistant IA entrepreneurial. Comment puis-je vous aider aujourd'hui ?</p>
+            <p class="text-sm" style="color: var(--gray-700);">Je suis LagentO, votre assistant IA entrepreneurial. Comment puis-je vous aider aujourd'hui ?</p>
         </div>
         
         <!-- Messages dynamiques -->
@@ -136,7 +136,7 @@
                         <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
                     </svg>
                 </div>
-                <span class="text-sm shimmer-text font-medium" style="color: var(--gray-700);">Horizon O réfléchit...</span>
+                <span class="text-sm shimmer-text font-medium" style="color: var(--gray-700);">LagentO réfléchit...</span>
             </div>
         </div>
     </div>

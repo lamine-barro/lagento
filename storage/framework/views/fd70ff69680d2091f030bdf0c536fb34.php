@@ -184,7 +184,7 @@
                         <textarea 
                             x-model="message"
                             @keydown.enter.prevent="if (!$event.shiftKey) sendMessage()"
-                            placeholder="Posez votre question à Horizon O..."
+                            placeholder="Posez votre question à LagentO..."
                             rows="1"
                             class="w-full min-h-[52px] max-h-[100px] bg-transparent rounded-2xl p-4 pt-6 pb-12 resize-none overflow-y-auto"
                             style="color: var(--gray-900); outline: none; border: none; font-size: 16px !important;"
@@ -623,7 +623,7 @@
                 
                 <p class="text-sm mb-6" style="color: var(--gray-600);">
                     Le mode vocal sera bientôt disponible !<br>
-                    Vous pourrez discuter avec Horizon O en utilisant votre voix.
+                    Vous pourrez discuter avec LagentO en utilisant votre voix.
                 </p>
                 
                 <button @click="showVoiceModal = false" 
