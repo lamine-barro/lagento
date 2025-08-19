@@ -9,7 +9,7 @@
     <title>@yield('page_title')</title>
     <meta name="description" content="@yield('meta_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement, diagnostic d\'entreprise et accompagnement personnalisé 24/7.')">
     <meta name="keywords" content="@yield('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, diagnostic entreprise, conseil business, innovation afrique')">
-    <meta name="author" content="LagentO - Lamine Barro">
+    <meta name="author" content="LagentO - L'équipe LagentO Tech">
     <meta name="robots" content="@yield('meta_robots', 'index, follow')">
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
     

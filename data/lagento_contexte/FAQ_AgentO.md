@@ -356,7 +356,7 @@ La fiabilité du diagnostic repose sur :
 - Validation croisée avec experts métier
 
 **🎯 Expertise Terrain**
-- 10+ ans d'expérience Lamine Barro
+- 10+ ans d'expérience LagentO Tech
 - Connaissance écosystème ivoirien
 - Partenariats institutionnels actifs
 - Mise à jour continue via feedback utilisateurs
@@ -849,12 +849,12 @@ Plusieurs canaux sont disponibles selon vos besoins :
 **📧 Contact Direct**
 - **Support général** : [support@agento.ci]
 - **Questions business** : [hello@agento.ci]  
-- **Partenariats** : [partnerships@etudesk.org]
-- **Presse et médias** : [press@etudesk.org]
+- **Partenariats** : [hello@lagento.ci]
+- **Presse et médias** : [hello@lagento.ci]
 
 **🏢 Contact Professionnel**
-- **Lamine BARRO (Fondateur)** : [lamine.barro@etudesk.org]
-- **LinkedIn** : [linkedin.com/in/laminebarro]
+- **Équipe LagentO Tech** : [hello@lagento.ci]
+- **LinkedIn** : [www.lagento.ci]
 - **Téléphone** : +225 05 74 63 11 48
 - **Adresse** : Abidjan, Côte d'Ivoire
 

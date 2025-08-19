@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('seo_title', 'Réseau d\'entrepreneurs ivoiriens - LagentO')
-@section('meta_description', 'Rejoignez le plus grand réseau d\'entrepreneurs ivoiriens avec LagentO. Networking, partenariats, mentoring et collaborations business en Côte d\'Ivoire. Connectez-vous avec Lamine Barro et la communauté Ci20.')
+@section('meta_description', 'Rejoignez le plus grand réseau d\'entrepreneurs ivoiriens avec LagentO. Networking, partenariats, mentoring et collaborations business en Côte d\'Ivoire. Connectez-vous avec L'équipe LagentO Tech et la communauté Ci20.')
 @section('meta_keywords', 'réseau entrepreneur ivoirien, networking business ci, communauté startup abidjan, partenariats entrepreneurs, mentoring business côte ivoire')
 @section('canonical_url', route('seo.reseau'))
 
@@ -25,7 +25,7 @@
         "description": "Réseau d'entrepreneurs ivoiriens et africains",
         "founder": {
             "@type": "Person",
-            "name": "Lamine Barro",
+            "name": "L'équipe LagentO Tech",
             "jobTitle": "Président Ci20"
         },
         "memberOf": {
@@ -75,7 +75,7 @@
                 🤝 Réseau d'entrepreneurs ivoiriens
             </h1>
             <p class="text-xl mb-8 opacity-90">
-                Rejoignez la communauté d'entrepreneurs ivoiriens avec Lamine Barro et le réseau Ci20
+                Rejoignez la communauté d'entrepreneurs ivoiriens avec L'équipe LagentO Tech et le réseau Ci20
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: white; color: var(--indigo-600);">
@@ -96,7 +96,7 @@
                     Réseau entrepreneurial en Côte d'Ivoire
                 </h2>
                 <p class="text-lg" style="color: var(--gray-700);">
-                    Animé par Lamine Barro, Président du Collège Ci20 et Ambassadeur Innovation
+                    Animé par L'équipe LagentO Tech, Président du Collège Ci20 et Ambassadeur Innovation
                 </p>
             </div>
 
@@ -151,7 +151,7 @@
                 <div class="text-center">
                     <div class="bg-white rounded-lg shadow-lg p-8">
                         <div class="text-6xl mb-4">🌟</div>
-                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">Lamine Barro</h4>
+                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">L'équipe LagentO Tech</h4>
                         <p class="text-sm mb-6" style="color: var(--gray-700);">
                             Président Ci20<br>
                             Ambassadeur Innovation CI<br>
@@ -346,7 +346,7 @@
                             <p class="text-sm" style="color: var(--gray-600);">CEO TechStart CI</p>
                         </div>
                     </div>
-                    <p style="color: var(--gray-700);">"Le réseau LagentO a été déterminant pour lever 100M FCFA. L'accès aux investisseurs et le mentoring de Lamine ont fait la différence."</p>
+                    <p style="color: var(--gray-700);">"Le réseau LagentO a été déterminant pour lever 100M FCFA. L'accès aux investisseurs et le mentoring de l'équipe LagentO ont fait la différence."</p>
                 </div>
                 
                 <div class="bg-white rounded-lg p-6 shadow-sm">
@@ -370,7 +370,7 @@
                 Prêt à rejoindre le réseau ?
             </h2>
             <p class="text-lg mb-8" style="color: var(--gray-700);">
-                Rejoignez Lamine Barro et la communauté d'entrepreneurs de Côte d'Ivoire
+                Rejoignez L'équipe LagentO Tech et la communauté d'entrepreneurs de Côte d'Ivoire
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg">

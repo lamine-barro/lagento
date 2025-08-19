@@ -27,7 +27,7 @@
             "name": "LagentO",
             "founder": {
                 "@type": "Person",
-                "name": "Lamine Barro"
+                "name": "L'équipe LagentO Tech"
             }
         },
         "serviceType": "Business Consulting",

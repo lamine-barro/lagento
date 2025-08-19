@@ -2,7 +2,7 @@
 
 @section('seo_title', 'Assistant IA pour entrepreneurs en Côte d\'Ivoire - LagentO')
 @section('meta_description', 'LagentO est le premier assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business personnalisés, opportunités de financement, diagnostic d\'entreprise et accompagnement 24/7. Gratuit pour startups en Côte d\'Ivoire.')
-@section('meta_keywords', 'assistant IA entrepreneur, côte ivoire startup, conseiller business abidjan, assistant entrepreneur ivoirien, IA business africaine, lamine barro agro tech')
+@section('meta_keywords', 'assistant IA entrepreneur, côte ivoire startup, conseiller business abidjan, assistant entrepreneur ivoirien, IA business africaine, lagento tech agro tech')
 @section('canonical_url', route('seo.assistant-ia'))
 
 @section('og_title', 'Assistant IA Entrepreneur Côte d\'Ivoire - LagentO')
@@ -31,7 +31,7 @@
         },
         "creator": {
             "@type": "Person",
-            "name": "Lamine Barro",
+            "name": "L'équipe LagentO Tech",
             "jobTitle": "CEO & Founder",
             "worksFor": {
                 "@type": "Organization",

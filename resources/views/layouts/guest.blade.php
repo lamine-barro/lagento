@@ -9,7 +9,7 @@
     <title>@yield('seo_title', 'LagentO - Assistant IA Entrepreneurial Côte d\'Ivoire')</title>
     <meta name="description" content="@yield('meta_description', 'LagentO, le premier assistant IA entrepreneurial de Côte d\'Ivoire. Conseils personnalisés, opportunités de financement, diagnostic d\'entreprise et accompagnement business 24/7 pour entrepreneurs ivoiriens.')">
     <meta name="keywords" content="@yield('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, conseil business, diagnostic entreprise, innovation afrique, lamine barro')">
-    <meta name="author" content="LagentO - Lamine Barro">
+    <meta name="author" content="LagentO - L'équipe LagentO Tech">
     <meta name="robots" content="@yield('meta_robots', 'index, follow')">
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
     

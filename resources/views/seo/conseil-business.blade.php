@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('seo_title', 'Conseil business et innovation en Côte d\'Ivoire - LagentO')
-@section('meta_description', 'Conseil business expert pour entrepreneurs africains avec LagentO. Stratégie d\'innovation, développement commercial, transformation digitale et croissance en Afrique. Expertise Lamine Barro.')
+@section('meta_description', 'Conseil business expert pour entrepreneurs africains avec LagentO. Stratégie d\'innovation, développement commercial, transformation digitale et croissance en Afrique. Expertise L'équipe LagentO Tech.')
 @section('meta_keywords', 'conseil business afrique, innovation entrepreneur, stratégie commerciale ci, consultant business abidjan, développement entreprise ivoirienne')
 @section('canonical_url', route('seo.conseil'))
 
@@ -27,7 +27,7 @@
             "name": "LagentO",
             "founder": {
                 "@type": "Person",
-                "name": "Lamine Barro",
+                "name": "L'équipe LagentO Tech",
                 "jobTitle": "Expert Business & Innovation",
                 "description": "Expert Innovation & Tech, Ambassadeur Innovation Côte d'Ivoire"
             }
@@ -76,7 +76,7 @@
                 🚀 Conseil business et innovation en Côte d'Ivoire
             </h1>
             <p class="text-xl mb-8 opacity-90">
-                L'expertise de Lamine Barro et LagentO pour développer votre entreprise en Côte d'Ivoire et en Afrique
+                L'expertise de L'équipe LagentO Tech et LagentO pour développer votre entreprise en Côte d'Ivoire et en Afrique
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: white; color: var(--purple-600);">
@@ -94,7 +94,7 @@
         <div class="container max-w-6xl mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4" style="color: var(--gray-900);">
-                    L'expérience de Lamine Barro au service des entrepreneurs
+                    L'expérience de L'équipe LagentO Tech au service des entrepreneurs
                 </h2>
                 <p class="text-lg" style="color: var(--gray-700);">
                     Expert Business & Tech, Ambassadeur Innovation CI, 15M+ entrepreneurs accompagnés en Afrique
@@ -136,7 +136,7 @@
                 <div class="text-center">
                     <div class="bg-white rounded-lg shadow-lg p-8">
                         <div class="text-6xl mb-4">👨‍💼</div>
-                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">Lamine Barro</h4>
+                        <h4 class="text-2xl font-semibold mb-2" style="color: var(--gray-900);">L'équipe LagentO Tech</h4>
                         <p class="text-sm mb-4" style="color: var(--gray-700);">
                             Entrepreneur Tech, Expert Innovation<br>
                             Ambassadeur Innovation Côte d'Ivoire
@@ -315,7 +315,7 @@
                 Prêt à transformer votre entreprise ?
             </h2>
             <p class="text-lg mb-8" style="color: var(--gray-700);">
-                Bénéficiez de l'expertise de Lamine Barro et de l'intelligence artificielle LagentO pour accélérer votre croissance
+                Bénéficiez de l'expertise de L'équipe LagentO Tech et de l'intelligence artificielle LagentO pour accélérer votre croissance
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg">

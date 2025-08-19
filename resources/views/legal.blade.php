@@ -27,9 +27,9 @@
                     <p><strong>Capital social :</strong> 10 000 000 FCFA</p>
                     <p><strong>RCCM :</strong> CI-ABJ-2019-B-12345</p>
                     <p><strong>Siège social :</strong> Cocody Riviera Golf, Abidjan, Côte d'Ivoire</p>
-                    <p><strong>Email :</strong> legal@lagento.com</p>
+                    <p><strong>Email :</strong> hello@lagento.ci</p>
                     <p><strong>Téléphone :</strong> +225 05 74 63 11 48</p>
-                    <p><strong>Directeur de publication :</strong> Lamine BARRO, PDG</p>
+                    <p><strong>Directeur de publication :</strong> Équipe LagentO Tech</p>
                 </div>
             </section>
 
@@ -67,7 +67,7 @@
                 
                 <h3 class="text-base font-medium mb-3" style="color: var(--gray-900);">Responsable de traitement</h3>
                 <p class="mb-4">
-                    LagentO Tech SAS, représentée par son PDG Lamine BARRO, est responsable du traitement 
+                    LagentO Tech SAS est responsable du traitement 
                     de vos données personnelles.
                 </p>
 
@@ -112,7 +112,7 @@
                     <li>Droit à la limitation du traitement</li>
                 </ul>
                 <p class="mb-4">
-                    Pour exercer ces droits, contactez-nous à : privacy@lagento.com
+                    Pour exercer ces droits, contactez-nous à : hello@lagento.ci
                 </p>
             </section>
 
@@ -182,7 +182,7 @@
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Contact</h2>
                 <p class="mb-2">Pour toute question concernant ces mentions légales :</p>
                 <div class="space-y-1">
-                    <p><strong>Email :</strong> legal@lagento.com</p>
+                    <p><strong>Email :</strong> hello@lagento.ci</p>
                     <p><strong>Téléphone :</strong> +225 05 74 63 11 48</p>
                     <p><strong>Adresse :</strong> Cocody Riviera Golf, Abidjan, Côte d'Ivoire</p>
                 </div>

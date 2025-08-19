@@ -84,7 +84,7 @@ class VectorAccessService
     private function determineAccessLevel(User $user): string
     {
         // Admin users (can be configured via database flag or specific emails)
-        if ($user->email === 'lamine.barro@etudesk.org' || $user->is_admin === true) {
+        if ($user->email === 'hello@lagento.ci' || $user->is_admin === true) {
             return 'admin';
         }
 
