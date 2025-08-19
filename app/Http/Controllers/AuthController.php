@@ -14,6 +14,32 @@ class AuthController extends Controller
 {
     public function showEmailForm()
     {
+        // Si l'utilisateur est déjà connecté, rediriger selon son statut
+        if (Auth::check()) {
+            $user = Auth::user();
+            $projet = \App\Models\Projet::where('user_id', $user->id)->latest()->first();
+            
+            if (!$projet) {
+                return redirect()->route('onboarding.step1');
+            }
+            
+            if (!$projet->isOnboardingComplete()) {
+                $progress = $projet->getOnboardingProgress();
+                
+                if (!$progress['steps']['step1']) {
+                    return redirect()->route('onboarding.step1');
+                } elseif (!$progress['steps']['step2']) {
+                    return redirect()->route('onboarding.step2');
+                } elseif (!$progress['steps']['step3']) {
+                    return redirect()->route('onboarding.step3');
+                } elseif (!$progress['steps']['step4']) {
+                    return redirect()->route('onboarding.step4');
+                }
+            }
+            
+            return redirect()->route('diagnostic');
+        }
+        
         return view('landing');
     }
     
@@ -83,6 +109,7 @@ class AuthController extends Controller
         $user = User::firstOrCreate(
             ['email' => session('email')],
             [
+                'id' => \Illuminate\Support\Str::uuid(),
                 'name' => explode('@', session('email'))[0],
                 'email_verified_at' => now()
             ]
@@ -93,18 +120,32 @@ class AuthController extends Controller
             $user->update(['email_verified_at' => now()]);
         }
         
-        // Login user
+        // Clear OTP session first to avoid conflicts
+        $request->session()->forget(['email', 'otp', 'otp_expires_at']);
+        
+        // Login user with remember me
         Auth::login($user, true);
         
-        // Clear OTP session
-        session()->forget(['email', 'otp', 'otp_expires_at']);
+        // Ensure the guard is using the correct user
+        Auth::guard('web')->login($user, true);
+        
+        // Regenerate session ID for security
+        $request->session()->regenerate();
+        
+        // Force the session to persist
+        $request->session()->save();
+        
+        // Double check authentication
+        if (!Auth::check() || Auth::id() != $user->id) {
+            return redirect()->route('landing')->withErrors(['auth' => 'Erreur d\'authentification. Veuillez réessayer.']);
+        }
         
         // Check if user has a project and onboarding status
         $projet = \App\Models\Projet::where('user_id', $user->id)->latest()->first();
         
         if (!$projet) {
             // Pas de projet, commencer l'onboarding
-            return redirect()->route('onboarding.step1');
+            return redirect()->route('onboarding.step1')->with('info', 'Bienvenue ! Veuillez compléter votre profil.');
         }
         
         // Vérifier si l'onboarding est complet

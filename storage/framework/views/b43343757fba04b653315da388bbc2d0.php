@@ -82,40 +82,7 @@ function documentUpload() {
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="container max-w-4xl mx-auto section px-4 sm:px-6 lg:px-8" x-data="{ 
-    showDeleteModal: false, 
-    documentToDelete: null,
-    deleting: false,
-    
-    deleteDocument(doc) {
-        if (!doc) return;
-        
-        this.deleting = true;
-        
-        // Créer un formulaire pour la suppression
-        const form = window.document.createElement('form');
-        form.method = 'POST';
-        form.action = '<?php echo e(url("documents/delete")); ?>/' + doc.filename;
-        
-        // Ajouter le token CSRF
-        const csrfToken = window.document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '<?php echo e(csrf_token()); ?>';
-        form.appendChild(csrfToken);
-        
-        // Ajouter la méthode DELETE
-        const methodField = window.document.createElement('input');
-        methodField.type = 'hidden';
-        methodField.name = '_method';
-        methodField.value = 'DELETE';
-        form.appendChild(methodField);
-        
-        // Ajouter au DOM et soumettre
-        window.document.body.appendChild(form);
-        form.submit();
-    }
-}">
+<div class="container max-w-4xl mx-auto section px-4 sm:px-6 lg:px-8">
     <!-- En-tête -->
     <div class="mb-6">
         <div class="flex items-center gap-3 mb-2">
@@ -247,7 +214,7 @@ function documentUpload() {
                                                 <i data-lucide="download" class="w-4 h-4 text-gray-600"></i>
                                             </a>
                                             
-                                            <button @click="$parent.documentToDelete = { id: '<?php echo e($document->id); ?>', name: '<?php echo e($document->original_name); ?>', filename: '<?php echo e($document->filename); ?>' }; $parent.showDeleteModal = true" 
+                                            <button @click="window.openDeleteModal({ id: '<?php echo e($document->id); ?>', name: '<?php echo e($document->original_name); ?>', filename: '<?php echo e($document->filename); ?>' })" 
                                                     class="p-2 rounded-lg hover:bg-red-50 transition-colors"
                                                     title="Supprimer">
                                                 <i data-lucide="trash-2" class="w-4 h-4 text-red-600"></i>
@@ -378,7 +345,50 @@ function documentUpload() {
         </div>
     <?php endif; ?>
 
-    <!-- Modal de suppression harmonisé -->
+</div>
+
+<!-- Modal de suppression harmonisé -->
+<div x-data="{ 
+    showDeleteModal: false, 
+    documentToDelete: null,
+    deleting: false,
+    
+    init() {
+        window.openDeleteModal = (doc) => {
+            this.documentToDelete = doc;
+            this.showDeleteModal = true;
+        };
+    },
+    
+    deleteDocument(doc) {
+        if (!doc) return;
+        
+        this.deleting = true;
+        
+        // Créer un formulaire pour la suppression
+        const form = window.document.createElement('form');
+        form.method = 'POST';
+        form.action = '<?php echo e(url("documents/delete")); ?>/' + doc.filename;
+        
+        // Ajouter le token CSRF
+        const csrfToken = window.document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '<?php echo e(csrf_token()); ?>';
+        form.appendChild(csrfToken);
+        
+        // Ajouter la méthode DELETE
+        const methodField = window.document.createElement('input');
+        methodField.type = 'hidden';
+        methodField.name = '_method';
+        methodField.value = 'DELETE';
+        form.appendChild(methodField);
+        
+        // Ajouter au DOM et soumettre
+        window.document.body.appendChild(form);
+        form.submit();
+    }
+}">
     <div x-show="showDeleteModal" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
