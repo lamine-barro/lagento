@@ -120,3 +120,76 @@
 [data-theme="dark"] [style*="background: var(--danger-50)"] {
     background: rgba(220, 38, 38, 0.1) !important; /* Rouge très foncé avec transparence */
 }
+
+/* Document cards dark mode */
+[data-theme="dark"] .document-card {
+    background-color: var(--surface-elevated) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .document-card:hover {
+    border-color: var(--orange-400) !important;
+}
+
+/* Document card icons and backgrounds */
+[data-theme="dark"] .document-card .bg-gray-50 {
+    background-color: var(--gray-200) !important;
+}
+
+[data-theme="dark"] .document-card .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+[data-theme="dark"] .document-card .bg-orange-50 {
+    background-color: var(--orange-100) !important;
+}
+
+[data-theme="dark"] .document-card .border-gray-100 {
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .document-card .border-gray-200 {
+    border-color: var(--border-light) !important;
+}
+
+[data-theme="dark"] .document-card .border-blue-200 {
+    border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+[data-theme="dark"] .document-card .border-orange-200 {
+    border-color: var(--orange-400) !important;
+}
+
+/* Document card text colors */
+[data-theme="dark"] .document-card .text-blue-600 {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .document-card .text-blue-700 {
+    color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .document-card .text-orange-600 {
+    color: var(--orange-primary) !important;
+}
+
+[data-theme="dark"] .document-card .text-orange-700 {
+    color: var(--orange-light) !important;
+}
+
+[data-theme="dark"] .document-card .text-purple-600 {
+    color: #a855f7 !important;
+}
+
+[data-theme="dark"] .document-card .text-green-600 {
+    color: #16a34a !important;
+}
+
+/* Hover effects in dark mode */
+[data-theme="dark"] .document-card .hover\:bg-blue-50:hover {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+[data-theme="dark"] .document-card .hover\:bg-red-50:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}

@@ -11,8 +11,11 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        host: 'localhost',
+        host: '0.0.0.0',
         port: 5173,
+        hmr: {
+            host: '192.168.1.9'
+        }
     },
     build: {
         chunkSizeWarningLimit: 1024,

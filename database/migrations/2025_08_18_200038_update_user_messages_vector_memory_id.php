@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_messages', function (Blueprint $table) {
-            $table->dropColumn('openai_file_id');
+            if (Schema::hasColumn('user_messages', 'openai_file_id')) {
+                $table->dropColumn('openai_file_id');
+            }
             $table->uuid('vector_memory_id')->nullable()->after('executed_tools');
             $table->foreign('vector_memory_id')->references('id')->on('vector_memories')->nullOnDelete();
         });

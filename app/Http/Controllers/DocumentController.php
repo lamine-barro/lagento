@@ -128,6 +128,31 @@ class DocumentController extends Controller
         
         return Storage::disk('private')->download($filePath);
     }
+
+    public function view($filename)
+    {
+        $user = Auth::user();
+        $filePath = 'documents/' . $user->id . '/' . $filename;
+        
+        if (!Storage::disk('private')->exists($filePath)) {
+            abort(404, 'Document non trouvé');
+        }
+
+        $document = Document::where('user_id', $user->id)
+            ->where('filename', $filename)
+            ->first();
+
+        if (!$document) {
+            abort(404, 'Document non trouvé');
+        }
+
+        // Servir le fichier avec le bon Content-Type pour affichage dans le navigateur
+        $fileContents = Storage::disk('private')->get($filePath);
+        
+        return response($fileContents)
+            ->header('Content-Type', $document->mime_type)
+            ->header('Content-Disposition', 'inline; filename="' . $document->original_name . '"');
+    }
     
     public function delete($filename)
     {

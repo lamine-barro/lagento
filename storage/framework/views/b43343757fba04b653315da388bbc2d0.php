@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Documents'); ?>
 
-@section('title', 'Documents')
-
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <script>
 // Définir la fonction documentUpload avant Alpine.js
 function documentUpload() {
@@ -23,7 +21,7 @@ function documentUpload() {
         
         uploadFiles(files) {
             // Vérifier le nombre de documents existants
-            const existingDocs = {{ $documents->count() }};
+            const existingDocs = <?php echo e($documents->count()); ?>;
             if (existingDocs + files.length > 10) {
                 alert(`Vous ne pouvez pas dépasser 10 documents. Vous avez actuellement ${existingDocs} document(s).`);
                 return;
@@ -73,22 +71,55 @@ function documentUpload() {
                     this.uploadingFiles = this.uploadingFiles.filter(f => f !== uploadFile);
                 });
                 
-                xhr.open('POST', '{{ route("documents.upload") }}');
-                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                xhr.open('POST', '<?php echo e(route("documents.upload")); ?>');
+                xhr.setRequestHeader('X-CSRF-TOKEN', '<?php echo e(csrf_token()); ?>');
                 xhr.send(formData);
             });
         }
     }
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
-<div class="container max-w-4xl mx-auto section px-4 sm:px-6 lg:px-8">
+<?php $__env->startSection('content'); ?>
+<div class="container max-w-4xl mx-auto section px-4 sm:px-6 lg:px-8" x-data="{ 
+    showDeleteModal: false, 
+    documentToDelete: null,
+    deleting: false,
+    
+    deleteDocument(doc) {
+        if (!doc) return;
+        
+        this.deleting = true;
+        
+        // Créer un formulaire pour la suppression
+        const form = window.document.createElement('form');
+        form.method = 'POST';
+        form.action = '<?php echo e(url("documents/delete")); ?>/' + doc.filename;
+        
+        // Ajouter le token CSRF
+        const csrfToken = window.document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '<?php echo e(csrf_token()); ?>';
+        form.appendChild(csrfToken);
+        
+        // Ajouter la méthode DELETE
+        const methodField = window.document.createElement('input');
+        methodField.type = 'hidden';
+        methodField.name = '_method';
+        methodField.value = 'DELETE';
+        form.appendChild(methodField);
+        
+        // Ajouter au DOM et soumettre
+        window.document.body.appendChild(form);
+        form.submit();
+    }
+}">
     <!-- En-tête -->
     <div class="mb-6">
         <div class="flex items-center gap-3 mb-2">
-            <a href="{{ route('diagnostic') }}" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Retour">
+            <a href="<?php echo e(route('diagnostic')); ?>" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Retour">
                 <i data-lucide="arrow-left" class="w-5 h-5" style="color: var(--gray-600);"></i>
             </a>
             <h1 class="text-primary">Documents</h1>
@@ -149,12 +180,12 @@ function documentUpload() {
     </div>
 
     <!-- Liste des documents -->
-    @if(count($documents) > 0)
+    <?php if(count($documents) > 0): ?>
         <div class="grid gap-6 max-w-none">
-            @foreach($documents as $document)
-                @php
+            <?php $__currentLoopData = $documents; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $document): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
                     $docId = str_replace('-', '_', $document->id);
-                @endphp
+                ?>
                 <div class="document-card group relative bg-white rounded-xl border border-gray-200 hover:border-orange-200 transition-all duration-200" 
                      x-data="{ showDetails: false, showPreview: false }">
                     
@@ -165,17 +196,19 @@ function documentUpload() {
                             <div class="">
                                 <div class="flex items-start justify-between gap-4">
                                     <div class="flex-1 min-w-0">
-                                            <h3 class="text-lg font-semibold text-gray-900 truncate mb-1" title="{{ $document->original_name }}">
-                                                {{ strlen($document->original_name) > 50 ? substr($document->original_name, 0, 47) . '...' : $document->original_name }}
+                                            <h3 class="text-lg font-semibold text-gray-900 truncate mb-1" title="<?php echo e($document->original_name); ?>">
+                                                <?php echo e(strlen($document->original_name) > 50 ? substr($document->original_name, 0, 47) . '...' : $document->original_name); ?>
+
                                             </h3>
                                             <div class="flex items-center gap-4 text-sm text-gray-600">
                                                 <span class="flex items-center gap-1">
                                                     <i data-lucide="hard-drive" class="w-4 h-4"></i>
-                                                    {{ $document->formatted_file_size }}
+                                                    <?php echo e($document->formatted_file_size); ?>
+
                                                 </span>
                                                 <span class="flex items-center gap-1">
                                                     <i data-lucide="folder" class="w-4 h-4"></i>
-                                                    @php
+                                                    <?php
                                                         $categoryTranslations = [
                                                             'other' => 'Autre',
                                                             'official' => 'Officiel',
@@ -183,36 +216,38 @@ function documentUpload() {
                                                             'legal' => 'Juridique',
                                                             'financial' => 'Financier'
                                                         ];
-                                                    @endphp
-                                                    {{ $categoryTranslations[$document->category] ?? ucfirst($document->category) }}
+                                                    ?>
+                                                    <?php echo e($categoryTranslations[$document->category] ?? ucfirst($document->category)); ?>
+
                                                 </span>
-                                                @if($document->is_processed)
+                                                <?php if($document->is_processed): ?>
                                                     <span class="text-gray-500">
-                                                        {{ $document->processed_at->format('d/m/Y H:i') }}
+                                                        <?php echo e($document->processed_at->format('d/m/Y H:i')); ?>
+
                                                     </span>
-                                                @endif
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                         
                                     <!-- Actions rapides -->
                                     <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            @if(in_array($document->file_extension, ['pdf', 'png', 'jpg', 'jpeg']))
-                                                <a href="{{ route('documents.view', $document->filename) }}" 
+                                            <?php if(in_array($document->file_extension, ['pdf', 'png', 'jpg', 'jpeg'])): ?>
+                                                <a href="<?php echo e(route('documents.view', $document->filename)); ?>" 
                                                    target="_blank"
                                                    class="p-2 rounded-lg hover:bg-blue-50 transition-colors"
                                                    title="Ouvrir dans un nouvel onglet">
                                                     <i data-lucide="external-link" class="w-4 h-4 text-blue-600"></i>
                                                 </a>
-                                            @endif
+                                            <?php endif; ?>
                                             
-                                            <a href="{{ route('documents.download', $document->filename) }}" 
+                                            <a href="<?php echo e(route('documents.download', $document->filename)); ?>" 
                                                download
                                                class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                                                title="Télécharger">
                                                 <i data-lucide="download" class="w-4 h-4 text-gray-600"></i>
                                             </a>
                                             
-                                            <button @click="window.openDeleteModal({ id: '{{ $document->id }}', name: '{{ $document->original_name }}', filename: '{{ $document->filename }}' })" 
+                                            <button @click="$parent.documentToDelete = { id: '<?php echo e($document->id); ?>', name: '<?php echo e($document->original_name); ?>', filename: '<?php echo e($document->filename); ?>' }; $parent.showDeleteModal = true" 
                                                     class="p-2 rounded-lg hover:bg-red-50 transition-colors"
                                                     title="Supprimer">
                                                 <i data-lucide="trash-2" class="w-4 h-4 text-red-600"></i>
@@ -222,29 +257,30 @@ function documentUpload() {
                             </div>
                             
                             <!-- Tags détectés avec design amélioré -->
-                                @if($document->is_processed && $document->detected_tags && is_array($document->detected_tags))
-                                    @php
+                                <?php if($document->is_processed && $document->detected_tags && is_array($document->detected_tags)): ?>
+                                    <?php
                                         $filteredTags = array_filter($document->detected_tags, function($tag) {
                                             return strtolower($tag) !== 'autre';
                                         });
-                                    @endphp
-                                    @if(count($filteredTags) > 0)
+                                    ?>
+                                    <?php if(count($filteredTags) > 0): ?>
                                 <div class="">
                                     <div class="flex flex-wrap gap-2">
-                                                @foreach($filteredTags as $tag)
+                                                <?php $__currentLoopData = $filteredTags; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium border" 
                                                           style="background: var(--orange-50); color: var(--orange-700); border-color: var(--orange-200);">
                                                         <i data-lucide="tag" class="w-3 h-3"></i>
-                                                        {{ str_replace('_', ' ', $tag) }}
+                                                        <?php echo e(str_replace('_', ' ', $tag)); ?>
+
                                                     </span>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
                                 </div>
-                                    @endif
-                                @endif
+                                    <?php endif; ?>
+                                <?php endif; ?>
                                 
                                 <!-- État du document avec messages informatifs -->
-                                @if($document->is_processed && $document->ai_summary)
+                                <?php if($document->is_processed && $document->ai_summary): ?>
                                     <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 mt-4">
                                         <div class="flex items-start justify-between mb-3">
                                             <h4 class="text-sm font-semibold text-gray-900">Résumé synthétique</h4>
@@ -256,28 +292,29 @@ function documentUpload() {
                                         </div>
                                         
                                         <p class="text-sm text-gray-700 leading-relaxed" :class="!showDetails && 'line-clamp-2'">
-                                            {{ $document->ai_summary }}
+                                            <?php echo e($document->ai_summary); ?>
+
                                         </p>
                                         
-                                        @if($document->ai_metadata && isset($document->ai_metadata['document_type']))
+                                        <?php if($document->ai_metadata && isset($document->ai_metadata['document_type'])): ?>
                                             <div x-show="showDetails" x-transition class="mt-3 pt-3 border-t border-gray-200">
                                                 <div class="flex items-center justify-between text-sm">
                                                     <div class="flex items-center gap-2">
                                                         <i data-lucide="file-search" class="w-4 h-4 text-gray-500"></i>
-                                                        <span class="text-gray-600">{{ $document->ai_metadata['document_type'] }}</span>
+                                                        <span class="text-gray-600"><?php echo e($document->ai_metadata['document_type']); ?></span>
                                                     </div>
-                                                    @if(isset($document->ai_metadata['confidence']))
+                                                    <?php if(isset($document->ai_metadata['confidence'])): ?>
                                                         <div class="flex items-center gap-2">
                                                             <span class="text-xs text-gray-500">Confiance:</span>
-                                                            <span class="font-medium text-gray-900">{{ round($document->ai_metadata['confidence'] * 100) }}%</span>
+                                                            <span class="font-medium text-gray-900"><?php echo e(round($document->ai_metadata['confidence'] * 100)); ?>%</span>
                                                         </div>
-                                                    @endif
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
-                                @elseif(!$document->is_processed)
-                                    @if(in_array($document->file_extension, ['png', 'jpg', 'jpeg']))
+                                <?php elseif(!$document->is_processed): ?>
+                                    <?php if(in_array($document->file_extension, ['png', 'jpg', 'jpeg'])): ?>
                                         <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -291,7 +328,7 @@ function documentUpload() {
                                                 </div>
                                             </div>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <div class="bg-orange-50 rounded-xl p-4 border border-orange-200">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
@@ -305,15 +342,15 @@ function documentUpload() {
                                                 </div>
                                             </div>
                                         </div>
-                                    @endif
-                                @endif
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-    @else
+    <?php else: ?>
         <div class="bg-white rounded-xl border-2 border-dashed border-gray-200 hover:border-gray-300 transition-all">
             <div class="text-center py-16">
                 <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -339,52 +376,9 @@ function documentUpload() {
                 </div>
             </div>
         </div>
-    @endif
+    <?php endif; ?>
 
-</div>
-
-<!-- Modal de suppression harmonisé -->
-<div x-data="{ 
-    showDeleteModal: false, 
-    documentToDelete: null,
-    deleting: false,
-    
-    init() {
-        window.openDeleteModal = (doc) => {
-            this.documentToDelete = doc;
-            this.showDeleteModal = true;
-        };
-    },
-    
-    deleteDocument(doc) {
-        if (!doc) return;
-        
-        this.deleting = true;
-        
-        // Créer un formulaire pour la suppression
-        const form = window.document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ url("documents/delete") }}/' + doc.filename;
-        
-        // Ajouter le token CSRF
-        const csrfToken = window.document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        form.appendChild(csrfToken);
-        
-        // Ajouter la méthode DELETE
-        const methodField = window.document.createElement('input');
-        methodField.type = 'hidden';
-        methodField.name = '_method';
-        methodField.value = 'DELETE';
-        form.appendChild(methodField);
-        
-        // Ajouter au DOM et soumettre
-        window.document.body.appendChild(form);
-        form.submit();
-    }
-}">
+    <!-- Modal de suppression harmonisé -->
     <div x-show="showDeleteModal" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -452,7 +446,7 @@ function documentUpload() {
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 // Initialiser les icônes Lucide après le chargement du DOM
 document.addEventListener('DOMContentLoaded', function() {
@@ -461,5 +455,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/documents/index.blade.php ENDPATH**/ ?>

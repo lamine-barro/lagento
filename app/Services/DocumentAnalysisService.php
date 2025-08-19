@@ -15,7 +15,7 @@ class DocumentAnalysisService
     public function __construct(PdfExtractionService $pdfService)
     {
         $this->pdfService = $pdfService;
-        $this->openaiApiKey = env('OPENAI_API_KEY');
+        $this->openaiApiKey = config('services.openai.api_key') ?? '';
     }
 
     /**

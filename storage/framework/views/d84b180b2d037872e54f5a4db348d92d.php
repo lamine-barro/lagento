@@ -1,24 +1,14 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Diagnostic Entreprise'); ?>
+<?php $__env->startSection('page_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Horizon O'); ?>
+<?php $__env->startSection('seo_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Horizon O'); ?>
+<?php $__env->startSection('meta_description', 'Obtenez un diagnostic complet et gratuit de votre entreprise avec l\'intelligence artificielle. Analyse des forces, faiblesses, opportunités de financement et conseils personnalisés pour entrepreneurs ivoiriens.'); ?>
+<?php $__env->startSection('meta_keywords', 'diagnostic entreprise gratuit, analyse startup, conseil business CI, diagnostic IA, évaluation entreprise côte ivoire, audit business abidjan'); ?>
+<?php $__env->startSection('canonical_url', route('diagnostic')); ?>
+<?php $__env->startSection('og_title', 'Diagnostic Entreprise IA Gratuit - Horizon O Côte d\'Ivoire'); ?>
+<?php $__env->startSection('og_description', 'Diagnostic IA complet de votre entreprise : forces, faiblesses, opportunités de financement et plan d\'action personnalisé. Gratuit pour entrepreneurs ivoiriens.'); ?>
+<?php $__env->startSection('schema_org'); ?>
 
-@section('title', 'Diagnostic Entreprise')
-@section('page_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Horizon O')
-@section('seo_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Horizon O')
-@section('meta_description', 'Obtenez un diagnostic complet et gratuit de votre entreprise avec l\'intelligence artificielle. Analyse des forces, faiblesses, opportunités de financement et conseils personnalisés pour entrepreneurs ivoiriens.')
-@section('meta_keywords', 'diagnostic entreprise gratuit, analyse startup, conseil business CI, diagnostic IA, évaluation entreprise côte ivoire, audit business abidjan')
-@section('canonical_url', route('diagnostic'))
-@section('og_title', 'Diagnostic Entreprise IA Gratuit - Horizon O Côte d\'Ivoire')
-@section('og_description', 'Diagnostic IA complet de votre entreprise : forces, faiblesses, opportunités de financement et plan d\'action personnalisé. Gratuit pour entrepreneurs ivoiriens.')
-@section('schema_org')
-@verbatim
-{
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "name": "Diagnostic Entreprise IA",
-    "description": "Service de diagnostic d'entreprise par intelligence artificielle pour entrepreneurs ivoiriens",
-    "provider": {
-        "@type": "Organization",
-        "name": "Horizon O",
-        "url": "@endverbatim{{ url('/') }}@verbatim"
+@__raw_block_0__{{ url('/') }}"
     },
     "areaServed": {
         "@type": "Country",
@@ -30,10 +20,10 @@
         "priceCurrency": "XOF"
     }
 }
-@endverbatim
-@endsection
 
-@section('content')
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.store('diagnostic', {
@@ -92,10 +82,10 @@ document.addEventListener('alpine:init', () => {
         // Démarrer l'animation de progression
         const progressInterval = this.simulateProgress();
         
-        fetch('{{ route("diagnostic.run") }}', {
+        fetch('<?php echo e(route("diagnostic.run")); ?>', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
                 'Content-Type': 'application/json'
             }
         })
@@ -143,7 +133,7 @@ document.addEventListener('alpine:init', () => {
     <div class="mb-4 flex items-center justify-between">
         <div>
             <h1 class="text-primary mb-1">Diagnostic</h1>
-            <p class="text-secondary text-sm">{{ isset($analytics) ? 'MAJ: ' . ($analytics->metadata['derniere_maj'] ?? 'N/A') : 'Vue d\'ensemble entrepreneuriale' }}</p>
+            <p class="text-secondary text-sm"><?php echo e(isset($analytics) ? 'MAJ: ' . ($analytics->metadata['derniere_maj'] ?? 'N/A') : 'Vue d\'ensemble entrepreneuriale'); ?></p>
         </div>
         
         <!-- Actions -->
@@ -160,7 +150,7 @@ document.addEventListener('alpine:init', () => {
             </button>
             
             <a 
-                href="{{ route('onboarding.step1') }}"
+                href="<?php echo e(route('onboarding.step1')); ?>"
                 class="p-3 rounded-md border transition-colors flex items-center justify-center text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
                 style="border-color: var(--gray-300); color: var(--gray-700);"
                 title="Éditer les informations du projet"
@@ -169,7 +159,7 @@ document.addEventListener('alpine:init', () => {
             </a>
             
             <a 
-                href="{{ route('documents.index') }}"
+                href="<?php echo e(route('documents.index')); ?>"
                 class="p-3 rounded-md border transition-colors flex items-center justify-center text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
                 style="border-color: var(--gray-300); color: var(--gray-700);"
                 title="Gérer les documents"
@@ -180,7 +170,7 @@ document.addEventListener('alpine:init', () => {
     </div>
     
     <!-- Loading State pour régénération de diagnostic existant -->
-    <div x-show="isGenerating && @json(isset($analytics))" x-transition class="mb-4" style="display: none;">
+    <div x-show="isGenerating && <?php echo json_encode(isset($analytics), 15, 512) ?>" x-transition class="mb-4" style="display: none;">
         <div class="card">
             <div class="card-body">
                 <div class="flex items-center justify-center py-8">
@@ -207,7 +197,7 @@ document.addEventListener('alpine:init', () => {
         </div>
     </div>
     
-    @if(isset($analytics))
+    <?php if(isset($analytics)): ?>
     <div class="diagnostic-cards space-y-4" x-show="!isGenerating" x-transition>
         <!-- Résumé Exécutif -->
         <div class="card">
@@ -218,7 +208,7 @@ document.addEventListener('alpine:init', () => {
                             <i data-lucide="file-text" class="w-5 h-5 text-orange"></i>
                             Résumé exécutif
                         </h3>
-                        <p class="card-description">Score : {{ $analytics->executive_summary['score_progression'] ?? 0 }}/100</p>
+                        <p class="card-description">Score : <?php echo e($analytics->executive_summary['score_progression'] ?? 0); ?>/100</p>
                     </div>
                     <button class="text-gray-500 hover:text-gray-700 transition-colors" style="z-index: 0;">
                         <i data-lucide="chevron-down" class="w-5 h-5 transition-transform" :class="sectionsState.resume ? 'rotate-180' : ''"></i>
@@ -229,25 +219,25 @@ document.addEventListener('alpine:init', () => {
             <div x-show="sectionsState.resume" x-transition class="card-body">
                 <div class="mb-3 p-3 rounded-lg message-principal">
                     <h4 class="font-medium text-orange mb-1">Message principal</h4>
-                    <p class="text-sm">{{ $analytics->executive_summary['message_principal'] ?? 'Analyse en cours...' }}</p>
+                    <p class="text-sm"><?php echo e($analytics->executive_summary['message_principal'] ?? 'Analyse en cours...'); ?></p>
                 </div>
                 
                 <div class="grid lg:grid-cols-2 gap-4 mt-4">
                     <div>
                         <h4 class="font-medium mb-3">3 actions clés</h4>
                         <div class="space-y-4">
-                            @foreach(($analytics->executive_summary['trois_actions_cles'] ?? []) as $action)
+                            <?php $__currentLoopData = ($analytics->executive_summary['trois_actions_cles'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $action): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="flex items-start gap-2">
                                 <div class="w-2 h-2 bg-orange rounded-full mt-2 flex-shrink-0"></div>
-                                <span class="text-sm">{{ $action }}</span>
+                                <span class="text-sm"><?php echo e($action); ?></span>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                     
                     <div>
                         <h4 class="font-medium mb-3">Opportunité du mois</h4>
-                        @php
+                        <?php
                             $opportunite = $analytics->opportunite_du_mois ?? $analytics->executive_summary['opportunite_du_mois'] ?? null;
                             
                             // Si c'est du JSON, le parser
@@ -261,82 +251,84 @@ document.addEventListener('alpine:init', () => {
                                     // Garder la string originale si erreur
                                 }
                             }
-                        @endphp
+                        ?>
                         
-                        @if(is_array($opportunite))
+                        <?php if(is_array($opportunite)): ?>
                             <div class="text-sm p-3 rounded" style="background: var(--success-100); color: var(--success-700);">
-                                @if(!empty($opportunite['titre']) && $opportunite['titre'] !== 'non disponible')
-                                    <div class="font-medium mb-2" style="color: var(--gray-900);">{{ $opportunite['titre'] }}</div>
-                                @endif
+                                <?php if(!empty($opportunite['titre']) && $opportunite['titre'] !== 'non disponible'): ?>
+                                    <div class="font-medium mb-2" style="color: var(--gray-900);"><?php echo e($opportunite['titre']); ?></div>
+                                <?php endif; ?>
                                 
-                                {{-- Description ou montant --}}
-                                @if(!empty($opportunite['description']) && $opportunite['description'] !== 'non disponible')
-                                    <div class="mb-3">{{ $opportunite['description'] }}</div>
-                                @elseif(!empty($opportunite['montant']) && $opportunite['montant'] !== 'non disponible')
-                                    <div class="mb-3">{{ $opportunite['montant'] }}</div>
-                                @endif
                                 
-                                {{-- Métadonnées --}}
+                                <?php if(!empty($opportunite['description']) && $opportunite['description'] !== 'non disponible'): ?>
+                                    <div class="mb-3"><?php echo e($opportunite['description']); ?></div>
+                                <?php elseif(!empty($opportunite['montant']) && $opportunite['montant'] !== 'non disponible'): ?>
+                                    <div class="mb-3"><?php echo e($opportunite['montant']); ?></div>
+                                <?php endif; ?>
+                                
+                                
                                 <div class="flex flex-wrap gap-4 text-xs mb-3" style="color: var(--gray-600);">
-                                    @if(!empty($opportunite['institution']) && $opportunite['institution'] !== 'non disponible')
+                                    <?php if(!empty($opportunite['institution']) && $opportunite['institution'] !== 'non disponible'): ?>
                                         <div class="flex items-center gap-1">
                                             <i data-lucide="building-2" class="w-3 h-3"></i>
-                                            <span>{{ $opportunite['institution'] }}</span>
+                                            <span><?php echo e($opportunite['institution']); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                     
-                                    @if(!empty($opportunite['type']) && $opportunite['type'] !== 'non disponible')
+                                    <?php if(!empty($opportunite['type']) && $opportunite['type'] !== 'non disponible'): ?>
                                         <div class="flex items-center gap-1">
                                             <i data-lucide="tag" class="w-3 h-3"></i>
-                                            <span>{{ $opportunite['type'] }}</span>
+                                            <span><?php echo e($opportunite['type']); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                     
-                                    @if(!empty($opportunite['deadline']) && $opportunite['deadline'] !== 'non disponible')
+                                    <?php if(!empty($opportunite['deadline']) && $opportunite['deadline'] !== 'non disponible'): ?>
                                         <div class="flex items-center gap-1">
                                             <i data-lucide="calendar" class="w-3 h-3"></i>
-                                            <span>{{ $opportunite['deadline'] }}</span>
+                                            <span><?php echo e($opportunite['deadline']); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                                 
-                                {{-- Lien --}}
-                                @if(!empty($opportunite['lien']) && $opportunite['lien'] !== 'non disponible')
-                                    @php
+                                
+                                <?php if(!empty($opportunite['lien']) && $opportunite['lien'] !== 'non disponible'): ?>
+                                    <?php
                                         $lien = $opportunite['lien'];
                                         // Ajouter https:// si pas de protocole
                                         if (!str_starts_with($lien, 'http')) {
                                             $lien = 'https://' . ltrim($lien, '/');
                                         }
-                                    @endphp
+                                    ?>
                                     <div class="mt-2">
-                                        <a href="{{ $lien }}" target="_blank" class="text-orange hover:underline text-xs font-medium">
+                                        <a href="<?php echo e($lien); ?>" target="_blank" class="text-orange hover:underline text-xs font-medium">
                                             Voir détails →
                                         </a>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
-                        @elseif($opportunite && $opportunite !== 'non disponible')
+                        <?php elseif($opportunite && $opportunite !== 'non disponible'): ?>
                             <p class="text-sm p-3 rounded" style="background: var(--success-100); color: var(--success-700);">
-                                {{ $opportunite }}
+                                <?php echo e($opportunite); ?>
+
                             </p>
-                        @else
+                        <?php else: ?>
                             <p class="text-sm p-3 rounded" style="background: var(--gray-50); color: var(--gray-600);">
                                 Aucune opportunité identifiée pour ce mois
                             </p>
-                        @endif
+                        <?php endif; ?>
                         
-                        @if(isset($analytics->executive_summary['alerte_importante']))
+                        <?php if(isset($analytics->executive_summary['alerte_importante'])): ?>
                         <div class="mt-4">
                             <h4 class="font-medium mb-3 flex items-center gap-2 text-orange">
                                 <i data-lucide="alert-triangle" class="w-4 h-4"></i>
                                 Alerte Importante
                             </h4>
                             <p class="text-sm p-4 rounded-lg bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-300 border border-warning-200 dark:border-warning-700">
-                                {{ $analytics->executive_summary['alerte_importante'] }}
+                                <?php echo e($analytics->executive_summary['alerte_importante']); ?>
+
                             </p>
                         </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -351,7 +343,7 @@ document.addEventListener('alpine:init', () => {
                             <i data-lucide="user" class="w-5 h-5 text-orange"></i>
                             Profil entrepreneur
                         </h3>
-                        <p class="card-description">Score : {{ $analytics->entrepreneur_profile['score_potentiel'] ?? 0 }}/100 | Niveau : {{ ucfirst($analytics->entrepreneur_profile['niveau_global'] ?? 'Non défini') }}</p>
+                        <p class="card-description">Score : <?php echo e($analytics->entrepreneur_profile['score_potentiel'] ?? 0); ?>/100 | Niveau : <?php echo e(ucfirst($analytics->entrepreneur_profile['niveau_global'] ?? 'Non défini')); ?></p>
                     </div>
                     <button class="text-gray-500 hover:text-gray-700 transition-colors" style="z-index: 0;">
                         <i data-lucide="chevron-down" class="w-5 h-5 transition-transform" :class="sectionsState.profil ? 'rotate-180' : ''"></i>
@@ -367,12 +359,12 @@ document.addEventListener('alpine:init', () => {
                             Forces identifiées
                         </h4>
                         <div class="space-y-3">
-                            @foreach(($analytics->entrepreneur_profile['forces'] ?? []) as $force)
+                            <?php $__currentLoopData = ($analytics->entrepreneur_profile['forces'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $force): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                                <h5 class="font-medium text-orange mb-1">{{ $force['domaine'] ?? 'N/A' }}</h5>
-                                <p class="text-sm text-gray-600">{{ $force['description'] ?? 'N/A' }}</p>
+                                <h5 class="font-medium text-orange mb-1"><?php echo e($force['domaine'] ?? 'N/A'); ?></h5>
+                                <p class="text-sm text-gray-600"><?php echo e($force['description'] ?? 'N/A'); ?></p>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                     
@@ -382,15 +374,15 @@ document.addEventListener('alpine:init', () => {
                             Axes de progression
                         </h4>
                         <div class="space-y-3">
-                            @foreach(($analytics->entrepreneur_profile['axes_progression'] ?? []) as $axe)
+                            <?php $__currentLoopData = ($analytics->entrepreneur_profile['axes_progression'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $axe): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <div class="flex items-start justify-between mb-1">
-                                    <h5 class="font-medium text-gray-900">{{ $axe['domaine'] ?? 'N/A' }}</h5>
-                                    <span class="text-xs badge badge-{{ ($axe['impact'] ?? null) === 'immédiat' ? 'orange' : (($axe['impact'] ?? null) === 'court_terme' ? 'orange' : 'gray') }}">{{ $axe['impact'] ?? 'N/A' }}</span>
+                                    <h5 class="font-medium text-gray-900"><?php echo e($axe['domaine'] ?? 'N/A'); ?></h5>
+                                    <span class="text-xs badge badge-<?php echo e(($axe['impact'] ?? null) === 'immédiat' ? 'orange' : (($axe['impact'] ?? null) === 'court_terme' ? 'orange' : 'gray')); ?>"><?php echo e($axe['impact'] ?? 'N/A'); ?></span>
                                 </div>
-                                <p class="text-sm text-gray-600">{{ $axe['action_suggeree'] ?? 'N/A' }}</p>
+                                <p class="text-sm text-gray-600"><?php echo e($axe['action_suggeree'] ?? 'N/A'); ?></p>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                 </div>
@@ -406,7 +398,7 @@ document.addEventListener('alpine:init', () => {
                             <i data-lucide="chart-bar" class="w-5 h-5 text-orange"></i>
                             Maturité du projet
                         </h3>
-                        <p class="card-description">Santé : {{ $analytics->project_diagnostic['score_sante'] ?? 0 }}/100 | Maturité : {{ ucfirst($analytics->project_diagnostic['niveau_maturite'] ?? 'Non défini') }}</p>
+                        <p class="card-description">Santé : <?php echo e($analytics->project_diagnostic['score_sante'] ?? 0); ?>/100 | Maturité : <?php echo e(ucfirst($analytics->project_diagnostic['niveau_maturite'] ?? 'Non défini')); ?></p>
                     </div>
                     <button class="text-gray-500 hover:text-gray-700 transition-colors" style="z-index: 0;">
                         <i data-lucide="chevron-down" class="w-5 h-5 transition-transform" :class="sectionsState.diagnostic ? 'rotate-180' : ''"></i>
@@ -422,19 +414,19 @@ document.addEventListener('alpine:init', () => {
                             Indicateurs clés
                         </h4>
                         <div class="space-y-3">
-                            @if(isset($analytics->project_diagnostic['indicateurs_cles']))
-                            @foreach($analytics->project_diagnostic['indicateurs_cles'] as $domaine => $indicateur)
+                            <?php if(isset($analytics->project_diagnostic['indicateurs_cles'])): ?>
+                            <?php $__currentLoopData = $analytics->project_diagnostic['indicateurs_cles']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $domaine => $indicateur): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <div class="flex items-center justify-between mb-1">
-                                    <h5 class="font-medium capitalize text-gray-900 dark:text-gray-100">{{ $domaine }}</h5>
-                                    <span class="badge badge-{{ ($indicateur['statut'] ?? null) === 'ok' ? 'success' : (($indicateur['statut'] ?? null) === 'en_cours' ? 'warning' : 'gray') }}">{{ $indicateur['statut'] ?? 'N/A' }}</span>
+                                    <h5 class="font-medium capitalize text-gray-900 dark:text-gray-100"><?php echo e($domaine); ?></h5>
+                                    <span class="badge badge-<?php echo e(($indicateur['statut'] ?? null) === 'ok' ? 'success' : (($indicateur['statut'] ?? null) === 'en_cours' ? 'warning' : 'gray')); ?>"><?php echo e($indicateur['statut'] ?? 'N/A'); ?></span>
                                 </div>
-                                @if(isset($indicateur['urgence']))
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Urgence : {{ $indicateur['urgence'] }}</p>
-                                @endif
+                                <?php if(isset($indicateur['urgence'])): ?>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Urgence : <?php echo e($indicateur['urgence']); ?></p>
+                                <?php endif; ?>
                             </div>
-                            @endforeach
-                            @endif
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                     
@@ -444,17 +436,17 @@ document.addEventListener('alpine:init', () => {
                             Prochaines étapes
                         </h4>
                         <div class="space-y-3">
-                            @foreach(($analytics->project_diagnostic['prochaines_etapes'] ?? []) as $etape)
+                            <?php $__currentLoopData = ($analytics->project_diagnostic['prochaines_etapes'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $etape): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <div class="flex items-start gap-2">
-                                    <span class="bg-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 font-medium">{{ $etape['priorite'] ?? '?' }}</span>
+                                    <span class="bg-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 font-medium"><?php echo e($etape['priorite'] ?? '?'); ?></span>
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">{{ $etape['action'] ?? 'N/A' }}</p>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400">Délai : {{ $etape['delai'] ?? 'N/A' }}</p>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1"><?php echo e($etape['action'] ?? 'N/A'); ?></p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">Délai : <?php echo e($etape['delai'] ?? 'N/A'); ?></p>
                                     </div>
                                 </div>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                 </div>
@@ -470,7 +462,7 @@ document.addEventListener('alpine:init', () => {
                             <i data-lucide="sparkles" class="w-5 h-5 text-orange"></i>
                             Opportunités matchées
                         </h3>
-                        <p class="card-description">{{ $analytics->matched_opportunities['nombre_total'] ?? 0 }} opportunités identifiées</p>
+                        <p class="card-description"><?php echo e($analytics->matched_opportunities['nombre_total'] ?? 0); ?> opportunités identifiées</p>
                     </div>
                     <button class="text-gray-500 hover:text-gray-700 transition-colors" style="z-index: 0;">
                         <i data-lucide="chevron-down" class="w-5 h-5 transition-transform" :class="sectionsState.opportunites ? 'rotate-180' : ''"></i>
@@ -480,32 +472,32 @@ document.addEventListener('alpine:init', () => {
             
             <div x-show="sectionsState.opportunites" x-transition class="card-body">
                 <div class="space-y-4">
-                    @foreach(($analytics->matched_opportunities['top_opportunites'] ?? []) as $opportunite)
+                    <?php $__currentLoopData = ($analytics->matched_opportunities['top_opportunites'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opportunite): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="p-4 rounded-lg border border-gray-200 bg-white opportunity-card">
                         <div class="flex items-start justify-between mb-2">
-                            <h4 class="font-semibold text-orange text-base">{{ $opportunite['titre'] ?? 'N/A' }}</h4>
-                            <span class="badge badge-{{ ($opportunite['urgence'] ?? null) === 'candidater_avant_7j' ? 'orange' : 'blue' }}">{{ $opportunite['urgence'] ?? 'N/A' }}</span>
+                            <h4 class="font-semibold text-orange text-base"><?php echo e($opportunite['titre'] ?? 'N/A'); ?></h4>
+                            <span class="badge badge-<?php echo e(($opportunite['urgence'] ?? null) === 'candidater_avant_7j' ? 'orange' : 'blue'); ?>"><?php echo e($opportunite['urgence'] ?? 'N/A'); ?></span>
                         </div>
                         <div class="mb-2">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $opportunite['institution'] ?? 'N/A' }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Compatibilité : {{ $opportunite['score_compatibilite'] ?? 0 }}%</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400"><?php echo e($opportunite['institution'] ?? 'N/A'); ?></p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Compatibilité : <?php echo e($opportunite['score_compatibilite'] ?? 0); ?>%</p>
                         </div>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">{{ $opportunite['pourquoi_vous'] ?? 'N/A' }}</p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-3"><?php echo e($opportunite['pourquoi_vous'] ?? 'N/A'); ?></p>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-orange">{{ $opportunite['montant_ou_valeur'] ?? 'N/A' }}</span>
-                            @if(isset($opportunite['lien']))
-                                @php
+                            <span class="text-sm font-medium text-orange"><?php echo e($opportunite['montant_ou_valeur'] ?? 'N/A'); ?></span>
+                            <?php if(isset($opportunite['lien'])): ?>
+                                <?php
                                     $lien = $opportunite['lien'];
                                     // Ajouter https:// si pas de protocole
                                     if (!str_starts_with($lien, 'http')) {
                                         $lien = 'https://' . ltrim($lien, '/');
                                     }
-                                @endphp
-                                <a href="{{ $lien }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">Candidater</a>
-                            @endif
+                                ?>
+                                <a href="<?php echo e($lien); ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">Candidater</a>
+                            <?php endif; ?>
                         </div>
                     </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
         </div>
@@ -519,7 +511,7 @@ document.addEventListener('alpine:init', () => {
                             <i data-lucide="trending-up" class="w-5 h-5 text-orange"></i>
                             Marché
                         </h3>
-                        <p class="card-description">{{ $analytics->market_insights['position_concurrentielle']['votre_place'] ?? 'Non définie' }}</p>
+                        <p class="card-description"><?php echo e($analytics->market_insights['position_concurrentielle']['votre_place'] ?? 'Non définie'); ?></p>
                     </div>
                     <button class="text-gray-500 hover:text-gray-700 transition-colors" style="z-index: 0;">
                         <i data-lucide="chevron-down" class="w-5 h-5 transition-transform" :class="sectionsState.marche ? 'rotate-180' : ''"></i>
@@ -539,7 +531,8 @@ document.addEventListener('alpine:init', () => {
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">Marché Local</h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $analytics->market_insights['taille_marche']['local'] ?? 'N/A' }}
+                                    <?php echo e($analytics->market_insights['taille_marche']['local'] ?? 'N/A'); ?>
+
                                 </p>
                             </div>
                             
@@ -547,7 +540,8 @@ document.addEventListener('alpine:init', () => {
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">Potentiel de Croissance</h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $analytics->market_insights['taille_marche']['potentiel'] ?? 'N/A' }}
+                                    <?php echo e($analytics->market_insights['taille_marche']['potentiel'] ?? 'N/A'); ?>
+
                                 </p>
                             </div>
                             
@@ -555,7 +549,8 @@ document.addEventListener('alpine:init', () => {
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
                                 <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">Taux de Croissance</h5>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $analytics->market_insights['taille_marche']['croissance'] ?? 'N/A' }}
+                                    <?php echo e($analytics->market_insights['taille_marche']['croissance'] ?? 'N/A'); ?>
+
                                 </p>
                             </div>
                         </div>
@@ -567,12 +562,12 @@ document.addEventListener('alpine:init', () => {
                             Zones d'opportunités
                         </h4>
                         <div class="space-y-3">
-                            @foreach(($analytics->market_insights['zones_opportunites'] ?? []) as $zone)
+                            <?php $__currentLoopData = ($analytics->market_insights['zones_opportunites'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $zone): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                                <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">{{ $zone['region'] ?? 'N/A' }}</h5>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ $zone['raison'] ?? 'N/A' }}</p>
+                                <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1"><?php echo e($zone['region'] ?? 'N/A'); ?></h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400"><?php echo e($zone['raison'] ?? 'N/A'); ?></p>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                 </div>
@@ -588,7 +583,7 @@ document.addEventListener('alpine:init', () => {
                             <i data-lucide="scale" class="w-5 h-5 text-orange"></i>
                             Conformité réglementaire
                         </h3>
-                        <p class="card-description">Statut : {{ ucfirst($analytics->regulations['conformite_globale'] ?? 'Non défini') }}</p>
+                        <p class="card-description">Statut : <?php echo e(ucfirst($analytics->regulations['conformite_globale'] ?? 'Non défini')); ?></p>
                     </div>
                     <button class="text-gray-500 hover:text-gray-700 transition-colors" style="z-index: 0;">
                         <i data-lucide="chevron-down" class="w-5 h-5 transition-transform" :class="sectionsState.regulations ? 'rotate-180' : ''"></i>
@@ -604,13 +599,13 @@ document.addEventListener('alpine:init', () => {
                             Urgent
                         </h4>
                         <div class="space-y-3">
-                            @foreach(($analytics->regulations['urgent'] ?? []) as $urgent)
+                            <?php $__currentLoopData = ($analytics->regulations['urgent'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $urgent): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="p-3 rounded-lg border-l-3 border-orange bg-orange-50/10 dark:bg-orange-900/5">
-                                <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">{{ $urgent['obligation'] ?? 'N/A' }}</h5>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Deadline : {{ $urgent['deadline'] ?? 'N/A' }}</p>
-                                <p class="text-sm text-gray-700 dark:text-gray-300">Coût : {{ $urgent['cout'] ?? 'N/A' }}</p>
+                                <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1"><?php echo e($urgent['obligation'] ?? 'N/A'); ?></h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Deadline : <?php echo e($urgent['deadline'] ?? 'N/A'); ?></p>
+                                <p class="text-sm text-gray-700 dark:text-gray-300">Coût : <?php echo e($urgent['cout'] ?? 'N/A'); ?></p>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                     
@@ -620,12 +615,12 @@ document.addEventListener('alpine:init', () => {
                             À prévoir
                         </h4>
                         <div class="space-y-3">
-                            @foreach(($analytics->regulations['a_prevoir'] ?? []) as $prevoir)
+                            <?php $__currentLoopData = ($analytics->regulations['a_prevoir'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prevoir): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                                <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1">{{ $prevoir['obligation'] ?? 'N/A' }}</h5>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Échéance : {{ $prevoir['echeance'] ?? 'N/A' }}</p>
+                                <h5 class="font-medium text-gray-900 dark:text-gray-100 mb-1"><?php echo e($prevoir['obligation'] ?? 'N/A'); ?></h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Échéance : <?php echo e($prevoir['echeance'] ?? 'N/A'); ?></p>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                 </div>
@@ -641,7 +636,7 @@ document.addEventListener('alpine:init', () => {
                             <i data-lucide="handshake" class="w-5 h-5 text-orange"></i>
                             Partenaires suggérés
                         </h3>
-                        <p class="card-description">{{ $analytics->suggested_partners['nombre_matches'] ?? 0 }} partenaires potentiels</p>
+                        <p class="card-description"><?php echo e($analytics->suggested_partners['nombre_matches'] ?? 0); ?> partenaires potentiels</p>
                     </div>
                     <button class="text-gray-500 hover:text-gray-700 transition-colors" style="z-index: 0;">
                         <i data-lucide="chevron-down" class="w-5 h-5 transition-transform" :class="sectionsState.partenaires ? 'rotate-180' : ''"></i>
@@ -651,25 +646,25 @@ document.addEventListener('alpine:init', () => {
             
             <div x-show="sectionsState.partenaires" x-transition class="card-body">
                 <div class="space-y-4">
-                    @foreach(($analytics->suggested_partners['top_partenaires'] ?? []) as $partenaire)
+                    <?php $__currentLoopData = ($analytics->suggested_partners['top_partenaires'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $partenaire): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="p-4 rounded-lg border border-gray-200 bg-white partner-card">
                         <div class="flex items-start justify-between mb-2">
-                            <h4 class="font-semibold text-gray-900 dark:text-gray-100 text-base">{{ $partenaire['nom_projet'] ?? 'N/A' }}</h4>
-                            <span class="badge badge-blue">{{ $partenaire['score_pertinence'] ?? 0 }}% match</span>
+                            <h4 class="font-semibold text-gray-900 dark:text-gray-100 text-base"><?php echo e($partenaire['nom_projet'] ?? 'N/A'); ?></h4>
+                            <span class="badge badge-blue"><?php echo e($partenaire['score_pertinence'] ?? 0); ?>% match</span>
                         </div>
                         <div class="mb-2">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $partenaire['secteur'] ?? 'N/A' }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $partenaire['localisation'] ?? 'N/A' }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400"><?php echo e($partenaire['secteur'] ?? 'N/A'); ?></p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400"><?php echo e($partenaire['localisation'] ?? 'N/A'); ?></p>
                         </div>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">{{ $partenaire['proposition_collaboration'] ?? 'N/A' }}</p>
-                        <span class="text-xs badge badge-{{ ($partenaire['type_synergie'] ?? null) === 'strategique' ? 'orange' : 'gray' }}">{{ $partenaire['type_synergie'] ?? 'N/A' }}</span>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><?php echo e($partenaire['proposition_collaboration'] ?? 'N/A'); ?></p>
+                        <span class="text-xs badge badge-<?php echo e(($partenaire['type_synergie'] ?? null) === 'strategique' ? 'orange' : 'gray'); ?>"><?php echo e($partenaire['type_synergie'] ?? 'N/A'); ?></span>
                     </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
         </div>
     </div>
-    @else
+    <?php else: ?>
     <div class="card">
         <div class="card-body text-center py-12" x-show="!isGenerating">
             <i data-lucide="lightbulb" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
@@ -746,7 +741,7 @@ document.addEventListener('alpine:init', () => {
             </div>
         </div>
     </div>
-    @endif
+    <?php endif; ?>
 </div>
 
 <!-- Diagnostic Confirmation Modal -->
@@ -784,23 +779,24 @@ document.addEventListener('alpine:init', () => {
             <!-- Content -->
             <div class="mb-6">
                 <p class="text-sm mb-4" style="color: var(--gray-700);">
-                    Vous avez <strong>{{ auth()->user()->getRemainingDiagnostics() }} diagnostic(s) restant(s)</strong> ce mois-ci.
+                    Vous avez <strong><?php echo e(auth()->user()->getRemainingDiagnostics()); ?> diagnostic(s) restant(s)</strong> ce mois-ci.
                 </p>
                 
-                @if(auth()->user()->canRunDiagnostic())
+                <?php if(auth()->user()->canRunDiagnostic()): ?>
                     <p class="text-sm" style="color: var(--gray-700);">
                         Voulez-vous lancer l'analyse de votre profil entrepreneurial ?
                     </p>
-                @else
+                <?php else: ?>
                     <div class="p-3 rounded-lg" style="background: var(--warning-50); border: 1px solid var(--warning-200);">
                         <p class="text-sm font-medium" style="color: var(--warning-700);">
                             ⚠️ Vous avez atteint la limite mensuelle de 50 diagnostics
                         </p>
                         <p class="text-xs mt-1" style="color: var(--warning-600);">
-                            Prochain reset : {{ now()->addMonth()->startOfMonth()->format('d/m/Y') }}
+                            Prochain reset : <?php echo e(now()->addMonth()->startOfMonth()->format('d/m/Y')); ?>
+
                         </p>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
             
             <!-- Actions -->
@@ -812,7 +808,7 @@ document.addEventListener('alpine:init', () => {
                 >
                     Annuler
                 </button>
-                @if(auth()->user()->canRunDiagnostic())
+                <?php if(auth()->user()->canRunDiagnostic()): ?>
                     <button 
                         type="button"
                         @click="$dispatch('run-diagnostic'); open = false"
@@ -826,13 +822,13 @@ document.addEventListener('alpine:init', () => {
                             <span class="shimmer-text">Génération en cours...</span>
                         </span>
                     </button>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
     </div>
 </div>
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
 /* Styles propres pour la page diagnostic - Dark/Light mode compatible */
 
@@ -1078,6 +1074,7 @@ document.addEventListener('alpine:init', () => {
     }
 }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/diagnostic.blade.php ENDPATH**/ ?>

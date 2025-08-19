@@ -103,6 +103,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('documents')->group(function () {
             Route::get('/', [DocumentController::class, 'index'])->name('documents.index');
             Route::post('/upload', [DocumentController::class, 'upload'])->name('documents.upload');
+            Route::get('/view/{filename}', [DocumentController::class, 'view'])->name('documents.view');
             Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download');
             Route::delete('/delete/{filename}', [DocumentController::class, 'delete'])->name('documents.delete');
         });
