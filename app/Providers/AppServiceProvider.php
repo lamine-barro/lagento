@@ -14,6 +14,7 @@ use App\Observers\UserAnalyticsObserver;
 use App\Services\VoyageVectorService;
 use App\Services\MemoryManagerService;
 use App\Services\PdfExtractionService;
+use App\Services\DocumentAnalysisService;
 use Illuminate\Support\Facades\Auth;
 use App\Auth\UuidEloquentUserProvider;
 
@@ -36,6 +37,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(MemoryManagerService::class, function ($app) {
             return new MemoryManagerService(
                 $app->make(VoyageVectorService::class),
+                $app->make(PdfExtractionService::class)
+            );
+        });
+
+        $this->app->singleton(DocumentAnalysisService::class, function ($app) {
+            return new DocumentAnalysisService(
                 $app->make(PdfExtractionService::class)
             );
         });

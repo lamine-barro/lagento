@@ -69,62 +69,115 @@
 
     <!-- Liste des documents -->
     @if(count($documents) > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="space-y-4">
             @foreach($documents as $document)
-                @php
-                    $filename = basename($document);
-                    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-                    $size = Storage::disk('private')->size($document);
-                    $sizeFormatted = $size > 1048576 ? 
-                        round($size / 1048576, 1) . ' Mo' : 
-                        round($size / 1024) . ' Ko';
-                    
-                    // Simplifier le nom du fichier si trop long
-                    $displayName = strlen($filename) > 30 ? 
-                        substr($filename, 0, 27) . '...' : 
-                        $filename;
-                @endphp
-                
-                <div class="card p-4 flex items-center gap-3">
-                    <!-- Icône minimaliste -->
-                    @if(in_array($extension, ['pdf']))
-                        <i data-lucide="file-text" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                    @elseif(in_array($extension, ['doc', 'docx']))
-                        <i data-lucide="file-type" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                    @elseif(in_array($extension, ['xls', 'xlsx']))
-                        <i data-lucide="table" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                    @elseif(in_array($extension, ['png', 'jpg', 'jpeg']))
-                        <i data-lucide="image" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                    @else
-                        <i data-lucide="file" class="w-5 h-5" style="color: var(--orange-primary);"></i>
-                    @endif
-                    
-                    <!-- Nom et taille -->
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium truncate" style="color: var(--gray-900);" title="{{ $filename }}">
-                            {{ $displayName }}
-                        </p>
-                        <p class="text-xs" style="color: var(--gray-500);">{{ $sizeFormatted }}</p>
+                <div class="card p-4" x-data="{ showDetails: false }">
+                    <div class="flex items-start gap-3">
+                        <!-- Icône avec statut de traitement -->
+                        <div class="relative">
+                            @if($document->file_extension === 'pdf')
+                                <i data-lucide="file-text" class="w-5 h-5" style="color: var(--orange-primary);"></i>
+                            @elseif(in_array($document->file_extension, ['doc', 'docx']))
+                                <i data-lucide="file-type" class="w-5 h-5" style="color: var(--orange-primary);"></i>
+                            @elseif(in_array($document->file_extension, ['xls', 'xlsx']))
+                                <i data-lucide="table" class="w-5 h-5" style="color: var(--orange-primary);"></i>
+                            @elseif(in_array($document->file_extension, ['png', 'jpg', 'jpeg']))
+                                <i data-lucide="image" class="w-5 h-5" style="color: var(--orange-primary);"></i>
+                            @else
+                                <i data-lucide="file" class="w-5 h-5" style="color: var(--orange-primary);"></i>
+                            @endif
+                            
+                            @if($document->is_processed)
+                                <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" title="Analysé"></div>
+                            @else
+                                <div class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border-2 border-white animate-pulse" title="En cours d'analyse"></div>
+                            @endif
+                        </div>
+                        
+                        <!-- Informations principales -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium truncate" style="color: var(--gray-900);" title="{{ $document->original_name }}">
+                                        {{ strlen($document->original_name) > 40 ? substr($document->original_name, 0, 37) . '...' : $document->original_name }}
+                                    </h3>
+                                    <p class="text-xs" style="color: var(--gray-500);">
+                                        {{ $document->formatted_file_size }} • {{ ucfirst($document->category) }}
+                                        @if($document->is_processed)
+                                            • Analysé le {{ $document->processed_at->format('d/m/Y') }}
+                                        @endif
+                                    </p>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="flex items-center gap-1 ml-2">
+                                    @if($document->is_processed && $document->ai_summary)
+                                        <button @click="showDetails = !showDetails" 
+                                                class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                                title="Voir l'analyse">
+                                            <i data-lucide="eye" class="w-4 h-4" style="color: var(--gray-500);"></i>
+                                        </button>
+                                    @endif
+                                    
+                                    <a href="{{ route('documents.download', $document->filename) }}" 
+                                       class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                       title="Télécharger">
+                                        <i data-lucide="download" class="w-4 h-4" style="color: var(--gray-500);"></i>
+                                    </a>
+                                    
+                                    <form method="POST" action="{{ route('documents.delete', $document->filename) }}" 
+                                          class="inline"
+                                          onsubmit="return confirm('Supprimer ce document ?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                                                title="Supprimer">
+                                            <i data-lucide="x" class="w-4 h-4" style="color: var(--red-500);"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Tags détectés -->
+                            @if($document->is_processed && $document->detected_tags && count($document->detected_tags) > 0)
+                                <div class="mt-2 flex flex-wrap gap-1">
+                                    @foreach($document->detected_tags as $tag)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" 
+                                              style="background: var(--orange-100); color: var(--orange-700);">
+                                            {{ str_replace('_', ' ', $tag) }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                            
+                            <!-- Résumé IA (expandable) -->
+                            @if($document->is_processed && $document->ai_summary)
+                                <div x-show="showDetails" x-collapse class="mt-3 p-3 rounded-lg" style="background: var(--gray-50);">
+                                    <h4 class="text-sm font-medium mb-2" style="color: var(--gray-900);">Résumé automatique :</h4>
+                                    <p class="text-sm leading-relaxed" style="color: var(--gray-700);">{{ $document->ai_summary }}</p>
+                                    
+                                    @if($document->ai_metadata && isset($document->ai_metadata['document_type']))
+                                        <div class="mt-2 pt-2 border-t border-gray-200">
+                                            <p class="text-xs" style="color: var(--gray-500);">
+                                                Type détecté: <span class="font-medium">{{ $document->ai_metadata['document_type'] }}</span>
+                                                @if(isset($document->ai_metadata['confidence']))
+                                                    • Confiance: {{ round($document->ai_metadata['confidence'] * 100) }}%
+                                                @endif
+                                            </p>
+                                        </div>
+                                    @endif
+                                </div>
+                            @elseif(!$document->is_processed)
+                                <div class="mt-3 p-3 rounded-lg" style="background: var(--yellow-50);">
+                                    <p class="text-sm" style="color: var(--yellow-700);">
+                                        <i data-lucide="clock" class="w-4 h-4 inline mr-1"></i>
+                                        Analyse en cours... Le résumé sera disponible sous peu.
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                    
-                    <!-- Actions simplifiées -->
-                    <a href="{{ route('documents.download', $filename) }}" 
-                       class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                       title="Télécharger">
-                        <i data-lucide="download" class="w-4 h-4" style="color: var(--gray-500);"></i>
-                    </a>
-                    
-                    <form method="POST" action="{{ route('documents.delete', $filename) }}" 
-                          class="inline"
-                          onsubmit="return confirm('Supprimer ce document ?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                                title="Supprimer">
-                            <i data-lucide="x" class="w-4 h-4" style="color: var(--gray-500);"></i>
-                        </button>
-                    </form>
                 </div>
             @endforeach
         </div>
@@ -159,7 +212,7 @@ function documentUpload() {
         
         uploadFiles(files) {
             // Vérifier le nombre de documents existants
-            const existingDocs = {{ count($documents) }};
+            const existingDocs = {{ $documents->count() }};
             if (existingDocs + files.length > 10) {
                 alert(`Vous ne pouvez pas dépasser 10 documents. Vous avez actuellement ${existingDocs} document(s).`);
                 return;

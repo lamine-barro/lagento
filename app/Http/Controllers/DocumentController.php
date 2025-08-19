@@ -2,45 +2,64 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Document;
 use App\Services\UserAnalyticsService;
+use App\Services\DocumentAnalysisService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class DocumentController extends Controller
 {
     private UserAnalyticsService $analyticsService;
+    private DocumentAnalysisService $documentAnalysisService;
 
-    public function __construct(UserAnalyticsService $analyticsService)
-    {
+    public function __construct(
+        UserAnalyticsService $analyticsService,
+        DocumentAnalysisService $documentAnalysisService
+    ) {
         $this->analyticsService = $analyticsService;
+        $this->documentAnalysisService = $documentAnalysisService;
     }
 
     public function upload(Request $request)
     {
         $request->validate([
-            'document' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:20480', // 20 Mo max
+            'document' => 'required|file|mimes:pdf,doc,docx,txt,xls,xlsx,png,jpg,jpeg|max:20480', // 20 Mo max
             'category' => 'nullable|string|in:business_plan,financial_docs,legal_docs,marketing,other'
         ]);
 
         $user = Auth::user();
         
         // Vérifier le nombre de documents existants (max 10)
-        $path = 'documents/' . $user->id;
-        $existingFiles = Storage::disk('private')->exists($path) ? 
-            Storage::disk('private')->files($path) : [];
+        $existingDocuments = Document::where('user_id', $user->id)->count();
         
-        if (count($existingFiles) >= 10) {
+        if ($existingDocuments >= 10) {
             return response()->json([
                 'error' => 'Vous avez atteint la limite de 10 documents'
             ], 422);
         }
+        
         $file = $request->file('document');
+        $filename = time() . '_' . $file->getClientOriginalName();
         
-        // Store file
-        $filePath = $file->store('documents/' . $user->id, 'private');
+        // Stocker le fichier
+        $filePath = $file->storeAs('documents/' . $user->id, $filename, 'private');
         
-        // Get file info
+        // Créer l'enregistrement Document
+        $document = Document::create([
+            'user_id' => $user->id,
+            'filename' => $filename,
+            'original_name' => $file->getClientOriginalName(),
+            'file_path' => $filePath,
+            'mime_type' => $file->getClientMimeType(),
+            'file_size' => $file->getSize(),
+            'category' => $request->get('category', 'other'),
+            'is_processed' => false
+        ]);
+
+        // Track upload in analytics
         $fileInfo = [
             'filename' => $file->getClientOriginalName(),
             'file_type' => $file->getClientMimeType(),
@@ -48,28 +67,52 @@ class DocumentController extends Controller
             'category' => $request->get('category', 'other'),
             'path' => $filePath
         ];
-
-        // Track upload in analytics
         $this->analyticsService->trackDataSourceUpload($user, $fileInfo);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Document téléchargé avec succès',
-            'file_info' => $fileInfo
-        ]);
+        // Lancer l'analyse en arrière-plan (ou synchrone pour demo)
+        try {
+            $analysisResult = $this->documentAnalysisService->analyzeDocument($document);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Document téléchargé et analysé avec succès',
+                'document' => [
+                    'id' => $document->id,
+                    'original_name' => $document->original_name,
+                    'formatted_file_size' => $document->formatted_file_size,
+                    'category' => $document->category,
+                    'ai_summary' => $document->fresh()->ai_summary,
+                    'detected_tags' => $document->fresh()->detected_tags,
+                    'is_processed' => $document->fresh()->is_processed
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Document analysis failed on upload', [
+                'document_id' => $document->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Document téléchargé. Analyse en cours...',
+                'document' => [
+                    'id' => $document->id,
+                    'original_name' => $document->original_name,
+                    'formatted_file_size' => $document->formatted_file_size,
+                    'category' => $document->category,
+                    'is_processed' => false
+                ]
+            ]);
+        }
     }
 
     public function index()
     {
         $user = Auth::user();
-        $path = 'documents/' . $user->id;
-        
-        // Vérifier si le dossier existe, sinon retourner un tableau vide
-        if (Storage::disk('private')->exists($path)) {
-            $documents = Storage::disk('private')->files($path);
-        } else {
-            $documents = [];
-        }
+        $documents = Document::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
         
         return view('documents.index', compact('documents'));
     }
@@ -98,5 +141,73 @@ class DocumentController extends Controller
         Storage::disk('private')->delete($filePath);
         
         return redirect()->route('documents.index')->with('success', 'Document supprimé avec succès');
+    }
+
+    /**
+     * Obtenir les détails d'un document avec analyse
+     */
+    public function show($id)
+    {
+        $user = Auth::user();
+        $document = Document::where('user_id', $user->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'document' => [
+                'id' => $document->id,
+                'original_name' => $document->original_name,
+                'formatted_file_size' => $document->formatted_file_size,
+                'category' => $document->category,
+                'ai_summary' => $document->ai_summary,
+                'detected_tags' => $document->detected_tags,
+                'ai_metadata' => $document->ai_metadata,
+                'is_processed' => $document->is_processed,
+                'processed_at' => $document->processed_at,
+                'created_at' => $document->created_at
+            ]
+        ]);
+    }
+
+    /**
+     * Relancer l'analyse d'un document
+     */
+    public function reanalyze($id)
+    {
+        $user = Auth::user();
+        $document = Document::where('user_id', $user->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        try {
+            $analysisResult = $this->documentAnalysisService->analyzeDocument($document);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Document analysé avec succès',
+                'analysis' => $analysisResult
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'analyse: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtenir les statistiques des documents d'un utilisateur
+     */
+    public function stats()
+    {
+        $user = Auth::user();
+        $stats = $this->documentAnalysisService->getUserDocumentStats($user->id);
+        
+        return response()->json([
+            'success' => true,
+            'stats' => $stats
+        ]);
     }
 }
