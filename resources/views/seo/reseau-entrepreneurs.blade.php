@@ -155,7 +155,7 @@
                         <p class="text-sm mb-6" style="color: var(--gray-700);">
                             Président Ci20<br>
                             Ambassadeur Innovation CI<br>
-                            PDG Etudesk - Executive MBA HEC
+                            Expert Tech & Innovation - Executive MBA HEC
                         </p>
                         <div class="space-y-2">
                             <div class="text-lg font-semibold" style="color: var(--indigo-600);">Mentorat Direct</div>

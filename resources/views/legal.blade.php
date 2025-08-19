@@ -22,12 +22,12 @@
             <section class="mb-8">
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Éditeur du site</h2>
                 <div class="space-y-2">
-                    <p><strong>Raison sociale :</strong> Etudesk SAS</p>
+                    <p><strong>Raison sociale :</strong> LagentO Tech SAS</p>
                     <p><strong>Forme juridique :</strong> Société par Actions Simplifiée</p>
                     <p><strong>Capital social :</strong> 10 000 000 FCFA</p>
                     <p><strong>RCCM :</strong> CI-ABJ-2019-B-12345</p>
                     <p><strong>Siège social :</strong> Cocody Riviera Golf, Abidjan, Côte d'Ivoire</p>
-                    <p><strong>Email :</strong> legal@etudesk.org</p>
+                    <p><strong>Email :</strong> legal@lagento.com</p>
                     <p><strong>Téléphone :</strong> +225 05 74 63 11 48</p>
                     <p><strong>Directeur de publication :</strong> Lamine BARRO, PDG</p>
                 </div>
@@ -48,16 +48,16 @@
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Propriété intellectuelle</h2>
                 <p class="mb-4">
                     L'ensemble du site Agent O, incluant mais non limité aux textes, images, sons, logiciels, 
-                    et tout autre élément composant le site, est la propriété exclusive d'Etudesk SAS, 
+                    et tout autre élément composant le site, est la propriété exclusive de LagentO Tech SAS, 
                     sauf mention contraire.
                 </p>
                 <p class="mb-4">
                     Toute reproduction, représentation, modification, publication, adaptation de tout ou partie 
                     des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, 
-                    sauf autorisation écrite préalable d'Etudesk SAS.
+                    sauf autorisation écrite préalable de LagentO Tech SAS.
                 </p>
                 <p>
-                    La marque "Agent O" et le logo associé sont des marques déposées d'Etudesk SAS.
+                    La marque "Agent O" et le logo associé sont des marques déposées de LagentO Tech SAS.
                 </p>
             </section>
 
@@ -67,7 +67,7 @@
                 
                 <h3 class="text-base font-medium mb-3" style="color: var(--gray-900);">Responsable de traitement</h3>
                 <p class="mb-4">
-                    Etudesk SAS, représentée par son PDG Lamine BARRO, est responsable du traitement 
+                    LagentO Tech SAS, représentée par son PDG Lamine BARRO, est responsable du traitement 
                     de vos données personnelles.
                 </p>
 
@@ -91,7 +91,7 @@
                 <h3 class="text-base font-medium mb-3" style="color: var(--gray-900);">Base légale</h3>
                 <p class="mb-4">
                     Le traitement de vos données repose sur l'exécution du contrat de service, 
-                    l'intérêt légitime d'Etudesk SAS, et le cas échéant votre consentement.
+                    l'intérêt légitime de LagentO Tech SAS, et le cas échéant votre consentement.
                 </p>
 
                 <h3 class="text-base font-medium mb-3" style="color: var(--gray-900);">Durée de conservation</h3>
@@ -112,7 +112,7 @@
                     <li>Droit à la limitation du traitement</li>
                 </ul>
                 <p class="mb-4">
-                    Pour exercer ces droits, contactez-nous à : privacy@etudesk.org
+                    Pour exercer ces droits, contactez-nous à : privacy@lagento.com
                 </p>
             </section>
 
@@ -133,7 +133,7 @@
             <section class="mb-8">
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Limitation de responsabilité</h2>
                 <p class="mb-4">
-                    Etudesk SAS s'efforce de fournir des informations exactes et à jour sur Agent O. 
+                    LagentO Tech SAS s'efforce de fournir des informations exactes et à jour sur Agent O. 
                     Cependant, nous ne pouvons garantir l'exactitude, la complétude ou l'actualité 
                     des informations fournies par l'IA.
                 </p>
@@ -143,7 +143,7 @@
                     qualifiés pour vos besoins spécifiques.
                 </p>
                 <p>
-                    Etudesk SAS ne saurait être tenue responsable des dommages directs ou indirects 
+                    LagentO Tech SAS ne saurait être tenue responsable des dommages directs ou indirects 
                     résultant de l'utilisation du service Agent O.
                 </p>
             </section>
@@ -161,7 +161,7 @@
                     fournies avant de prendre des décisions basées sur ces informations.
                 </p>
                 <p>
-                    Etudesk SAS améliore continuellement ses algorithmes d'IA, mais ne garantit 
+                    LagentO Tech SAS améliore continuellement ses algorithmes d'IA, mais ne garantit 
                     pas la perfection du contenu généré.
                 </p>
             </section>
@@ -182,7 +182,7 @@
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Contact</h2>
                 <p class="mb-2">Pour toute question concernant ces mentions légales :</p>
                 <div class="space-y-1">
-                    <p><strong>Email :</strong> legal@etudesk.org</p>
+                    <p><strong>Email :</strong> legal@lagento.com</p>
                     <p><strong>Téléphone :</strong> +225 05 74 63 11 48</p>
                     <p><strong>Adresse :</strong> Cocody Riviera Golf, Abidjan, Côte d'Ivoire</p>
                 </div>

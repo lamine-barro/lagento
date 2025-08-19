@@ -16,11 +16,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Nom du projet *</label>
-                    <input type="text" name="nom_projet" value="{{ old('nom_projet', $projet->nom_projet ?? '') }}" placeholder="Ex: Etudesk" class="input-field w-full" maxlength="100" required />
+                    <input type="text" name="nom_projet" value="{{ old('nom_projet', $projet->nom_projet ?? '') }}" placeholder="Ex: AgroTech CI" class="input-field w-full" maxlength="100" required />
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale</label>
-                    <input type="text" name="raison_sociale" value="{{ old('raison_sociale', $projet->raison_sociale ?? '') }}" placeholder="Ex: Etudesk SAS" class="input-field w-full" maxlength="120" />
+                    <input type="text" name="raison_sociale" value="{{ old('raison_sociale', $projet->raison_sociale ?? '') }}" placeholder="Ex: AgroTech CI SAS" class="input-field w-full" maxlength="120" />
                     @error('raison_sociale')<p class="text-sm mt-1" style="color: var(--danger);">{{ $message }}</p>@enderror
                 </div>
                 <div class="md:col-span-2">

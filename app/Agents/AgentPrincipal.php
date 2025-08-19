@@ -309,7 +309,7 @@ OUTILS ET QUAND LES UTILISER :
     → Incubateurs, accélérateurs, structures d'appui réelles
     
   * 'user_project' : Projet spécifique de CET utilisateur seulement
-    → Analyse personnalisée du projet Etudesk ou autre
+    → Analyse personnalisée du projet utilisateur
     
   * 'user_analytics' : Diagnostic personnalisé de CET utilisateur
     → Forces, axes progression, recommandations personnelles
@@ -570,7 +570,7 @@ STYLE :
         $types[] = 'lagento_context';
 
         // USER_PROJECT : projets personnels, startup, entreprise spécifique
-        if (preg_match('/(projet|entreprise|startup|business|entrepreneuriat|etudesk|décris|décrire|présente|analyser|mon projet|ma startup|mon entreprise|mon activité)/i', $message)) {
+        if (preg_match('/(projet|entreprise|startup|business|entrepreneuriat|agrotech|décris|décrire|présente|analyser|mon projet|ma startup|mon entreprise|mon activité)/i', $message)) {
             $types[] = 'user_project';
         }
         

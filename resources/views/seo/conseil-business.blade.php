@@ -29,7 +29,7 @@
                 "@type": "Person",
                 "name": "Lamine Barro",
                 "jobTitle": "Expert Business & Innovation",
-                "description": "PDG Etudesk, Ambassadeur Innovation Côte d'Ivoire"
+                "description": "Expert Innovation & Tech, Ambassadeur Innovation Côte d'Ivoire"
             }
         },
         "serviceType": "Business Consulting",
@@ -97,7 +97,7 @@
                     L'expérience de Lamine Barro au service des entrepreneurs
                 </h2>
                 <p class="text-lg" style="color: var(--gray-700);">
-                    PDG d'Etudesk, Ambassadeur Innovation CI, 15M+ entrepreneurs accompagnés en Afrique
+                    Expert Business & Tech, Ambassadeur Innovation CI, 15M+ entrepreneurs accompagnés en Afrique
                 </p>
             </div>
 
@@ -110,7 +110,7 @@
                         <div class="flex items-start">
                             <span class="text-2xl mr-4">✨</span>
                             <div>
-                                <strong>500+ Organisations</strong> accompagnées avec Etudesk
+                                <strong>500+ Organisations</strong> accompagnées en Afrique
                             </div>
                         </div>
                         <div class="flex items-start">
