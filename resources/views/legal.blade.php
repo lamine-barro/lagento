@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Mentions légales - Lagento')
+@section('title', 'Mentions légales - LagentO')
 
 @section('content')
 <div class="min-h-screen bg-white">

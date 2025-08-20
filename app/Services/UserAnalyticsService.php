@@ -1828,8 +1828,8 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             $projet = $user->projets()->latest()->first();
 
             return [
-                // 1. Contexte Lagento (vectorisé)
-                'lagento_context' => $this->getLagentoContextSummary(),
+                // 1. Contexte LagentO (vectorisé)
+                'lagento_context' => $this->getLagentOContextSummary(),
                 
                 // 2. Opportunités pertinentes pour l'utilisateur
                 'opportunities' => $this->getRelevantOpportunities($user, $projet),
@@ -1874,7 +1874,7 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             
             return [
                 'error' => 'Unable to generate summary data',
-                'lagento_context' => $this->getLagentoContextSummary(),
+                'lagento_context' => $this->getLagentOContextSummary(),
                 'opportunities' => [],
                 'user_project' => null,
                 'user_analytics' => [],
@@ -1888,9 +1888,9 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
     }
 
     /**
-     * Get Lagento context summary from vectorized corpus
+     * Get LagentO context summary from vectorized corpus
      */
-    private function getLagentoContextSummary(): array
+    private function getLagentOContextSummary(): array
     {
         try {
             // Test search to verify Pinecone context availability
