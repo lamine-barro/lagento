@@ -748,10 +748,10 @@ document.addEventListener('alpine:init', () => {
                 @else
                     <div class="p-3 rounded-lg" style="background: var(--warning-50); border: 1px solid var(--warning-200);">
                         <p class="text-sm font-medium" style="color: var(--warning-700);">
-                            ⚠️ Vous avez atteint la limite mensuelle de 50 diagnostics
+                            ⚠️ Vous avez atteint la limite hebdomadaire de {{ auth()->user()::WEEKLY_LIMITS['diagnostics'] }} diagnostics
                         </p>
                         <p class="text-xs mt-1" style="color: var(--warning-600);">
-                            Prochain reset : {{ now()->addMonth()->startOfMonth()->format('d/m/Y') }}
+                            Prochain reset : {{ now()->startOfWeek()->addWeek()->format('d/m/Y') }}
                         </p>
                     </div>
                 @endif
