@@ -25,10 +25,24 @@ class DocumentController extends Controller
 
     public function upload(Request $request)
     {
-        $request->validate([
-            'document' => 'required|file|mimes:pdf,doc,docx,txt,xls,xlsx,png,jpg,jpeg|max:20480', // 20 Mo max
-            'category' => 'nullable|string|in:business_plan,financial_docs,legal_docs,marketing,other'
+        Log::info('Document upload request started', [
+            'user_id' => Auth::id(),
+            'has_file' => $request->hasFile('document'),
+            'files' => $request->allFiles()
         ]);
+
+        try {
+            $request->validate([
+                'document' => 'required|file|mimes:pdf,doc,docx,txt,xls,xlsx,png,jpg,jpeg|max:20480', // 20 Mo max
+                'category' => 'nullable|string|in:business_plan,financial_docs,legal_docs,marketing,other'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Document upload validation failed', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+            throw $e;
+        }
 
         $user = Auth::user();
         
@@ -43,12 +57,31 @@ class DocumentController extends Controller
         
         $file = $request->file('document');
         
-        // Store the file using centralized service
-        $fileStorage = app(\App\Services\FileStorageService::class);
-        $result = $fileStorage->storeDocument($file, $user->id);
-        
-        $filename = basename($result['path']);
-        $filePath = $result['path'];
+        try {
+            // Store the file using centralized service
+            $fileStorage = app(\App\Services\FileStorageService::class);
+            $result = $fileStorage->storeDocument($file, $user->id);
+            
+            Log::info('File stored successfully', [
+                'user_id' => $user->id,
+                'file_name' => $file->getClientOriginalName(),
+                'result' => $result
+            ]);
+            
+            $filename = basename($result['path']);
+            $filePath = $result['path'];
+        } catch (\Exception $e) {
+            Log::error('File storage failed', [
+                'user_id' => $user->id,
+                'file_name' => $file->getClientOriginalName(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'error' => 'Erreur lors du stockage du fichier: ' . $e->getMessage()
+            ], 500);
+        }
         
         // Créer l'enregistrement Document
         $document = Document::create([

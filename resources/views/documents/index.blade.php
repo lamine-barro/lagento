@@ -57,19 +57,27 @@ function documentUpload() {
                 });
                 
                 xhr.addEventListener('load', () => {
+                    console.log('Upload response:', xhr.status, xhr.responseText);
                     if (xhr.status === 200) {
                         // Succès - recharger la page
                         setTimeout(() => {
                             window.location.reload();
                         }, 500);
                     } else {
-                        alert(`Erreur lors de l'upload de ${file.name}`);
+                        console.error('Upload failed:', xhr.status, xhr.responseText);
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            alert(`Erreur lors de l'upload de ${file.name}: ${response.error || response.message || 'Erreur inconnue'}`);
+                        } catch (e) {
+                            alert(`Erreur lors de l'upload de ${file.name} (Status: ${xhr.status})`);
+                        }
                         this.uploadingFiles = this.uploadingFiles.filter(f => f !== uploadFile);
                     }
                 });
                 
-                xhr.addEventListener('error', () => {
-                    alert(`Erreur lors de l'upload de ${file.name}`);
+                xhr.addEventListener('error', (event) => {
+                    console.error('Upload error event:', event, xhr.status, xhr.responseText);
+                    alert(`Erreur lors de l'upload de ${file.name}: Erreur réseau`);
                     this.uploadingFiles = this.uploadingFiles.filter(f => f !== uploadFile);
                 });
                 
