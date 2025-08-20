@@ -67,6 +67,16 @@ return [
             'report' => false,
         ],
 
+        'vercel-blob' => [
+            'driver' => 'local', // Temporarily using local, will implement custom driver
+            'root' => storage_path('app/public'),
+            'url' => env('VERCEL_BLOB_BASE_URL', 'https://68oqqdazslwpwzti.public.blob.vercel-storage.com'),
+            'visibility' => 'public',
+            'token' => env('BLOB_READ_WRITE_TOKEN'),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*
