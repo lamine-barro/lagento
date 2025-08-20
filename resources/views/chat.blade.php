@@ -28,10 +28,7 @@
 @endsection
 
 @section('content')
-{{-- Include streaming enhancements BEFORE Alpine.js initialization --}}
-@include('chat-streaming')
-
-<div class="min-h-screen bg-white" x-data="getChatInterface()" x-init="init()" data-conversation-id="{{ $conversation->id ?? '' }}">
+<div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="{{ $conversation->id ?? '' }}">
     <!-- Chat Header with Tabs -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
         <div class="max-w-4xl mx-auto">
