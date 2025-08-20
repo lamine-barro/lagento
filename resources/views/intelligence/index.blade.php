@@ -88,9 +88,9 @@
     </div>
 
     <!-- Navigation Pills Mobile -->
-    <div class="container max-w-7xl mx-auto px-4 pt-4 md:pt-8">
+    <div class="container max-w-7xl mx-auto px-4 pt-4 md:pt-8" x-data="{ activeTab: 'insights' }">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-2 mb-6">
-            <nav class="flex space-x-1" x-data="{ activeTab: 'insights' }">
+            <nav class="flex space-x-1">
                 <button @click="activeTab = 'insights'" :class="activeTab === 'insights' ? 'bg-gradient-to-r from-orange-500 to-green-500 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'" class="flex-1 flex items-center justify-center px-3 py-3 rounded-lg font-medium transition-all duration-200 text-sm">
                     <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
