@@ -110,7 +110,6 @@ class ChatController extends Controller
         }
 
         $attachmentData = null;
-        $vectorMemoryId = null;
         
         // Handle file attachment
         if ($request->hasFile('file')) {
@@ -128,14 +127,6 @@ class ChatController extends Controller
                     'path' => $result['path'],
                     'url' => $result['url']
                 ];
-                
-                // Vectoriser le fichier pour le contexte
-                try {
-                    $vectorMemoryId = $this->vectorizeFileContent($file, $user->id, $conversation->id);
-                } catch (\Exception $e) {
-                    \Log::error('Vectorisation failed, continuing without it: ' . $e->getMessage());
-                    $vectorMemoryId = null;
-                }
                 
             } catch (\Exception $e) {
                 \Log::error('Erreur traitement fichier: ' . $e->getMessage());
@@ -180,41 +171,6 @@ class ChatController extends Controller
         ]);
     }
     
-    private function vectorizeFileContent($file, $userId, $conversationId)
-    {
-        // Utiliser le nouveau service d'auto-vectorisation
-        $autoVectorService = app(\App\Services\AutoVectorizationService::class);
-        
-        try {
-            // Store the file temporarily using centralized service
-            $fileStorage = app(\App\Services\FileStorageService::class);
-            $tempResult = $fileStorage->storeTemp($file);
-            $fullPath = $tempResult['url'];
-            
-            // Use the auto-vectorization service
-            $success = $autoVectorService->vectorizeAttachment($fullPath, [
-                'user_id' => $userId,
-                'conversation_id' => $conversationId,
-                'filename' => $file->getClientOriginalName(),
-                'mime_type' => $file->getMimeType(),
-                'size' => $file->getSize(),
-                'uploaded_at' => now()->toISOString()
-            ]);
-            
-            // Clean up temp file
-            $fileStorage->delete($tempResult['url']);
-            
-            if (!$success) {
-                throw new \Exception("Impossible de vectoriser le fichier");
-            }
-            
-            return true;
-            
-        } catch (\Exception $e) {
-            \Log::error('Erreur vectorisation fichier: ' . $e->getMessage());
-            throw $e;
-        }
-    }
 
     public function sendMessage(Request $request)
     {
@@ -254,22 +210,22 @@ class ChatController extends Controller
         if ($useStream) {
             \Log::info('Using streaming response');
             try {
-                return $this->streamResponse($userMessageContent, $user, $conversation, $vectorMemoryId);
+                return $this->streamResponse($userMessageContent, $user, $conversation);
             } catch (\Exception $e) {
                 \Log::error('Streaming failed', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
                 // Fallback to standard response
-                return $this->standardResponse($userMessageContent, $user, $conversation, $vectorMemoryId);
+                return $this->standardResponse($userMessageContent, $user, $conversation);
             }
         }
         
         // Standard non-streaming response
-        return $this->standardResponse($userMessageContent, $user, $conversation, $vectorMemoryId);
+        return $this->standardResponse($userMessageContent, $user, $conversation);
     }
     
-    private function standardResponse($userMessageContent, $user, $conversation, $vectorMemoryId)
+    private function standardResponse($userMessageContent, $user, $conversation)
     {
         // Generate title for new conversation
         $isNewConversation = $conversation->message_count === 1;
@@ -289,8 +245,7 @@ class ChatController extends Controller
         $agentResult = $this->agentService->processMessage(
             $userMessageContent,
             $user->id,
-            $conversation->id,
-            $vectorMemoryId
+            $conversation->id
         );
         
         if (!$agentResult['success']) {
@@ -317,7 +272,7 @@ class ChatController extends Controller
             'message_length' => strlen($userMessageContent),
             'tools_used' => $agentResult['tools_used'] ?? [],
             'response_length' => strlen($agentResult['response']),
-            'has_attachment' => !empty($vectorMemoryId),
+            'has_attachment' => !empty($attachmentData),
             'conversation_id' => $conversation->id,
             'timestamp' => now()->toISOString()
         ]);
@@ -369,7 +324,7 @@ class ChatController extends Controller
         ]);
     }
     
-    private function streamResponse($userMessageContent, $user, $conversation, $vectorMemoryId)
+    private function streamResponse($userMessageContent, $user, $conversation)
     {
         $headers = [
             'Content-Type' => 'text/event-stream',
@@ -378,7 +333,7 @@ class ChatController extends Controller
             'X-Accel-Buffering' => 'no'
         ];
         
-        return response()->stream(function () use ($userMessageContent, $user, $conversation, $vectorMemoryId) {
+        return response()->stream(function () use ($userMessageContent, $user, $conversation) {
             try {
                 \Log::info('Starting streaming response');
                 
@@ -402,8 +357,7 @@ class ChatController extends Controller
                 $agentResult = $this->agentService->processMessage(
                     $userMessageContent,
                     $user->id,
-                    $conversation->id,
-                    $vectorMemoryId
+                    $conversation->id
                 );
                 
                 if (!$agentResult['success']) {
@@ -470,7 +424,7 @@ class ChatController extends Controller
                 'message_length' => strlen($userMessageContent),
                 'tools_used' => $agentResult['tools_used'] ?? [],
                 'response_length' => strlen($response),
-                'has_attachment' => !empty($vectorMemoryId),
+                'has_attachment' => !empty($attachmentData),
                 'conversation_id' => $conversation->id,
                 'timestamp' => now()->toISOString()
             ]);
