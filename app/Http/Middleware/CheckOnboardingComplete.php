@@ -26,7 +26,7 @@ class CheckOnboardingComplete
         $projet = Projet::where('user_id', $user->id)->latest()->first();
 
         // Si aucun projet ou onboarding incomplet, rediriger vers onboarding
-        if (!$projet || !$projet->isOnboardingComplete()) {
+        if (!$projet || !$projet->isOnboardingComplete() || !$user->onboarding_completed) {
             $redirectRoute = 'onboarding.step1';
             
             if ($projet) {

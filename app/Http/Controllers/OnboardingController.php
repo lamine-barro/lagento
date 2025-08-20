@@ -280,8 +280,12 @@ class OnboardingController extends Controller
         // Rafraîchir le modèle pour être sûr d'avoir les dernières données
         $projet->refresh();
 
+        // Marquer l'onboarding comme terminé
+        $user->update(['onboarding_completed' => true]);
+
         \Log::info('Step 4 completed successfully', [
             'projet_id' => $projet->id,
+            'user_onboarding_completed' => true,
             'redirecting_to' => 'diagnostic'
         ]);
 

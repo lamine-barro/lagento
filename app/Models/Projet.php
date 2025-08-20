@@ -196,8 +196,8 @@ class Projet extends Model
 
         // Step 3: Pas de champs obligatoires
 
-        // Step 4: Fondateurs obligatoire
-        if (is_null($this->nombre_fondateurs) || is_null($this->nombre_fondatrices)) {
+        // Step 4: Fondateurs obligatoire (doit être >= 0, car cast en int)
+        if (!isset($this->nombre_fondateurs) || !isset($this->nombre_fondatrices)) {
             return false;
         }
 
@@ -210,7 +210,7 @@ class Projet extends Model
             'step1' => !empty($this->nom_projet) && !empty($this->formalise) && !empty($this->region),
             'step2' => true, // Pas de champs obligatoires
             'step3' => true, // Pas de champs obligatoires  
-            'step4' => !is_null($this->nombre_fondateurs) && !is_null($this->nombre_fondatrices)
+            'step4' => isset($this->nombre_fondateurs) && isset($this->nombre_fondatrices)
         ];
 
         return [
