@@ -8,12 +8,20 @@ use Illuminate\Http\UploadedFile;
 
 class VercelBlobService
 {
-    private string $token;
+    private ?string $token;
     private string $baseUrl;
 
     public function __construct()
     {
-        $this->token = config('filesystems.disks.vercel-blob.token') ?? env('BLOB_READ_WRITE_TOKEN');
+        $token = env('VERCEL_BLOB_READ_WRITE_TOKEN') ?? config('filesystems.disks.vercel-blob.token');
+        
+        // Don't assign placeholder values
+        if ($token && $token !== 'vercel_blob_rw_placeholder') {
+            $this->token = $token;
+        } else {
+            $this->token = null;
+        }
+        
         $this->baseUrl = 'https://blob.vercel-storage.com';
     }
 
@@ -22,6 +30,11 @@ class VercelBlobService
      */
     public function upload(UploadedFile|string $file, string $filename = null): array
     {
+        // If no token is configured, throw an exception
+        if (!$this->token) {
+            throw new \Exception('Vercel Blob token is not configured. Please set VERCEL_BLOB_READ_WRITE_TOKEN in your .env file.');
+        }
+        
         if ($file instanceof UploadedFile) {
             $filename = $filename ?? $file->getClientOriginalName();
             $content = $file->getContent();
