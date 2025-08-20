@@ -9,17 +9,17 @@
     <title>@yield('page_title')</title>
     <meta name="description" content="@yield('meta_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement, diagnostic d\'entreprise et accompagnement personnalisé 24/7.')">
     <meta name="keywords" content="@yield('meta_keywords', 'assistant IA côte ivoire, entrepreneur ivoirien, startup abidjan, financement PME, diagnostic entreprise, conseil business, innovation afrique')">
-    <meta name="author" content="Horizon O - L'équipe Horizon O">
+    <meta name="author" content="Agento - L'équipe Agento">
     <meta name="robots" content="@yield('meta_robots', 'index, follow')">
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:site_name" content="LagentO">
-    <meta property="og:title" content="@yield('og_title', 'Horizon O - Assistant IA Entrepreneurial Côte d\'Ivoire')">
+    <meta property="og:site_name" content="Agento">
+    <meta property="og:title" content="@yield('og_title', 'Agento - Assistant IA Entrepreneurial Côte d\'Ivoire')">
     <meta property="og:description" content="@yield('og_description', 'Assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, opportunités de financement et accompagnement personnalisé.')">
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="@yield('og_url', url()->current())">
-    <meta property="og:image" content="@yield('og_image', asset('images/lagento-social-preview.jpg'))">
+    <meta property="og:image" content="@yield('og_image', asset('images/agento-social-preview.jpg'))">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:locale" content="fr_CI">
@@ -27,17 +27,17 @@
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@Horizon O_CI">
+    <meta name="twitter:site" content="@Agento_CI">
     <meta name="twitter:creator" content="@LamBarro">
-    <meta name="twitter:title" content="@yield('twitter_title', 'Horizon O - Assistant IA Entrepreneurial')">
+    <meta name="twitter:title" content="@yield('twitter_title', 'Agento - Assistant IA Entrepreneurial')">
     <meta name="twitter:description" content="@yield('twitter_description', 'Assistant IA pour entrepreneurs ivoiriens')">
-    <meta name="twitter:image" content="@yield('twitter_image', asset('images/lagento-social-preview.jpg'))">
+    <meta name="twitter:image" content="@yield('twitter_image', asset('images/agento-social-preview.jpg'))">
     
     <!-- Additional Meta Tags -->
     <meta name="theme-color" content="#ff6b35">
     <meta name="msapplication-TileColor" content="#ff6b35">
-    <meta name="application-name" content="Horizon O">
-    <meta name="apple-mobile-web-app-title" content="Horizon O">
+    <meta name="application-name" content="Agento">
+    <meta name="apple-mobile-web-app-title" content="Agento">
     <meta name="format-detection" content="telephone=no">
     
     <!-- Preconnect for Performance -->

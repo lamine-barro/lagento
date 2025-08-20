@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code de vérification Horizon O</title>
+    <title>Code de vérification Agento</title>
     <style>
         body {
             margin: 0;
@@ -137,7 +137,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="{{ asset('logo-light.png') }}" alt="Horizon O" style="height: 60px; width: auto; margin-bottom: 10px;">
+            <img src="{{ asset('logo-light.png') }}" alt="Agento" style="height: 60px; width: auto; margin-bottom: 10px;">
             <div class="header-subtitle">Votre assistant IA entrepreneurial</div>
         </div>
         
@@ -145,7 +145,7 @@
             <div class="greeting">Bonjour {{ $userName }} ! 👋</div>
             
             <div class="message">
-                Nous avons reçu une demande de connexion à votre compte Horizon O. 
+                Nous avons reçu une demande de connexion à votre compte Agento. 
                 Pour confirmer votre identité, veuillez utiliser le code de vérification ci-dessous :
             </div>
             
@@ -171,7 +171,7 @@
         
         <div class="footer">
             <div class="footer-text">
-                Cet email a été envoyé par <span class="footer-brand">Horizon O</span>
+                Cet email a été envoyé par <span class="footer-brand">Agento</span>
             </div>
             <div class="footer-text">
                 Votre assistant IA dédié aux entrepreneurs ivoiriens

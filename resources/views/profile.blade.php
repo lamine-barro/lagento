@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
 @section('title', 'Mon Profil Entrepreneur')
-@section('seo_title', 'Profil Entrepreneur - Gérez vos Informations Business | Horizon O')
-@section('meta_description', 'Gérez votre profil entrepreneur sur Horizon O : informations personnelles, projets d\'entreprise, préférences et paramètres de votre assistant IA business personnalisé.')
+@section('seo_title', 'Profil Entrepreneur - Gérez vos Informations Business | Agento')
+@section('meta_description', 'Gérez votre profil entrepreneur sur Agento : informations personnelles, projets d\'entreprise, préférences et paramètres de votre assistant IA business personnalisé.')
 @section('meta_keywords', 'profil entrepreneur, gestion compte business, paramètres assistant IA, profil startup, dashboard entrepreneur')
 @section('meta_robots', 'noindex, nofollow')
 @section('canonical_url', route('profile'))
-@section('og_title', 'Mon Profil Entrepreneur - Horizon O')
-@section('og_description', 'Gérez votre profil et paramètres sur Horizon O, votre assistant IA entrepreneurial personnalisé.')
+@section('og_title', 'Mon Profil Entrepreneur - Agento')
+@section('og_description', 'Gérez votre profil et paramètres sur Agento, votre assistant IA entrepreneurial personnalisé.')
 @section('page_title', 'Mon Profil Entrepreneur')
 
 @section('schema_org')
@@ -15,8 +15,8 @@
 {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    "name": "Profil Entrepreneur Horizon O",
-    "description": "Page de profil pour entrepreneurs utilisant l'assistant IA Horizon O",
+    "name": "Profil Entrepreneur Agento",
+    "description": "Page de profil pour entrepreneurs utilisant l'assistant IA Agento",
     "mainEntity": {
         "@type": "Person",
         "name": "Entrepreneur"

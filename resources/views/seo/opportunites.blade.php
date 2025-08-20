@@ -1,12 +1,12 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'Opportunités business pour entrepreneurs en Côte d\'Ivoire - Horizon O')
-@section('meta_description', 'Découvrez toutes les opportunités business, appels d\'offres, concours et partenariats pour entrepreneurs en Côte d\'Ivoire avec Horizon O. Veille stratégique et intelligence business en temps réel.')
+@section('seo_title', 'Opportunités business pour entrepreneurs en Côte d\'Ivoire - Agento')
+@section('meta_description', 'Découvrez toutes les opportunités business, appels d\'offres, concours et partenariats pour entrepreneurs en Côte d\'Ivoire avec Agento. Veille stratégique et intelligence business en temps réel.')
 @section('meta_keywords', 'opportunités business ci, appels offres abidjan, concours entrepreneur ivoirien, partenariats startup, veille business côte ivoire')
 @section('canonical_url', route('seo.opportunites'))
 
-@section('og_title', 'Opportunités Entrepreneur Côte d\'Ivoire - Horizon O')
-@section('og_description', 'Toutes les opportunités business pour entrepreneurs ivoiriens : concours, appels d\'offres, partenariats. Veille intelligente Horizon O.')
+@section('og_title', 'Opportunités Entrepreneur Côte d\'Ivoire - Agento')
+@section('og_description', 'Toutes les opportunités business pour entrepreneurs ivoiriens : concours, appels d\'offres, partenariats. Veille intelligente Agento.')
 @section('og_type', 'website')
 
 @section('schema_org')
@@ -24,7 +24,7 @@
         "name": "Veille Opportunités Business",
         "provider": {
             "@type": "Organization",
-            "name": "Horizon O"
+            "name": "Agento"
         },
         "serviceType": "Business Intelligence",
         "areaServed": {
@@ -77,7 +77,7 @@
                 🔍 Opportunités business en Côte d'Ivoire
             </h1>
             <p class="text-xl mb-8 opacity-90">
-                Horizon O vous aide à découvrir les opportunités business en Côte d'Ivoire : concours, financements, partenariats
+                Agento vous aide à découvrir les opportunités business en Côte d'Ivoire : concours, financements, partenariats
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-lg px-8 py-4 text-lg" style="background: white; color: var(--teal-600);">
@@ -184,7 +184,7 @@
     <section class="py-16" style="background: var(--gray-100);">
         <div class="container max-w-4xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-12 text-center" style="color: var(--gray-900);">
-                Comment fonctionne la veille Horizon O ?
+                Comment fonctionne la veille Agento ?
             </h2>
             
             <div class="grid md:grid-cols-4 gap-8">
@@ -279,7 +279,7 @@
     <section class="py-16" style="background: var(--gray-100);">
         <div class="container max-w-4xl mx-auto px-4">
             <h2 class="text-3xl font-bold mb-12 text-center" style="color: var(--gray-900);">
-                Ils ont saisi leur opportunité avec Horizon O
+                Ils ont saisi leur opportunité avec Agento
             </h2>
             
             <div class="grid md:grid-cols-2 gap-8">
@@ -291,7 +291,7 @@
                             <p class="text-sm" style="color: var(--gray-600);">Lauréate Prix Innovation CEDEAO</p>
                         </div>
                     </div>
-                    <p style="color: var(--gray-700);">"Grâce à l'alerte Horizon O, nous avons postulé au Prix Innovation CEDEAO et remporté 50 000€. Cette opportunité a transformé notre startup."</p>
+                    <p style="color: var(--gray-700);">"Grâce à l'alerte Agento, nous avons postulé au Prix Innovation CEDEAO et remporté 50 000€. Cette opportunité a transformé notre startup."</p>
                 </div>
                 
                 <div class="bg-white rounded-lg p-6 shadow-sm">
@@ -302,7 +302,7 @@
                             <p class="text-sm" style="color: var(--gray-600);">Marché public 200M FCFA</p>
                         </div>
                     </div>
-                    <p style="color: var(--gray-700);">"Horizon O nous a alertés sur un appel d'offres parfait pour nos services. Nous avons remporté le marché et doublé notre CA."</p>
+                    <p style="color: var(--gray-700);">"Agento nous a alertés sur un appel d'offres parfait pour nos services. Nous avons remporté le marché et doublé notre CA."</p>
                 </div>
             </div>
         </div>
@@ -315,7 +315,7 @@
                 Besoin d'aide pour trouver des opportunités ?
             </h2>
             <p class="text-lg mb-8" style="color: var(--gray-700);">
-                Horizon O peut vous aider à identifier les bonnes opportunités pour votre entreprise
+                Agento peut vous aider à identifier les bonnes opportunités pour votre entreprise
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('landing') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg">

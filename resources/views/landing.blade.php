@@ -1,12 +1,12 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'Horizon O - Assistant IA Entrepreneurial N°1 en Côte d\'Ivoire')
-@section('meta_description', 'Découvrez Horizon O, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens. Conseils personnalisés, opportunités de financement, réseau d\'affaires et accompagnement 24/7 pour réussir votre entreprise en Côte d\'Ivoire.')
-@section('meta_keywords', 'assistant IA côte ivoire, entrepreneur abidjan, startup CI, financement pme, conseil business, innovation afrique, lamine barro, etudesk')
-@section('og_title', 'Horizon O - Votre Assistant IA Entrepreneurial en Côte d\'Ivoire')
-@section('og_description', 'Rejoignez plus de 15M+ entrepreneurs qui font confiance à Horizon O pour développer leur business en Afrique. Gratuit et disponible 24/7.')
+@section('seo_title', 'Agento - Assistant IA Entrepreneurial N°1 en Côte d\'Ivoire')
+@section('meta_description', 'Découvrez Agento, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens. Conseils personnalisés, opportunités de financement, réseau d\'affaires et accompagnement 24/7 pour réussir votre entreprise en Côte d\'Ivoire.')
+@section('meta_keywords', 'assistant IA côte ivoire, entrepreneur abidjan, startup CI, financement pme, conseil business, innovation afrique, lamine barro, etudesk, agento')
+@section('og_title', 'Agento - Votre Assistant IA Entrepreneurial en Côte d\'Ivoire')
+@section('og_description', 'Rejoignez plus de 15M+ entrepreneurs qui font confiance à Agento pour développer leur business en Afrique. Gratuit et disponible 24/7.')
 @section('canonical_url', route('landing'))
-@section('title', 'Agent O - Assistant IA Entrepreneurial')
+@section('title', 'Agento - Assistant IA Entrepreneurial')
 
 @section('vite')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,14 +18,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
 @endpush
 
-@section('page_title', 'Agent O - Assistant IA Entrepreneurial')
+@section('page_title', 'Agento - Assistant IA Entrepreneurial')
 
 @section('schema_org')
 @verbatim
 {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Horizon O",
+    "name": "Agento",
     "alternateName": "Agent O",
     "description": "Premier assistant IA entrepreneurial pour la Côte d'Ivoire",
 @endverbatim
@@ -33,7 +33,7 @@
 @verbatim
     "sameAs": [
         "https://linkedin.com/company/lagento",
-        "https://twitter.com/Horizon O_CI"
+        "https://twitter.com/Agento_CI"
     ],
     "offers": {
         "@type": "Offer",
@@ -75,7 +75,7 @@
             
             <!-- Subtitle -->
             <p class="text-lg mb-8 mt-4" style="color: var(--gray-700);">
-                Horizon O a cartographié plus de 2000 milliards de Fcfa d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire a travers les initiatives gouvernementales et écosystèmes. Il est disposé 24h/7 pour vous accompagner à les saisir.
+                LagentO a cartographié plus de 2 000 milliards de FCFA d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire à travers les initiatives gouvernementales et les écosystèmes. Il est disponible 24h/7 pour vous accompagner à les saisir.
             </p>
 
             <!-- Email Form -->
