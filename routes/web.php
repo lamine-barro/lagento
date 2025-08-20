@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\IntelligenceController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SitemapController;
@@ -69,6 +70,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/step4', [OnboardingController::class, 'processStep4'])->name('onboarding.step4.process');
     });
     
+    // Route intelligence spéciale (pas de restriction d'onboarding)
+    Route::get('/intelligence', [IntelligenceController::class, 'index'])->name('intelligence');
+    Route::get('/intelligence/insights', [IntelligenceController::class, 'insights'])->name('intelligence.insights');
+    Route::get('/intelligence/directory', [IntelligenceController::class, 'directory'])->name('intelligence.directory');
+
     // Routes protégées qui nécessitent un onboarding complet
     Route::middleware(['onboarding.complete'])->group(function () {
         Route::get('/diagnostic', [DiagnosticController::class, 'index'])->name('diagnostic');
