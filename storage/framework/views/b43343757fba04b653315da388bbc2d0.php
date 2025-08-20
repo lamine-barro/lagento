@@ -235,7 +235,11 @@ function documentUpload() {
                                                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border" 
                                                       style="background: var(--orange-50); color: var(--orange-700); border-color: var(--orange-200);">
                                                     <i data-lucide="tag" class="w-3 h-3 mr-1"></i>
-                                                    <?php echo e(str_replace('_', ' ', $tag)); ?>
+                                                    <?php
+                                                        $displayTag = str_replace('_', ' ', $tag);
+                                                        $displayTag = ucfirst($displayTag);
+                                                    ?>
+                                                    <?php echo e($displayTag); ?>
 
                                                 </span>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -245,7 +249,7 @@ function documentUpload() {
                             <?php endif; ?>
                             <!-- État du document avec messages informatifs -->
                             <?php if($document->is_processed && $document->ai_summary): ?>
-                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                <div class="bg-gray-50 rounded-xl border border-gray-100" style="padding: var(--space-4);">
                                     <div class="flex items-start justify-between mb-3">
                                         <h4 class="text-sm font-semibold text-gray-900">Résumé synthétique</h4>
                                         <button @click="showDetails = !showDetails" 
@@ -323,20 +327,6 @@ function documentUpload() {
                 <p class="text-sm text-gray-600 mb-4 max-w-sm mx-auto">
                     Glissez vos documents officiels dans la zone de téléchargement ci-dessus pour commencer l'analyse automatique
                 </p>
-                <div class="flex items-center justify-center gap-6 text-xs text-gray-500">
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="shield-check" class="w-4 h-4 text-green-500"></i>
-                        <span>Analyse IA sécurisée</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="clock" class="w-4 h-4 text-blue-500"></i>
-                        <span>Traitement rapide</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="tag" class="w-4 h-4 text-orange-500"></i>
-                        <span>Tags automatiques</span>
-                    </div>
-                </div>
             </div>
         </div>
     <?php endif; ?>
@@ -364,7 +354,7 @@ function documentUpload() {
         // Créer un formulaire pour la suppression
         const form = window.document.createElement('form');
         form.method = 'POST';
-        form.action = '<?php echo e(url("documents/delete")); ?>/' + doc.filename;
+        form.action = `/documents/delete/${encodeURIComponent(doc.filename)}`;
         
         // Ajouter le token CSRF
         const csrfToken = window.document.createElement('input');

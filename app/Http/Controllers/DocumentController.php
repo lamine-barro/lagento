@@ -157,13 +157,50 @@ class DocumentController extends Controller
     public function delete($filename)
     {
         $user = Auth::user();
-        $filePath = 'documents/' . $user->id . '/' . $filename;
         
-        if (!Storage::disk('private')->exists($filePath)) {
+        // Logger pour déboguer
+        Log::info('Delete request received', [
+            'user_id' => $user->id,
+            'filename_param' => $filename,
+            'filename_decoded' => urldecode($filename)
+        ]);
+        
+        // Essayer d'abord avec le filename tel quel, puis décodé
+        $document = Document::where('user_id', $user->id)
+            ->where('filename', $filename)
+            ->first();
+            
+        if (!$document) {
+            $document = Document::where('user_id', $user->id)
+                ->where('filename', urldecode($filename))
+                ->first();
+        }
+            
+        if (!$document) {
+            Log::error('Document not found', [
+                'user_id' => $user->id,
+                'filename' => $filename,
+                'filename_decoded' => urldecode($filename)
+            ]);
             abort(404, 'Document non trouvé');
         }
         
-        Storage::disk('private')->delete($filePath);
+        $filePath = 'documents/' . $user->id . '/' . $document->filename;
+        
+        // Supprimer le fichier physique s'il existe
+        if (Storage::disk('private')->exists($filePath)) {
+            Storage::disk('private')->delete($filePath);
+        }
+        
+        // Supprimer l'enregistrement en base de données
+        $document->delete();
+        
+        // Logger l'action
+        Log::info('Document deleted', [
+            'user_id' => $user->id,
+            'document_id' => $document->id,
+            'filename' => $document->filename
+        ]);
         
         return redirect()->route('documents.index')->with('success', 'Document supprimé avec succès');
     }

@@ -323,20 +323,6 @@ function documentUpload() {
                 <p class="text-sm text-gray-600 mb-4 max-w-sm mx-auto">
                     Glissez vos documents officiels dans la zone de téléchargement ci-dessus pour commencer l'analyse automatique
                 </p>
-                <div class="flex items-center justify-center gap-6 text-xs text-gray-500">
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="shield-check" class="w-4 h-4 text-green-500"></i>
-                        <span>Analyse IA sécurisée</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="clock" class="w-4 h-4 text-blue-500"></i>
-                        <span>Traitement rapide</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="tag" class="w-4 h-4 text-orange-500"></i>
-                        <span>Tags automatiques</span>
-                    </div>
-                </div>
             </div>
         </div>
     @endif
@@ -364,7 +350,7 @@ function documentUpload() {
         // Créer un formulaire pour la suppression
         const form = window.document.createElement('form');
         form.method = 'POST';
-        form.action = '{{ route("documents.delete", "") }}/' + doc.filename;
+        form.action = `/documents/delete/${encodeURIComponent(doc.filename)}`;
         
         // Ajouter le token CSRF
         const csrfToken = window.document.createElement('input');
