@@ -28,7 +28,6 @@ Ligne 1:
   nom: CEPICI - Centre de Promotion des Investissements en Côte d'Ivoire
   description: Le CEPICI est le Guichet Unique de l'investissement centralisant les formalités de création d'entreprise
   services: [Création entreprise 2-5 jours,RCCM,DFE,Compte bancaire,Facilitation investissement,Incitations fiscales]
-  logo_url: [VIDE]
   tags: [creation entreprise,investissement,facilitation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -46,7 +45,6 @@ Ligne 2:
   nom: Tribunal de Commerce d'Abidjan
   description: Juridiction spécialisée de premier degré pour trancher les litiges commerciaux
   services: [RCCM,Contentieux commercial,Procédures collectives,Arbitrage commercial]
-  logo_url: [VIDE]
   tags: [justice,commerce,rccm]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -64,7 +62,6 @@ Ligne 3:
   nom: Tribunal de Commerce de Bouaké
   description: Juridiction commerciale région Centre
   services: [RCCM régional,Contentieux,Médiation commerciale]
-  logo_url: [VIDE]
   tags: [justice,commerce,regional]
   pays: Côte d'Ivoire
   region: Gbêkê
@@ -74,7 +71,6 @@ Ligne 3:
   latitude: 7.69
   telephone: +225 31 00 00 00
   email: bouake@tribunalcommerce.ci
-  site_web: [VIDE]
 
 Ligne 4:
   type: TRIBUNAL_COMMERCE
@@ -82,7 +78,6 @@ Ligne 4:
   nom: Tribunal de Commerce de Daloa
   description: Juridiction commerciale région Ouest
   services: [RCCM régional,Contentieux,Procédures simplifiées]
-  logo_url: [VIDE]
   tags: [justice,commerce,regional]
   pays: Côte d'Ivoire
   region: Haut-Sassandra
@@ -92,7 +87,6 @@ Ligne 4:
   latitude: 6.87
   telephone: +225 32 00 00 00
   email: daloa@tribunalcommerce.ci
-  site_web: [VIDE]
 
 Ligne 5:
   type: NOTAIRE
@@ -100,7 +94,6 @@ Ligne 5:
   nom: Chambre des Notaires de Côte d'Ivoire
   description: Organisme encadrant la profession notariale ivoirienne
   services: [Annuaire notaires,Formation continue,Médiation,Tarification,Conservation minutes]
-  logo_url: [VIDE]
   tags: [notaire,ordre,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -118,7 +111,6 @@ Ligne 6:
   nom: Me FADIKA-DELAFOSSE Christiane
   description: Étude notariale spécialisée droit des affaires
   services: [Statuts sociétés,Actes commerciaux,Contrats,Conseil juridique,Fusions-acquisitions]
-  logo_url: [VIDE]
   tags: [notaire,droit affaires,conseil]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -136,7 +128,6 @@ Ligne 7:
   nom: Me ANGOUA Lambert
   description: Office notarial avec expertise PME
   services: [Constitution sociétés,Actes OHADA,Baux commerciaux,Successions]
-  logo_url: [VIDE]
   tags: [notaire,ohada,pme]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -146,7 +137,6 @@ Ligne 7:
   latitude: 5.365
   telephone: +225 27 22 00 00
   email: angoua@notaire-ci.com
-  site_web: [VIDE]
 
 Ligne 8:
   type: NOTAIRE
@@ -154,7 +144,6 @@ Ligne 8:
   nom: Me N'GUESSAN Aimée
   description: Notaire spécialisée entrepreneuriat féminin
   services: [Statuts SARL/SA,Conseil femmes entrepreneurs,Transmission entreprises]
-  logo_url: [VIDE]
   tags: [notaire,femmes,transmission]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -164,7 +153,6 @@ Ligne 8:
   latitude: 5.295
   telephone: +225 21 00 00 00
   email: nguessan.notaire@gmail.com
-  site_web: [VIDE]
 
 Ligne 9:
   type: NOTAIRE
@@ -172,7 +160,6 @@ Ligne 9:
   nom: SCP KOUAME & KOUADIO
   description: Société Civile Professionnelle de Notaires
   services: [Actes de sociétés,Sûretés,Contrats commerciaux,Due diligence]
-  logo_url: [VIDE]
   tags: [notaire,societes,suretes]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -182,7 +169,6 @@ Ligne 9:
   latitude: 5.3681
   telephone: +225 22 00 00 00
   email: scp@kouame-kouadio.ci
-  site_web: [VIDE]
 
 Ligne 10:
   type: NOTAIRE
@@ -190,7 +176,6 @@ Ligne 10:
   nom: Me BROU Rose
   description: Notaire avec focus transmission d'entreprises
   services: [Cession parts sociales,Transmission PME,Pactes actionnaires]
-  logo_url: [VIDE]
   tags: [notaire,transmission,cession]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -200,7 +185,6 @@ Ligne 10:
   latitude: 5.34
   telephone: +225 07 00 00 00
   email: brou@notaire-transmission.ci
-  site_web: [VIDE]
 
 Ligne 11:
   type: NOTAIRE
@@ -208,7 +192,6 @@ Ligne 11:
   nom: Me TOURE Fatoumata
   description: Notaire spécialisée économie sociale et solidaire
   services: [Coopératives,Associations,Mutuelles,GIE,Fondations]
-  logo_url: [VIDE]
   tags: [notaire,ess,cooperatives]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -218,7 +201,6 @@ Ligne 11:
   latitude: 5.337
   telephone: +225 23 00 00 00
   email: toure@notaire-ess.ci
-  site_web: [VIDE]
 
 Ligne 12:
   type: FONDS_INVESTISSEMENT
@@ -226,7 +208,6 @@ Ligne 12:
   nom: Comoé Capital
   description: Premier fonds d'impact dédié aux PME ivoiriennes
   services: [Investissements 20-300M FCFA,Focus femmes entrepreneurs,Assistance technique,Impact investing]
-  logo_url: [VIDE]
   tags: [investissement,impact,femmes,pme]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -244,7 +225,6 @@ Ligne 13:
   nom: Janngo Capital
   description: Société panafricaine de capital-risque basée à Abidjan
   services: [Capital-risque seed/série A,Accélération startups tech,Focus égalité genres,78M USD fund]
-  logo_url: [VIDE]
   tags: [startup tech,égalité femmes-hommes,pan-africain]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -252,7 +232,6 @@ Ligne 13:
   adresse: Deux-Plateaux, Abidjan
   longitude: -3.9872
   latitude: 5.3681
-  telephone: [VIDE]
   email: contact@janngo.com
   site_web: https://janngo.com
 
@@ -262,7 +241,6 @@ Ligne 14:
   nom: Adiwale Partners
   description: Gestionnaire de fonds private equity indépendant
   services: [Capital-développement growth equity,Conseil gouvernance,Accès réseaux d'affaires]
-  logo_url: [VIDE]
   tags: [PME,private equity,croissance]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -270,7 +248,6 @@ Ligne 14:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: info@adiwale.com
   site_web: https://adiwale.com
 
@@ -280,7 +257,6 @@ Ligne 15:
   nom: I&P - Investisseurs & Partenaires
   description: Groupe d'investissement d'impact pionnier
   services: [Investissements 30K-5M USD,Coaching managérial,Suivi ESG,Levée fonds international]
-  logo_url: [VIDE]
   tags: [PME,impact,développement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -298,7 +274,6 @@ Ligne 16:
   nom: AfricInvest
   description: Société panafricaine de capital-investissement
   services: [Capital-développement,Capital-risque,Conseil stratégique,Réseau international]
-  logo_url: [VIDE]
   tags: [Pan-Africain,multisecteur,expérience]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -306,7 +281,6 @@ Ligne 16:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: contact@africinvest.com
   site_web: https://www.africinvest.com
 
@@ -316,7 +290,6 @@ Ligne 17:
   nom: Partech Africa
   description: Fonds africain du groupe global Partech
   services: [Venture capital seed & Série A,Mentorat international,Accès marché global,Support stratégique]
-  logo_url: [VIDE]
   tags: [startup tech,fintech,international]
   pays: France/Sénégal
   region: Lagunes
@@ -324,7 +297,6 @@ Ligne 17:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: africa@partechpartners.com
   site_web: https://partechpartners.com
 
@@ -334,7 +306,6 @@ Ligne 18:
   nom: Ubuntu Capital
   description: Fonds d'investissement et programme d'accélération
   services: [Investment 50K-500K USD,Acceleration program,Technical assistance,Portfolio support]
-  logo_url: [VIDE]
   tags: [investissement,acceleration,tech]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -352,7 +323,6 @@ Ligne 19:
   nom: Africalink Capital
   description: Fonds d'investissement Tech et Innovation
   services: [Seed funding,Series A,Tech investments,Exit support]
-  logo_url: [VIDE]
   tags: [investissement,tech,venture capital]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -370,7 +340,6 @@ Ligne 20:
   nom: Teranga Capital
   description: Fonds d'investissement impact Afrique de l'Ouest
   services: [Impact investing,PME financing,Technical assistance,ESG focus]
-  logo_url: [VIDE]
   tags: [investissement,impact,esg]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -388,7 +357,6 @@ Ligne 21:
   nom: Phoenix Capital Management
   description: Gestionnaire de fonds Private Equity UEMOA
   services: [Private equity,Growth capital,M&A advisory,Portfolio management]
-  logo_url: [VIDE]
   tags: [investissement,private equity,uemoa]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -406,7 +374,6 @@ Ligne 22:
   nom: BNI - Banque Nationale d'Investissement
   description: Banque publique de développement et d'investissement
   services: [Crédits PME jusqu'à 200M FCFA,Taux 6.5%,Garanties souples,Accompagnement,Refinancement]
-  logo_url: [VIDE]
   tags: [banque,credit,pme,developpement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -424,7 +391,6 @@ Ligne 23:
   nom: BAD - Banque Africaine de Développement
   description: Institution multilatérale de financement du développement
   services: [YEB youth initiative,AFAWA femmes,Infrastructure,Private sector,Lignes crédit PME]
-  logo_url: [VIDE]
   tags: [développement,multilatéral,financement grands projets]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -442,7 +408,6 @@ Ligne 24:
   nom: Société Générale CI
   description: Banque universelle avec offre PME
   services: [Pack Pro PME,Crédits équipement,Affacturage,International banking]
-  logo_url: [VIDE]
   tags: [banque,pme,international]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -460,7 +425,6 @@ Ligne 25:
   nom: Ecobank Côte d'Ivoire
   description: Banque panafricaine avec solutions PME
   services: [Rapidtransfer,Trade finance,Crédits PME,Digital banking]
-  logo_url: [VIDE]
   tags: [banque,panafricain,digital]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -478,7 +442,6 @@ Ligne 26:
   nom: Bridge Bank Group Côte d'Ivoire
   description: Banque commerciale avec focus PME
   services: [Crédits PME,Trade finance,Facilité IFC 40M USD,Cash management]
-  logo_url: [VIDE]
   tags: [banque,pme,commerce]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -496,7 +459,6 @@ Ligne 27:
   nom: BHCI - Banque de l'Habitat
   description: Banque spécialisée habitat et PME
   services: [Crédits immobiliers,Financement PME BTP,Garanties hypothécaires,Leasing]
-  logo_url: [VIDE]
   tags: [banque,immobilier,btp]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -514,7 +476,6 @@ Ligne 28:
   nom: Advans Côte d'Ivoire
   description: Institution de microfinance digitale
   services: [Micro-crédits,Crédits agricoles,Épargne,26 agences,Mobile banking]
-  logo_url: [VIDE]
   tags: [microfinance,digital,pme]
   pays: Côte d'Ivoire
   region: National
@@ -532,7 +493,6 @@ Ligne 29:
   nom: Baobab Côte d'Ivoire
   description: Leader de la microfinance avec réseau national
   services: [Microcrédits 100K-300M FCFA,Épargne,37 agences,Mobile banking,Micro-assurance]
-  logo_url: [VIDE]
   tags: [TPE,inclusion financière,prêt rapide]
   pays: Côte d'Ivoire
   region: National
@@ -541,7 +501,6 @@ Ligne 29:
   longitude: -4.0142
   latitude: 5.3207
   telephone: +225 27 20 30 69 00
-  email: [VIDE]
   site_web: https://baobab.com/cote-divoire
 
 Ligne 30:
@@ -550,7 +509,6 @@ Ligne 30:
   nom: COFINA Côte d'Ivoire
   description: Institution de méso-finance entre micro et banque
   services: [Crédits PME,Crédit-bail,Affacturage,Programme Fin'Elle femmes]
-  logo_url: [VIDE]
   tags: [mésofinance,PME,femmes entrepreneurs]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -568,7 +526,6 @@ Ligne 31:
   nom: Kolinvest
   description: Plateforme ivoirienne de financement participatif crowdfunding
   services: [Crowdlending,Prêt participatif en ligne,Suivi campagne,Communauté investisseurs]
-  logo_url: [VIDE]
   tags: [crowdfunding,prêt en ligne,startup fintech]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -576,7 +533,6 @@ Ligne 31:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: contact@kolinvest.ci
   site_web: https://kolinvest.ci
 
@@ -586,7 +542,6 @@ Ligne 32:
   nom: Oukaley
   description: Plateforme numérique de crowdfunding par dons et préventes
   services: [Crowdfunding dons,Contreparties,Campagne vidéo,Accompagnement communication]
-  logo_url: [VIDE]
   tags: [crowdfunding,dons,projets créatifs]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -594,7 +549,6 @@ Ligne 32:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: contact@oukaley.com
   site_web: https://oukaley.com
 
@@ -604,7 +558,6 @@ Ligne 33:
   nom: UNACOOPEC-CI
   description: Union Nationale des Coopératives d'Épargne et de Crédit
   services: [Microcrédits,Épargne,Programme jeunes AGIR,Education financière,Mobile banking]
-  logo_url: [VIDE]
   tags: [microfinance,cooperative,epargne]
   pays: Côte d'Ivoire
   region: National
@@ -622,7 +575,6 @@ Ligne 34:
   nom: MANSA Bank
   description: Banque digitale pour l'inclusion financière
   services: [Mobile banking,Microcrédits digital,Épargne mobile,Paiements]
-  logo_url: [VIDE]
   tags: [microfinance,digital,mobile]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -640,7 +592,6 @@ Ligne 35:
   nom: MUCREFAB
   description: Mutuelle de Crédit et d'Épargne des Femmes
   services: [Microcrédits femmes,Tontines,Formation entrepreneuriale,Solidarité]
-  logo_url: [VIDE]
   tags: [microfinance,femmes,mutuelle]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -658,7 +609,6 @@ Ligne 36:
   nom: ALIOS Finance CI
   description: Institution de crédit-bail et location
   services: [Leasing équipement,Location longue durée,Financement actifs,PME/PMI]
-  logo_url: [VIDE]
   tags: [leasing,financement,equipement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -676,7 +626,6 @@ Ligne 37:
   nom: Orange Corners Côte d'Ivoire
   description: Programme d'incubation pour jeunes entrepreneurs financé par Pays-Bas
   services: [Incubation 6 mois,Formations business,Mentorat,Coworking,Mise en relation investisseurs]
-  logo_url: [VIDE]
   tags: [incubation,jeunes entrepreneurs,innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -684,7 +633,6 @@ Ligne 37:
   adresse: Cocody
   longitude: -3.99
   latitude: 5.35
-  telephone: [VIDE]
   email: abidjan@orangecorners.com
   site_web: https://www.orangecorners.com/country/cote-divoire
 
@@ -694,7 +642,6 @@ Ligne 38:
   nom: Orange Fab CI
   description: Accélérateur corporate d'Orange pour startups tech
   services: [Accélération 6 mois,Coworking high-tech,Mentorat Orange,Financement amorçage,Accès API]
-  logo_url: [VIDE]
   tags: [corporate,tech,telecom,acceleration]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -702,7 +649,6 @@ Ligne 38:
   adresse: Orange Digital Center, Deux Plateaux
   longitude: -3.9872
   latitude: 5.3681
-  telephone: [VIDE]
   email: orangefab@orange.com
   site_web: https://business.orange.ci
 
@@ -712,7 +658,6 @@ Ligne 39:
   nom: Y'ello Startup (MTN)
   description: Programme d'accélération de MTN CI
   services: [Accélération 4 mois,5M FCFA financement,Mentorat MTN,Accès plateforme,Market access]
-  logo_url: [VIDE]
   tags: [corporate,tech,telecom,financement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -730,7 +675,6 @@ Ligne 40:
   nom: Yiri (AGL Africa)
   description: Accélérateur lancé par Africa Global Logistics
   services: [Accélération 6 mois,Coworking industriel,Coaching logistique,Mise en réseau corporate]
-  logo_url: [VIDE]
   tags: [logistique,supply chain,corporate VC]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -738,7 +682,6 @@ Ligne 40:
   adresse: Zone Portuaire d'Abidjan
   longitude: -4.0
   latitude: 5.28
-  telephone: [VIDE]
   email: yiri@aglgroup.com
   site_web: https://www.aglgroup.com
 
@@ -748,7 +691,6 @@ Ligne 41:
   nom: ZEBOX West Africa
   description: Hub d'innovation CMA CGM pour startups
   services: [3 programmes acceleration,Coworking 400m²,PoC factory,Corporate partnerships,Scale-up support]
-  logo_url: [VIDE]
   tags: [logistique,maritime,réseau international]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -766,7 +708,6 @@ Ligne 42:
   nom: Incub'Ivoir
   description: Incubateur spécialisé secteur agricole et agroalimentaire
   services: [Agricultural incubation,Speed Farmer program,Agribusiness training,Market linkage]
-  logo_url: [VIDE]
   tags: [agriculture,agroalimentaire,innovation rurale]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -774,7 +715,6 @@ Ligne 42:
   adresse: Yopougon
   longitude: -4.09
   latitude: 5.337
-  telephone: [VIDE]
   email: contact@incubivoir.net
   site_web: http://www.incubivoir.net
 
@@ -784,7 +724,6 @@ Ligne 43:
   nom: MStudio VC
   description: Premier startup studio d'Afrique francophone
   services: [Venture studio co-création,Financement pré-amorçage,Ressources mutualisées,Mentorat experts]
-  logo_url: [VIDE]
   tags: [startup studio,mobile,économie informelle]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -792,7 +731,6 @@ Ligne 43:
   adresse: Cocody
   longitude: -3.99
   latitude: 5.35
-  telephone: [VIDE]
   email: hello@mstudio.vc
   site_web: https://www.mstudio.vc
 
@@ -802,7 +740,6 @@ Ligne 44:
   nom: ADEI Tech Hub
   description: Hub technologique formant et connectant les acteurs tech
   services: [Tech Talent Accelerator,Incubation tech,Formation coding,FabLab,Networking events]
-  logo_url: [VIDE]
   tags: [tech,formation,innovation,digital]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -820,7 +757,6 @@ Ligne 45:
   nom: Incubateur Université FHB
   description: Structure d'incubation académique pour étudiants
   services: [Pré-incubation étudiants,Formation entrepreneurship,Mentorat académique,Concours pitch]
-  logo_url: [VIDE]
   tags: [étudiant-entrepreneur,innovation universitaire,transfert technologie]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -828,7 +764,6 @@ Ligne 45:
   adresse: Université FHB, Cocody
   longitude: -3.99
   latitude: 5.35
-  telephone: [VIDE]
   email: incubateur@univ-fhb.ci
   site_web: https://univ-fhb.edu.ci/incubateur
 
@@ -838,7 +773,6 @@ Ligne 46:
   nom: EntraAfrica (Programme)
   description: Programme d'incubation panafricain en ligne
   services: [Incubation virtuelle,Formation en ligne,Mentorat à distance,Communauté entrepreneurs]
-  logo_url: [VIDE]
   tags: [incubation en ligne,jeunes entreprises,développement local]
   pays: Côte d'Ivoire
   region: En ligne
@@ -846,7 +780,6 @@ Ligne 46:
   adresse: Plateforme numérique
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: via Facebook @EntraAfrica
   site_web: https://www.facebook.com/EntraAfrica
 
@@ -856,7 +789,6 @@ Ligne 47:
   nom: Impact Hub Abidjan
   description: Hub global d'innovation sociale et entrepreneuriat
   services: [Coworking,WIC Academy femmes,Booster for Youth,Impact programs,Events space]
-  logo_url: [VIDE]
   tags: [impact,social,coworking,femmes]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -874,7 +806,6 @@ Ligne 48:
   nom: Moov Innovation Center
   description: Programme d'incubation de Moov Africa
   services: [Incubation services numériques,Accès APIs Moov,Formations business,Support technique]
-  logo_url: [VIDE]
   tags: [télécom,mobile services,corporate]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -882,7 +813,6 @@ Ligne 48:
   adresse: Treichville
   longitude: -4.005
   latitude: 5.29
-  telephone: [VIDE]
   email: startup@moov-africa.ci
   site_web: https://www.moov-africa.ci/startup
 
@@ -892,7 +822,6 @@ Ligne 49:
   nom: Cofina Startup House
   description: Incubateur adossé à COFINA pour jeunes entreprises
   services: [Incubation fintech,Coaching affaires,Financement amorçage,Mise en réseau bancaire]
-  logo_url: [VIDE]
   tags: [fintech,mésofinance,innovation financière]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -900,7 +829,6 @@ Ligne 49:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: startup@cofinacorp.com
   site_web: https://cofinacorp.com/startuphouse
 
@@ -910,7 +838,6 @@ Ligne 50:
   nom: ADN Factory
   description: Hub d'innovation et accélération pour startups tech
   services: [Incubation early-stage,Accélération growth,Mentorat experts,Démo day,Investisseurs]
-  logo_url: [VIDE]
   tags: [startup tech,accélération,mentors]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -918,7 +845,6 @@ Ligne 50:
   adresse: Cocody
   longitude: -3.99
   latitude: 5.35
-  telephone: [VIDE]
   email: contact@adnfactory.com
   site_web: https://www.facebook.com/ADNFactory
 
@@ -928,7 +854,6 @@ Ligne 51:
   nom: Seedstars Abidjan
   description: Incubateur et accélérateur du réseau international Seedstars
   services: [Accélération 3 mois,Coworking international,Mentorat global,Bootcamps,Seedstars World]
-  logo_url: [VIDE]
   tags: [accélération,international,seed funding]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -936,7 +861,6 @@ Ligne 51:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: abidjan@seedspace.co
   site_web: https://www.seedspace.co
 
@@ -946,7 +870,6 @@ Ligne 52:
   nom: MakeSense Afrique
   description: Organisation internationale d'innovation sociale
   services: [Incubation projets sociaux,Ateliers co-création,Hackathons,Mentors bénévoles]
-  logo_url: [VIDE]
   tags: [innovation sociale,communauté,open innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -954,7 +877,6 @@ Ligne 52:
   adresse: Zone 4, Abidjan
   longitude: -3.992
   latitude: 5.295
-  telephone: [VIDE]
   email: abidjan@makesense.org
   site_web: https://www.makesense.org
 
@@ -964,7 +886,6 @@ Ligne 53:
   nom: Dream Factory (CI PME)
   description: Hub d'innovation public de l'Agence CI PME
   services: [Incubation gratuite,Coworking public,Formations,Événements,Aides publiques]
-  logo_url: [VIDE]
   tags: [gouvernemental,hub public,innovation locale]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -972,7 +893,6 @@ Ligne 53:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: contact@agencecipme.ci
   site_web: https://www.facebook.com/DreamFactoryCI
 
@@ -982,7 +902,6 @@ Ligne 54:
   nom: Ayiyikoh
   description: Incubateur communautaire pour jeunes porteurs de projets
   services: [Pré-incubation,Formations gestion,Développement personnel,Networking,Orientation]
-  logo_url: [VIDE]
   tags: [jeunes entrepreneurs,pré-incubation,formation base]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -990,7 +909,6 @@ Ligne 54:
   adresse: Marcory
   longitude: -3.992
   latitude: 5.295
-  telephone: [VIDE]
   email: ayiyikoh@gmail.com
   site_web: https://www.facebook.com/ayiyikoh.incubation
 
@@ -1000,7 +918,6 @@ Ligne 55:
   nom: Smart Up – Fondation Jeunesse Numérique
   description: Programme d'incubation de la FJN pour compétences numériques
   services: [Bootcamps code & business,Incubation post-bootcamp,Coaching numérique,Fab lab]
-  logo_url: [VIDE]
   tags: [jeunesse,numérique,e-inclusion]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1008,7 +925,6 @@ Ligne 55:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: contact@fjn.ci
   site_web: https://www.fjn.ci
 
@@ -1018,7 +934,6 @@ Ligne 56:
   nom: ABX Accelerator
   description: Accélérateur tech leader avec programme intensif de 16 semaines
   services: [Programme accélération,Mentorat,Coaching,Support financier 30M FCFA,Investment readiness]
-  logo_url: [VIDE]
   tags: [tech,startup,acceleration,fintech]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1036,7 +951,6 @@ Ligne 57:
   nom: CGECI Accélérateur
   description: Programme d'accélération de la Confédération Générale des Entreprises
   services: [CGECI Academy,Business Plan Competition,PRODIJE,Tech@work,Mentorat CEOs]
-  logo_url: [VIDE]
   tags: [pme,acceleration,formation,jeunes]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1054,7 +968,6 @@ Ligne 58:
   nom: HEC Challenge Plus
   description: Programme d'accélération HEC Paris en Afrique
   services: [Programme 8 mois,30000 EUR funding,Mentorship international,Training bootcamps,Demo Day]
-  logo_url: [VIDE]
   tags: [education,acceleration,international]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1072,7 +985,6 @@ Ligne 59:
   nom: ESPartners
   description: Cabinet d'accompagnement et investissement intelligent
   services: [Advisory services,Intelligent capital,Leadership training,Strategic consulting,Investment facilitation]
-  logo_url: [VIDE]
   tags: [conseil,investissement,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1090,7 +1002,6 @@ Ligne 60:
   nom: Fondation Jeunesse Numérique
   description: Fondation dédiée à l'entrepreneuriat digital des jeunes
   services: [Accompagnement digital,Coaching entrepreneurial,Financement jeunes,Formation numérique,Bootcamps]
-  logo_url: [VIDE]
   tags: [jeunesse,digital,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1108,7 +1019,6 @@ Ligne 61:
   nom: INOVIS
   description: Hub d'innovation et d'entrepreneuriat
   services: [Incubation,Acceleration,Coworking,Training,Investment facilitation]
-  logo_url: [VIDE]
   tags: [innovation,entrepreneuriat,tech]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1126,7 +1036,6 @@ Ligne 62:
   nom: Innovation Lab – Société Générale CI
   description: Laboratoire d'innovation fintech de SGCI
   services: [Laboratoire fintech,Open API bancaire,Co-création produits,Mentorat,POC financiers]
-  logo_url: [VIDE]
   tags: [fintech,banque,open innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1134,7 +1043,6 @@ Ligne 62:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: innovation@socgen.com
   site_web: https://societegenerale.ci
 
@@ -1144,7 +1052,6 @@ Ligne 63:
   nom: Akendewa Tech Hub
   description: Espace d'innovation et d'incubation tech depuis 2009
   services: [Communauté développeurs,Barcamp Abidjan,Projets open-source,Formations coding]
-  logo_url: [VIDE]
   tags: [tech community,open source,pionnier]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1162,7 +1069,6 @@ Ligne 64:
   nom: O'Village
   description: Tiers-lieu d'innovation sociale et numérique créé en 2014
   services: [Tiers-lieu open-source,Ateliers logiciels libres,Communauté autogérée,Projets civiques]
-  logo_url: [VIDE]
   tags: [open-source,innovation sociale,communauté]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1170,7 +1076,6 @@ Ligne 64:
   adresse: Yopougon Niangon
   longitude: -4.09
   latitude: 5.337
-  telephone: [VIDE]
   email: info@ovillage.ci
   site_web: http://www.ovillage.ci
 
@@ -1180,7 +1085,6 @@ Ligne 65:
   nom: French Tech Abidjan
   description: Communauté French Tech pour l'écosystème startup francophone
   services: [Networking events,Workshops,Facilitation internationale,Mentoring,Promotion startups]
-  logo_url: [VIDE]
   tags: [tech,francophone,networking,international]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1198,7 +1102,6 @@ Ligne 66:
   nom: Hub Ivoire Tech
   description: Hub d'innovation gouvernemental pour la tech
   services: [Incubation,Coworking,FabLab,Formation tech,Événements innovation]
-  logo_url: [VIDE]
   tags: [gouvernement,tech,innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1216,7 +1119,6 @@ Ligne 67:
   nom: Le Phare Coworking
   description: Premier espace de coworking moderne d'Abidjan
   services: [Open space,Bureaux privés,Salles réunion,Événements networking,Communauté]
-  logo_url: [VIDE]
   tags: [coworking,innovation,communauté]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1224,7 +1126,6 @@ Ligne 67:
   adresse: Cocody Angré
   longitude: -3.975
   latitude: 5.355
-  telephone: [VIDE]
   email: contact@pharecoworking.com
   site_web: https://www.pharecoworking.com
 
@@ -1234,7 +1135,6 @@ Ligne 68:
   nom: AkwaHub
   description: Espace de coworking et hub créatif
   services: [Coworking space,Studios créatifs,Incubation interne,Workshops,Conférences tech]
-  logo_url: [VIDE]
   tags: [coworking,créativité,tech]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1242,7 +1142,6 @@ Ligne 68:
   adresse: Cocody II Plateaux
   longitude: -3.9872
   latitude: 5.3681
-  telephone: [VIDE]
   email: hello@akwahub.net
   site_web: https://www.akwahub.net
 
@@ -1252,7 +1151,6 @@ Ligne 69:
   nom: AfricaWorks Abidjan
   description: Chaîne panafricaine d'espaces de coworking premium
   services: [Bureaux flexibles premium,Salles réunion pro,Services support,Networking corporate]
-  logo_url: [VIDE]
   tags: [coworking haut de gamme,réseau panafricain]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1260,7 +1158,6 @@ Ligne 69:
   adresse: Plateau, Immeuble Nour Al Hayat
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: abidjan@africaworks.com
   site_web: https://www.africaworks.co
 
@@ -1270,7 +1167,6 @@ Ligne 70:
   nom: Colab Abidjan
   description: Espace de coworking innovant interdisciplinaire
   services: [Coworking open-space,Studio multimédia,Coin fablab,Communauté en ligne]
-  logo_url: [VIDE]
   tags: [créatifs,collaboration,fablab urbain]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1278,7 +1174,6 @@ Ligne 70:
   adresse: Cocody Riviera
   longitude: -3.97
   latitude: 5.34
-  telephone: [VIDE]
   email: contact@colab.ci
   site_web: https://colab.andcards.com
 
@@ -1288,7 +1183,6 @@ Ligne 71:
   nom: My Address
   description: Espace de coworking et centre d'affaires
   services: [Domiciliation entreprise,Coworking,Salles réunion,Services secrétariat]
-  logo_url: [VIDE]
   tags: [domiciliation,centre affaires,formalisation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1296,7 +1190,6 @@ Ligne 71:
   adresse: Plateau, Avenue Nogues
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: contact@myaddress-ci.com
   site_web: https://www.myaddress-ci.com
 
@@ -1306,7 +1199,6 @@ Ligne 72:
   nom: Seedspace Abidjan
   description: Hub entrepreneurial et espace de coworking Seedstars
   services: [Coworking 24/7,Investment Readiness,Seedstars programs,Events,Mentoring]
-  logo_url: [VIDE]
   tags: [coworking,investissement,seedstars]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1324,7 +1216,6 @@ Ligne 73:
   nom: Jokkolabs Abidjan
   description: Espace de coworking et communauté d'entrepreneurs
   services: [Coworking solidaire,Events hosting,Community building,Networking,Training]
-  logo_url: [VIDE]
   tags: [coworking solidaire,innovation sociale]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1342,7 +1233,6 @@ Ligne 74:
   nom: Regus Côte d'Ivoire
   description: Leader mondial des espaces de travail flexibles
   services: [Bureaux équipés,Salles réunion pro,Domiciliation,Business lounge,Réseau global]
-  logo_url: [VIDE]
   tags: [business center,flexible office,international]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1351,7 +1241,6 @@ Ligne 74:
   longitude: -4.0142
   latitude: 5.3207
   telephone: +225 27 20 31 41 00
-  email: [VIDE]
   site_web: https://www.regus.com
 
 Ligne 75:
@@ -1360,7 +1249,6 @@ Ligne 75:
   nom: Baby Lab (FabLab Abobo)
   description: Premier FabLab de Côte d'Ivoire créé en 2014
   services: [FabLab,Ateliers enfants,Réparation informatique,Formation numérique,Makers]
-  logo_url: [VIDE]
   tags: [FabLab,éducation numérique,inclusion]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1368,7 +1256,6 @@ Ligne 75:
   adresse: Abobo Derrière-rails
   longitude: -4.016
   latitude: 5.418
-  telephone: [VIDE]
   email: babylab@gmail.com
   site_web: https://www.fablabs.io/labs/babylab
 
@@ -1378,7 +1265,6 @@ Ligne 76:
   nom: H-FABLAB
   description: FabLab moderne orienté AgriTech et IoT
   services: [FabLab,Formation makers,AgriTech innovation,3D printing,Projets Green Tech]
-  logo_url: [VIDE]
   tags: [FabLab,IoT,agritech]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1396,7 +1282,6 @@ Ligne 77:
   nom: Ministère de l'Entrepreneuriat National et des PME
   description: Ministère chargé de la politique PME et entrepreneuriat
   services: [Politique PME,Startup Act,Tutelle CI PME,Programmes jeunes,Formalisation]
-  logo_url: [VIDE]
   tags: [gouvernement,politique PME,entrepreneuriat]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1414,7 +1299,6 @@ Ligne 78:
   nom: Ministère de la Transition Numérique
   description: Ministère en charge de la transformation digitale
   services: [Politique numérique,Innovation digitale,E-gouvernement,Soutien startups tech]
-  logo_url: [VIDE]
   tags: [gouvernement,digital,innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1432,7 +1316,6 @@ Ligne 79:
   nom: Ministère du Commerce et de l'Industrie
   description: Ministère en charge du commerce et développement industriel
   services: [Régulation commerce,Promotion PME,Politique industrielle,Facilitation export]
-  logo_url: [VIDE]
   tags: [gouvernement,commerce,industrie]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1450,7 +1333,6 @@ Ligne 80:
   nom: Ministère de la Jeunesse
   description: Ministère en charge de la jeunesse et insertion professionnelle
   services: [Politique jeunesse,Programme entrepreneuriat,Formation professionnelle,Insertion jeunes]
-  logo_url: [VIDE]
   tags: [gouvernement,jeunesse,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1468,7 +1350,6 @@ Ligne 81:
   nom: Secrétariat d'État chargé de l'Autonomisation des Femmes
   description: Structure gouvernementale pour l'autonomisation économique des femmes
   services: [Entrepreneuriat féminin,Financement femmes,Formation genre,Autonomisation économique]
-  logo_url: [VIDE]
   tags: [femmes,genre,autonomisation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1486,7 +1367,6 @@ Ligne 82:
   nom: Agence Côte d'Ivoire PME
   description: Agence nationale de promotion des PME
   services: [Financement PME,Formation entrepreneuriale,Incubation,Formalisation,Conseil PME]
-  logo_url: [VIDE]
   tags: [pme,financement,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1504,7 +1384,6 @@ Ligne 83:
   nom: Agence Emploi Jeunes
   description: Agence gouvernementale pour l'emploi et entrepreneuriat jeune
   services: [Formation entrepreneuriat,Financement jeunes,C2D emploi,Stage emploi,PEJEDEC]
-  logo_url: [VIDE]
   tags: [jeunesse,emploi,entrepreneuriat]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1522,7 +1401,6 @@ Ligne 84:
   nom: APEX-CI
   description: Agence de Promotion des Exportations de Côte d'Ivoire
   services: [Information marchés,Formation normes export,Missions commerciales,Label qualité]
-  logo_url: [VIDE]
   tags: [export,commerce international,soutien PME]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1540,7 +1418,6 @@ Ligne 85:
   nom: CEPICI - Service Diaspora
   description: Service du CEPICI dédié aux investisseurs de la diaspora
   services: [Accueil diaspora,Appui création entreprise,Banque projets régionaux,Forums diaspora]
-  logo_url: [VIDE]
   tags: [diaspora,investissement,retour au pays]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1558,7 +1435,6 @@ Ligne 86:
   nom: FDFP
   description: Fonds de Développement de la Formation Professionnelle
   services: [Formation continue,Apprentissage,Perfectionnement PME,Certification professionnelle]
-  logo_url: [VIDE]
   tags: [formation,apprentissage,competences]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1576,7 +1452,6 @@ Ligne 87:
   nom: AGEPE
   description: Agence d'Études et de Promotion de l'Emploi
   services: [Études emploi,Intermédiation,Orientation professionnelle,Statistiques emploi]
-  logo_url: [VIDE]
   tags: [emploi,etudes,orientation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1594,7 +1469,6 @@ Ligne 88:
   nom: MPME CI
   description: Ministère de la Promotion des PME
   services: [Politique PME,Facilitation administrative,Programme financement,Formation entrepreneuriale]
-  logo_url: [VIDE]
   tags: [gouvernement,pme,politique]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1612,7 +1486,6 @@ Ligne 89:
   nom: ANSUT
   description: Agence Nationale du Service Universel des Télécommunications
   services: [Service universel,Accès TIC rural,Formation digitale,Infrastructure télécom]
-  logo_url: [VIDE]
   tags: [telecom,inclusion digitale,rural]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1630,7 +1503,6 @@ Ligne 90:
   nom: CCI-CI
   description: Chambre de Commerce et d'Industrie de Côte d'Ivoire
   services: [Formation commerce,Export support,Certification origine,B2B matchmaking,18 bureaux]
-  logo_url: [VIDE]
   tags: [chambre commerce,export,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1648,7 +1520,6 @@ Ligne 91:
   nom: CCI France Côte d'Ivoire
   description: Chambre de Commerce France-Côte d'Ivoire
   services: [Business France,Matchmaking B2B,Prospection marchés,VIE program,600 membres]
-  logo_url: [VIDE]
   tags: [chambre commerce,france,international]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1666,7 +1537,6 @@ Ligne 92:
   nom: AmCham Côte d'Ivoire
   description: American Chamber of Commerce
   services: [US business facilitation,Trade missions,Advocacy,Networking,400 membres]
-  logo_url: [VIDE]
   tags: [chambre commerce,usa,networking]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1684,7 +1554,6 @@ Ligne 93:
   nom: Chambre de Commerce Libanaise
   description: Chambre de commerce communauté libanaise
   services: [Import/export,Networking diaspora,Commerce international]
-  logo_url: [VIDE]
   tags: [chambre commerce,diaspora,import export]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1694,7 +1563,6 @@ Ligne 93:
   latitude: 5.295
   telephone: +225 21 00 00 00
   email: ccl@liban-ci.org
-  site_web: [VIDE]
 
 Ligne 94:
   type: CHAMBRE_COMMERCE
@@ -1702,7 +1570,6 @@ Ligne 94:
   nom: Chambre de Commerce Chinoise CI
   description: Chambre commerce communauté chinoise
   services: [Trade Chine-CI,Import facilitation,B2B China,Language support]
-  logo_url: [VIDE]
   tags: [chambre commerce,chine,trade]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1712,7 +1579,6 @@ Ligne 94:
   latitude: 5.295
   telephone: +225 07 00 00 00
   email: cccaci@china-ci.org
-  site_web: [VIDE]
 
 Ligne 95:
   type: CENTRE_FORMATION
@@ -1720,7 +1586,6 @@ Ligne 95:
   nom: IECD
   description: Institut Européen de Coopération et de Développement
   services: [Formation professionnelle,Programme PATPE,Mentorat PME,TRANSFORM agro,Clubs entrepreneurs]
-  logo_url: [VIDE]
   tags: [formation entrepreneurs,ONG,économie locale]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1738,7 +1603,6 @@ Ligne 96:
   nom: Empow'Her Côte d'Ivoire
   description: Organisation internationale pour l'autonomisation économique des femmes
   services: [Formations business femmes,Incubation projets féminins,Mentorat femmes leaders,Coworking]
-  logo_url: [VIDE]
   tags: [femmes,inclusion,capacity building]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1746,7 +1610,6 @@ Ligne 96:
   adresse: Cocody Angré
   longitude: -3.975
   latitude: 5.355
-  telephone: [VIDE]
   email: cotedivoire@empow-her.com
   site_web: https://empow-her.com
 
@@ -1756,7 +1619,6 @@ Ligne 97:
   nom: MPME CI
   description: Mouvement des PME de Côte d'Ivoire
   services: [Représentation PME,Lobbying,Formations,Networking,Assistance juridique/fiscale]
-  logo_url: [VIDE]
   tags: [PME,association patronale,plaidoyer]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1764,9 +1626,7 @@ Ligne 97:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: mpme.ci@gmail.com
-  site_web: [VIDE]
 
 Ligne 98:
   type: ASSOCIATION_ENTREPRENEURIALE
@@ -1774,7 +1634,6 @@ Ligne 98:
   nom: La French Tech Abidjan
   description: Communauté French Tech réunissant l'écosystème tech francophone
   services: [Réseau startup,Networking franco-ivoirien,Événements tech,Promotion internationale]
-  logo_url: [VIDE]
   tags: [communauté tech,diaspora,coopération]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1782,7 +1641,6 @@ Ligne 98:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: abidjan@lafrenchtech.com
   site_web: https://lafrenchtech.com
 
@@ -1792,7 +1650,6 @@ Ligne 99:
   nom: CEI Diaspora (CCEDIAF)
   description: Club des Entrepreneurs Ivoiriens de la Diaspora
   services: [Réseau business diaspora,Forums investissement,Missions économiques,Mentorat]
-  logo_url: [VIDE]
   tags: [diaspora,réseau affaires,investissement]
   pays: France/Côte d'Ivoire
   region: Île-de-France/Lagunes
@@ -1800,7 +1657,6 @@ Ligne 99:
   adresse: Paris France
   longitude: -2.3522
   latitude: 48.8566
-  telephone: [VIDE]
   email: contact@ccediaf.org
   site_web: https://ccediaf.org
 
@@ -1810,7 +1666,6 @@ Ligne 100:
   nom: CGECI
   description: Confédération Générale des Entreprises de Côte d'Ivoire
   services: [Représentation patronale,Plaidoyer,Formation dirigeants,200+ entreprises membres]
-  logo_url: [VIDE]
   tags: [patronat,entreprises,plaidoyer]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1828,7 +1683,6 @@ Ligne 101:
   nom: FIPME
   description: Fédération Ivoirienne des PME
   services: [Plaidoyer PME,Ateliers formation,Genre et PME,31 régions,14 districts]
-  logo_url: [VIDE]
   tags: [pme,federation,plaidoyer]
   pays: Côte d'Ivoire
   region: National
@@ -1846,7 +1700,6 @@ Ligne 102:
   nom: FENACCI
   description: Fédération Nationale des Chambres de Commerce
   services: [1.5M membres,Carte professionnelle,Formation continue,159 sections locales]
-  logo_url: [VIDE]
   tags: [commerce,federation,formation]
   pays: Côte d'Ivoire
   region: National
@@ -1864,7 +1717,6 @@ Ligne 103:
   nom: JCI Côte d'Ivoire
   description: Jeune Chambre Internationale
   services: [Leadership 18-40 ans,Formation soft skills,32 chapitres locaux,Réseautage]
-  logo_url: [VIDE]
   tags: [jeunesse,leadership,networking]
   pays: Côte d'Ivoire
   region: National
@@ -1882,7 +1734,6 @@ Ligne 104:
   nom: APEX-CI Banques
   description: Association Professionnelle des Banques
   services: [Représentation bancaire,Formation bancaire,Inclusion financière,Mobile money]
-  logo_url: [VIDE]
   tags: [banques,finance,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1900,7 +1751,6 @@ Ligne 105:
   nom: ROADCI
   description: Réseau Ouest Africain des Femmes Entrepreneures
   services: [Networking femmes,Formation leadership,Mentorat,Commerce transfrontalier]
-  logo_url: [VIDE]
   tags: [femmes,reseau,leadership]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1918,7 +1768,6 @@ Ligne 106:
   nom: RICOMEN
   description: Réseau Ivoirien des Commerçantes
   services: [Commerce femmes,Microfinance,Formation commerce,Plaidoyer genre]
-  logo_url: [VIDE]
   tags: [femmes,commerce,microfinance]
   pays: Côte d'Ivoire
   region: National
@@ -1928,7 +1777,6 @@ Ligne 106:
   latitude: 5.336
   telephone: +225 07 00 00 00
   email: ricomen@gmail.com
-  site_web: [VIDE]
 
 Ligne 107:
   type: ASSOCIATION_ENTREPRENEURIALE
@@ -1936,7 +1784,6 @@ Ligne 107:
   nom: Club des Entrepreneurs CI
   description: Club d'affaires et networking
   services: [Networking premium,Conférences,Mentorat,Deal flow]
-  logo_url: [VIDE]
   tags: [networking,affaires,mentorat]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1954,7 +1801,6 @@ Ligne 108:
   nom: AFCI - Association Fintech CI
   description: Association des Fintech de Côte d'Ivoire
   services: [Plaidoyer fintech,Régulation,Innovation financière,Standards]
-  logo_url: [VIDE]
   tags: [fintech,innovation,regulation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1972,7 +1818,6 @@ Ligne 109:
   nom: VITIB
   description: Association du Village des Technologies
   services: [Tech ecosystem,Innovation,Digital transformation,Events]
-  logo_url: [VIDE]
   tags: [tech,innovation,digital]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -1990,7 +1835,6 @@ Ligne 110:
   nom: UNICI
   description: Union Nationale des Investisseurs de CI
   services: [Advocacy investisseurs,Capital local,Deal syndication,Formation]
-  logo_url: [VIDE]
   tags: [investissement,capital,advocacy]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2000,7 +1844,6 @@ Ligne 110:
   latitude: 5.3207
   telephone: +225 20 00 00 00
   email: unici@investisseurs-ci.org
-  site_web: [VIDE]
 
 Ligne 111:
   type: ASSOCIATION_ENTREPRENEURIALE
@@ -2008,7 +1851,6 @@ Ligne 111:
   nom: APBEF-CI
   description: Association Professionnelle des Banques et Établissements Financiers
   services: [Régulation bancaire,Formation finance,Standards,Compliance]
-  logo_url: [VIDE]
   tags: [banques,finance,regulation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2026,7 +1868,6 @@ Ligne 112:
   nom: GOTIC
   description: Groupement des Opérateurs du Secteur des TIC
   services: [Plaidoyer TIC,Formation tech,Standards,Innovation]
-  logo_url: [VIDE]
   tags: [tic,tech,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2044,7 +1885,6 @@ Ligne 113:
   nom: REJEC
   description: Réseau des Jeunes Entrepreneurs de CI
   services: [Entrepreneuriat jeune,Mentorat,Pitch competitions,Formation]
-  logo_url: [VIDE]
   tags: [jeunesse,entrepreneuriat,mentorat]
   pays: Côte d'Ivoire
   region: National
@@ -2062,7 +1902,6 @@ Ligne 114:
   nom: AFEM-CI
   description: Association des Femmes Entrepreneures et des Métiers
   services: [Femmes entrepreneures,Formation métiers,Autonomisation,Microfinance]
-  logo_url: [VIDE]
   tags: [femmes,metiers,formation]
   pays: Côte d'Ivoire
   region: National
@@ -2072,7 +1911,6 @@ Ligne 114:
   latitude: 5.337
   telephone: +225 23 00 00 00
   email: afem@femmes-entrepreneurs.ci
-  site_web: [VIDE]
 
 Ligne 115:
   type: CABINET_CONSEIL
@@ -2080,7 +1918,6 @@ Ligne 115:
   nom: ESPartners
   description: Cabinet de conseil international en développement entrepreneurial
   services: [Consulting stratégique PME,Design programmes incubation,Études marché,Levée fonds]
-  logo_url: [VIDE]
   tags: [consulting,stratégie,écosystème]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2088,7 +1925,6 @@ Ligne 115:
   adresse: Cocody Riviera
   longitude: -3.97
   latitude: 5.34
-  telephone: [VIDE]
   email: info@espartners.co
   site_web: http://www.espartners.co
 
@@ -2098,7 +1934,6 @@ Ligne 116:
   nom: Legafrik
   description: Plateforme juridique en ligne pour entrepreneurs
   services: [Création entreprise en ligne,Domiciliation,Dépôt marque,Contrats,Chatbot juridique]
-  logo_url: [VIDE]
   tags: [legaltech,formalisation,juridique en ligne]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2116,7 +1951,6 @@ Ligne 117:
   nom: FDKA
   description: Cabinet d'avocats d'affaires international
   services: [Droit des affaires,M&A,Arbitrage,Droit OHADA,Private equity]
-  logo_url: [VIDE]
   tags: [avocat,affaires,international]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2134,7 +1968,6 @@ Ligne 118:
   nom: Bilé-Aka Brizoua-Bi & Associés
   description: Cabinet d'avocats leader en Côte d'Ivoire
   services: [Corporate,Finance,Contentieux,Arbitrage,Conseil stratégique]
-  logo_url: [VIDE]
   tags: [avocat,corporate,finance]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2152,7 +1985,6 @@ Ligne 119:
   nom: SCPA KADJO-KADJO & Associés
   description: Cabinet spécialisé droit des affaires OHADA
   services: [Droit OHADA,Fiscalité,Contentieux commercial,Propriété intellectuelle]
-  logo_url: [VIDE]
   tags: [avocat,ohada,fiscalite]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2162,7 +1994,6 @@ Ligne 119:
   latitude: 5.3207
   telephone: +225 20 00 00 00
   email: cabinet@kadjo-associes.ci
-  site_web: [VIDE]
 
 Ligne 120:
   type: CABINET_JURIDIQUE
@@ -2170,7 +2001,6 @@ Ligne 120:
   nom: Me DEGNY DAILLY Sylvie
   description: Avocate spécialisée startups et tech
   services: [Droit du numérique,Propriété intellectuelle,Startups,Levées de fonds]
-  logo_url: [VIDE]
   tags: [avocat,tech,startup]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2180,7 +2010,6 @@ Ligne 120:
   latitude: 5.35
   telephone: +225 07 00 00 00
   email: sdegny@avocat-tech.ci
-  site_web: [VIDE]
 
 Ligne 121:
   type: CABINET_JURIDIQUE
@@ -2188,7 +2017,6 @@ Ligne 121:
   nom: COFINA CONSEIL JURIDIQUE
   description: Cabinet conseil juridique et fiscal PME
   services: [Conseil juridique PME,Optimisation fiscale,Conformité,Formation]
-  logo_url: [VIDE]
   tags: [conseil juridique,fiscal,pme]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2198,7 +2026,6 @@ Ligne 121:
   latitude: 5.295
   telephone: +225 21 00 00 00
   email: conseil@cofina-juridique.ci
-  site_web: [VIDE]
 
 Ligne 122:
   type: CABINET_JURIDIQUE
@@ -2206,7 +2033,6 @@ Ligne 122:
   nom: ASAFO & Co
   description: Cabinet d'avocats panafricain
   services: [Droit des affaires régional,UEMOA,CEDEAO,Investment law]
-  logo_url: [VIDE]
   tags: [avocat,regional,investissement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2224,7 +2050,6 @@ Ligne 123:
   nom: YAO & Associates
   description: Cabinet conseil juridique entrepreneuriat social
   services: [Impact investing,Entreprises sociales,Compliance ESG,B-Corp]
-  logo_url: [VIDE]
   tags: [avocat,impact,esg]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2234,7 +2059,6 @@ Ligne 123:
   latitude: 5.35
   telephone: +225 07 00 00 00
   email: contact@yao-associates.ci
-  site_web: [VIDE]
 
 Ligne 124:
   type: CABINET_JURIDIQUE
@@ -2242,7 +2066,6 @@ Ligne 124:
   nom: Ordre des Avocats de Côte d'Ivoire
   description: Barreau de Côte d'Ivoire
   services: [Annuaire avocats,Aide juridictionnelle,Formation,Déontologie]
-  logo_url: [VIDE]
   tags: [avocat,barreau,ordre]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2260,7 +2083,6 @@ Ligne 125:
   nom: Cabinet KOFFI & Partenaires
   description: Cabinet spécialisé restructuration PME
   services: [Restructuration,Redressement,Médiation commerciale,Recouvrement]
-  logo_url: [VIDE]
   tags: [avocat,restructuration,mediation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2270,7 +2092,6 @@ Ligne 125:
   latitude: 5.3207
   telephone: +225 20 00 00 00
   email: cabinet@koffi-partners.ci
-  site_web: [VIDE]
 
 Ligne 126:
   type: CABINET_JURIDIQUE
@@ -2278,7 +2099,6 @@ Ligne 126:
   nom: AHOU Legal
   description: Cabinet boutique droit des technologies
   services: [Fintech law,Data protection,E-commerce,Blockchain]
-  logo_url: [VIDE]
   tags: [avocat,fintech,data]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2288,7 +2108,6 @@ Ligne 126:
   latitude: 5.35
   telephone: +225 07 00 00 00
   email: info@ahou-legal.ci
-  site_web: [VIDE]
 
 Ligne 127:
   type: CABINET_CONSEIL
@@ -2296,7 +2115,6 @@ Ligne 127:
   nom: KPMG Côte d'Ivoire
   description: Cabinet Big Four audit et conseil
   services: [Audit,Advisory,Tax,Deal advisory,PME services]
-  logo_url: [VIDE]
   tags: [audit,conseil,fiscalite]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2314,7 +2132,6 @@ Ligne 128:
   nom: PwC Côte d'Ivoire
   description: PricewaterhouseCoopers CI
   services: [Assurance,Tax,Advisory,Deals,700+ staff]
-  logo_url: [VIDE]
   tags: [audit,conseil,fiscalite]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2332,7 +2149,6 @@ Ligne 129:
   nom: Deloitte Côte d'Ivoire
   description: Cabinet Big Four audit et conseil
   services: [Audit,Consulting,Risk advisory,Financial advisory,Tax]
-  logo_url: [VIDE]
   tags: [audit,conseil,risque]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2350,7 +2166,6 @@ Ligne 130:
   nom: EY Côte d'Ivoire
   description: Ernst & Young CI
   services: [Assurance,Tax,Transaction advisory,Consulting,Forensics]
-  logo_url: [VIDE]
   tags: [audit,conseil,transaction]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2368,7 +2183,6 @@ Ligne 131:
   nom: Grant Thornton CI
   description: Cabinet audit et conseil international
   services: [Audit,Tax advisory,Business consulting,Recovery & Reorganisation]
-  logo_url: [VIDE]
   tags: [audit,conseil,restructuration]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2386,7 +2200,6 @@ Ligne 132:
   nom: MS International
   description: Premier cabinet conseil ivoirien
   services: [Strategy consulting,Organisation,Change management,UEMOA expertise]
-  logo_url: [VIDE]
   tags: [strategie,organisation,conseil]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2404,7 +2217,6 @@ Ligne 133:
   nom: HASEL Consulting
   description: Cabinet conseil PME et startups
   services: [Business plan,Levée de fonds,Stratégie PME,Formation dirigeants]
-  logo_url: [VIDE]
   tags: [conseil,pme,strategie]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2422,7 +2234,6 @@ Ligne 134:
   nom: BDO Côte d'Ivoire
   description: 5ème réseau mondial audit et conseil
   services: [Audit,Tax,Advisory,Outsourcing,IT consulting]
-  logo_url: [VIDE]
   tags: [audit,conseil,outsourcing]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2440,7 +2251,6 @@ Ligne 135:
   nom: Mazars Côte d'Ivoire
   description: Cabinet audit et conseil international
   services: [Audit,Tax,Financial advisory,Consulting,Accounting]
-  logo_url: [VIDE]
   tags: [audit,conseil,comptabilite]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2458,7 +2268,6 @@ Ligne 136:
   nom: Performances Management Consulting
   description: Cabinet conseil en management
   services: [Organisation,RH,Stratégie,Digital transformation,Change management]
-  logo_url: [VIDE]
   tags: [management,rh,transformation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2476,7 +2285,6 @@ Ligne 137:
   nom: Afrika Stratégies
   description: Cabinet conseil stratégie et communication
   services: [Stratégie d'entreprise,Communication,Marketing,Études de marché]
-  logo_url: [VIDE]
   tags: [strategie,communication,marketing]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2486,7 +2294,6 @@ Ligne 137:
   latitude: 5.295
   telephone: +225 21 00 00 00
   email: contact@afrika-strategies.com
-  site_web: [VIDE]
 
 Ligne 138:
   type: CABINET_CONSEIL
@@ -2494,7 +2301,6 @@ Ligne 138:
   nom: Bloomfield Investment Corporation
   description: Agence notation et conseil financier
   services: [Rating UEMOA,Advisory,Research,Risk analysis]
-  logo_url: [VIDE]
   tags: [notation,finance,risque]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2512,7 +2318,6 @@ Ligne 139:
   nom: Phoenix Capital Advisory
   description: Conseil en fusion-acquisition
   services: [M&A advisory,Valuation,Due diligence,Capital raising]
-  logo_url: [VIDE]
   tags: [fusion acquisition,valorisation,conseil]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2522,7 +2327,6 @@ Ligne 139:
   latitude: 5.3207
   telephone: +225 20 00 00 00
   email: advisory@phoenix-capital.ci
-  site_web: [VIDE]
 
 Ligne 140:
   type: CABINET_CONSEIL
@@ -2530,7 +2334,6 @@ Ligne 140:
   nom: Saracen Partners
   description: Cabinet conseil transformation digitale
   services: [Digital strategy,IT consulting,Process optimization,Data analytics]
-  logo_url: [VIDE]
   tags: [digital,transformation,it]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2540,7 +2343,6 @@ Ligne 140:
   latitude: 5.35
   telephone: +225 07 00 00 00
   email: info@saracen-partners.ci
-  site_web: [VIDE]
 
 Ligne 141:
   type: CABINET_CONSEIL
@@ -2548,7 +2350,6 @@ Ligne 141:
   nom: Africa Business Consulting
   description: Conseil développement business Afrique
   services: [Market entry,Partner search,Feasibility studies,Project management]
-  logo_url: [VIDE]
   tags: [business development,etudes,projet]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2558,7 +2359,6 @@ Ligne 141:
   latitude: 5.295
   telephone: +225 21 00 00 00
   email: info@abc-consulting.ci
-  site_web: [VIDE]
 
 Ligne 142:
   type: CABINET_CONSEIL
@@ -2566,7 +2366,6 @@ Ligne 142:
   nom: Nexus Conseils
   description: Cabinet conseil multisectoriel
   services: [Conseil fiscal,Audit interne,Formation,Accompagnement PME]
-  logo_url: [VIDE]
   tags: [fiscal,audit,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2576,7 +2375,6 @@ Ligne 142:
   latitude: 5.34
   telephone: +225 22 00 00 00
   email: contact@nexus-conseils.ci
-  site_web: [VIDE]
 
 Ligne 143:
   type: CABINET_CONSEIL
@@ -2584,7 +2382,6 @@ Ligne 143:
   nom: Dalberg Advisors
   description: Conseil en impact et développement
   services: [Impact strategy,Development consulting,Social innovation,ESG]
-  logo_url: [VIDE]
   tags: [impact,developpement,esg]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2592,7 +2389,6 @@ Ligne 143:
   adresse: Via bureau Dakar
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: cotedivoire@dalberg.com
   site_web: https://dalberg.com
 
@@ -2602,7 +2398,6 @@ Ligne 144:
   nom: Entrepreneurial Solutions Partners
   description: Solutions entrepreneuriales intégrées
   services: [Incubation support,Business development,Training,Investment readiness]
-  logo_url: [VIDE]
   tags: [entrepreneuriat,formation,investissement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2612,7 +2407,6 @@ Ligne 144:
   latitude: 5.35
   telephone: +225 07 00 00 00
   email: esp@esp-partners.com
-  site_web: [VIDE]
 
 Ligne 145:
   type: CABINET_CONSEIL
@@ -2620,7 +2414,6 @@ Ligne 145:
   nom: Afrique Emergence & Investissements
   description: Conseil en investissement et développement
   services: [Investment advisory,PPP structuring,Project finance,Fundraising]
-  logo_url: [VIDE]
   tags: [investissement,ppp,financement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2629,8 +2422,6 @@ Ligne 145:
   longitude: -4.0142
   latitude: 5.3207
   telephone: +225 20 00 00 00
-  email: [VIDE]
-  site_web: [VIDE]
 
 Ligne 146:
   type: CABINET_CONSEIL
@@ -2638,7 +2429,6 @@ Ligne 146:
   nom: Roland Berger
   description: Cabinet stratégie allemand
   services: [Strategy consulting,Restructuring,Digital,Performance improvement]
-  logo_url: [VIDE]
   tags: [strategie,restructuration,digital]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2646,7 +2436,6 @@ Ligne 146:
   adresse: Via bureau Casablanca
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: abidjan@rolandberger.com
   site_web: https://rolandberger.com
 
@@ -2656,7 +2445,6 @@ Ligne 147:
   nom: ARTCI
   description: Autorité de Régulation des Télécommunications/TIC
   services: [Régulation télécoms,Licences télécoms,Cybersécurité,Protection consommateurs]
-  logo_url: [VIDE]
   tags: [regulation,telecom,tic]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2674,7 +2462,6 @@ Ligne 148:
   nom: DGI - Direction Générale des Impôts
   description: Administration fiscale de Côte d'Ivoire
   services: [Enregistrement fiscal,E-impôts,Attestation fiscale,Conseil fiscal PME]
-  logo_url: [VIDE]
   tags: [fiscal,impots,administration]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2683,7 +2470,6 @@ Ligne 148:
   longitude: -4.0142
   latitude: 5.3207
   telephone: +225 27 20 30 80 00
-  email: [VIDE]
   site_web: http://www.dgi.gouv.ci
 
 Ligne 149:
@@ -2692,7 +2478,6 @@ Ligne 149:
   nom: Direction Générale des Douanes
   description: Administration douanière de Côte d'Ivoire
   services: [Dédouanement,Tarifs douaniers,Régimes économiques,GUCE,Certification OEA]
-  logo_url: [VIDE]
   tags: [douanes,commerce,import export]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2701,7 +2486,6 @@ Ligne 149:
   longitude: -4.0142
   latitude: 5.3207
   telephone: +225 27 20 21 06 30
-  email: [VIDE]
   site_web: http://www.douanes.ci
 
 Ligne 150:
@@ -2710,7 +2494,6 @@ Ligne 150:
   nom: Banque Mondiale
   description: Institution de Bretton Woods
   services: [PARE-PME 15M USD,LTIF startups,Doing Business,Technical assistance,IFC]
-  logo_url: [VIDE]
   tags: [developpement,financement,assistance technique]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2728,7 +2511,6 @@ Ligne 151:
   nom: IFC - Société Financière Internationale
   description: Branche secteur privé Groupe Banque Mondiale
   services: [Portfolio 761M USD,Banking facilities,Advisory services,Blended finance]
-  logo_url: [VIDE]
   tags: [investissement,secteur prive,conseil]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2746,7 +2528,6 @@ Ligne 152:
   nom: AFD - Agence Française de Développement
   description: Agence de développement France
   services: [Choose Africa,Digital Africa,Proparco,Ambition PME,Meet Africa]
-  logo_url: [VIDE]
   tags: [developpement,france,financement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2764,7 +2545,6 @@ Ligne 153:
   nom: GIZ - Coopération Allemande
   description: Agence de coopération technique allemande
   services: [ProDEC économie,Invest for Jobs,Formation professionnelle,Green economy]
-  logo_url: [VIDE]
   tags: [cooperation,allemagne,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2782,7 +2562,6 @@ Ligne 154:
   nom: Tony Elumelu Foundation
   description: Fondation entrepreneuriat africain
   services: [TEF Program,1000 entrepreneurs/an,5000 USD seed,Training,Mentoring]
-  logo_url: [VIDE]
   tags: [startups africaines,empowerment,financement seed]
   pays: Nigeria
   region: Lagunes
@@ -2790,7 +2569,6 @@ Ligne 154:
   adresse: Via online platform
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: info@tonyelumelufoundation.org
   site_web: https://tonyelumelufoundation.org
 
@@ -2800,7 +2578,6 @@ Ligne 155:
   nom: MEET Africa
   description: Programme UE pour entrepreneurs diaspora africaine
   services: [Identification projets,Incubation Europe+Afrique,Subvention 15K EUR,Mentorat]
-  logo_url: [VIDE]
   tags: [diaspora,UE,co-développement]
   pays: Côte d'Ivoire/Europe
   region: Abidjan/Paris
@@ -2808,7 +2585,6 @@ Ligne 155:
   adresse: Coordination CEPICI/Expertise France
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: info@meetafrica.fr
   site_web: https://www.meetafrica.fr
 
@@ -2818,7 +2594,6 @@ Ligne 156:
   nom: Forum de la Diaspora Ivoirienne
   description: Événement institutionnel pour impliquer la diaspora
   services: [Conférence annuelle,Panels investissements,B2B diaspora,Networking]
-  logo_url: [VIDE]
   tags: [diaspora,forum économique,intégration]
   pays: Côte d'Ivoire
   region: Yamoussoukro
@@ -2826,7 +2601,6 @@ Ligne 156:
   adresse: Hôtel Parlementaire
   longitude: -5.2728
   latitude: 6.8181
-  telephone: [VIDE]
   email: diaspora@mae.ci
   site_web: http://www.diasporacotedivoire.org
 
@@ -2836,17 +2610,13 @@ Ligne 157:
   nom: 225 Business Club
   description: Réseau de professionnels de la diaspora ivoirienne
   services: [Réseau informel,Plateforme échanges,Mentorat,Co-investissement]
-  logo_url: [VIDE]
   tags: [diaspora business,réseau social,mentoring]
   pays: France/Canada
   region: Paris/Montréal
   ville: Abidjan
   adresse: -4.0305
   longitude: 5.3364
-  latitude: [VIDE]
   telephone: 225businessclub@gmail.com
-  email: [VIDE]
-  site_web: [VIDE]
 
 Ligne 158:
   type: COOPERATION_DIASPORA
@@ -2854,7 +2624,6 @@ Ligne 158:
   nom: ADECI
   description: Association de la Diaspora Entrepreneuriale
   services: [Investment facilitation,Knowledge transfer,Mentoring,Business linkages]
-  logo_url: [VIDE]
   tags: [diaspora,investissement,mentorat]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2872,7 +2641,6 @@ Ligne 159:
   nom: USAID
   description: Agence américaine pour le développement
   services: [AWE women program,YALI youth,MCC 536M USD,Trade hubs]
-  logo_url: [VIDE]
   tags: [developpement,usa,commerce]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2890,7 +2658,6 @@ Ligne 160:
   nom: Délégation Union Européenne
   description: Représentation de l'UE en Côte d'Ivoire
   services: [100M EUR BNI partnership,Global Gateway,Team Europe,Green Deal]
-  logo_url: [VIDE]
   tags: [europe,partenariat,financement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2908,7 +2675,6 @@ Ligne 161:
   nom: PNUD
   description: Programme des Nations Unies pour le Développement
   services: [Timbuktoo initiative,Innovation labs,SDGs implementation,Youth programs]
-  logo_url: [VIDE]
   tags: [developpement,onu,innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2926,7 +2692,6 @@ Ligne 162:
   nom: OIT
   description: Organisation Internationale du Travail
   services: [Decent work,Youth employment,Social protection,Skills development]
-  logo_url: [VIDE]
   tags: [emploi,travail,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2944,7 +2709,6 @@ Ligne 163:
   nom: JICA
   description: Agence Japonaise de Coopération
   services: [Kaizen productivity,Technical training,Infrastructure,Innovation support]
-  logo_url: [VIDE]
   tags: [japon,cooperation,formation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2962,7 +2726,6 @@ Ligne 164:
   nom: BOAD
   description: Banque Ouest Africaine de Développement
   services: [PME financing,Regional integration,Infrastructure,Green bonds]
-  logo_url: [VIDE]
   tags: [developpement,uemoa,financement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2980,7 +2743,6 @@ Ligne 165:
   nom: BEI
   description: Banque Européenne d'Investissement
   services: [Global Gateway,Sustainable finance,Climate action,SME credit lines]
-  logo_url: [VIDE]
   tags: [europe,investissement,climat]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -2998,7 +2760,6 @@ Ligne 166:
   nom: ONUDI
   description: Organisation des Nations Unies pour le Développement Industriel
   services: [Agribusiness development,Quality infrastructure,Green industry,Technology transfer]
-  logo_url: [VIDE]
   tags: [industrie,onu,technologie]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3016,7 +2777,6 @@ Ligne 167:
   nom: CI20 - Côte d'Ivoire Innovation 20
   description: Patronat des startups ivoiriennes créé en 2021 fédérant les meilleures startups tech du pays
   services: [Business Club,CI20 CONNECT plateforme,Startup Boost Capital 2 milliards FCFA,Plaidoyer Startup Act,Talent Link avec AEJ]
-  logo_url: [VIDE]
   tags: [startup,tech,innovation,patronat]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3024,7 +2784,6 @@ Ligne 167:
   adresse: Maison de l'Entreprise, Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: contact@ci20.net
   site_web: https://www.ci20.net
 
@@ -3034,7 +2793,6 @@ Ligne 168:
   nom: Abidjanaises In Tech
   description: Club d'affaires fédérant 700+ femmes professionnelles du numérique en CI et diaspora
   services: [Networking femmes tech,Campus Start-ups 20+ startups,Bootcamps formation,Événements CAN tech,Talk-show dirigeantes]
-  logo_url: [VIDE]
   tags: [femmes,tech,networking,inclusion]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3042,7 +2800,6 @@ Ligne 168:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: contact@abidjanaisesintech.ci
   site_web: https://www.abidjanaisesintech.ci
 
@@ -3052,7 +2809,6 @@ Ligne 169:
   nom: Fondation SEPHIS
   description: Fondation créée en 2009 pour l'autonomisation des femmes entrepreneures
   services: [AWF program accélération,1700+ PME femmes formées,Inclusion financière 10M EUR,FILF forum annuel,Programme Ellever Ecobank]
-  logo_url: [VIDE]
   tags: [femmes,entrepreneuriat,formation,financement]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3060,7 +2816,6 @@ Ligne 169:
   adresse: Cocody 9è tranche, Immeuble Derra
   longitude: -3.99
   latitude: 5.35
-  telephone: [VIDE]
   email: info@fondationsephis.org
   site_web: https://fondationsephis.org
 
@@ -3070,7 +2825,6 @@ Ligne 170:
   nom: JCI Côte d'Ivoire
   description: Jeune Chambre Internationale pour développement personnel 18-40 ans
   services: [Leadership training,32 chapitres locaux,Formation soft skills,Service communautaire,Réseau international]
-  logo_url: [VIDE]
   tags: [jeunesse,leadership,développement personnel]
   pays: Côte d'Ivoire
   region: National
@@ -3088,7 +2842,6 @@ Ligne 171:
   nom: Fondation Jeunesse Numérique
   description: Incubateur gouvernemental pour lutter contre chômage jeunes via TIC
   services: [Incubation startups,Formation numérique,Bootcamps intensifs,Smart Up program,Fab lab accès]
-  logo_url: [VIDE]
   tags: [jeunesse,numérique,incubation,emploi]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3096,7 +2849,6 @@ Ligne 171:
   adresse: Plateau
   longitude: -4.0142
   latitude: 5.3207
-  telephone: [VIDE]
   email: contact@fjn.ci
   site_web: https://fjn.ci
 
@@ -3106,7 +2858,6 @@ Ligne 172:
   nom: DIGI Femmes
   description: Initiative de formation à l'entrepreneuriat et compétences numériques pour femmes
   services: [Formation digitale femmes,Entrepreneuriat numérique,Compétences tech,Prix innovation 2024]
-  logo_url: [VIDE]
   tags: [femmes,digital,formation,innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3114,9 +2865,7 @@ Ligne 172:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: contact@digifemmes.ci
-  site_web: [VIDE]
 
 Ligne 173:
   type: CENTRE_FORMATION
@@ -3124,7 +2873,6 @@ Ligne 173:
   nom: StemBlab
   description: Organisation promouvant compétences numériques et innovation technologique
   services: [Formation STEM,Innovation tech,Education numérique,Prix innovation 2024]
-  logo_url: [VIDE]
   tags: [stem,education,innovation,tech]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3132,9 +2880,7 @@ Ligne 173:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: info@stemblab.ci
-  site_web: [VIDE]
 
 Ligne 174:
   type: CENTRE_FORMATION
@@ -3142,7 +2888,6 @@ Ligne 174:
   nom: Programme GENIE
   description: Initiative gouvernementale créant 35 centres numériques pour emploi jeunes
   services: [35 centres numériques,Formation compétences digitales,Insertion professionnelle,230M emplois numériques 2030]
-  logo_url: [VIDE]
   tags: [gouvernement,emploi,digital,jeunesse]
   pays: Côte d'Ivoire
   region: National
@@ -3150,9 +2895,7 @@ Ligne 174:
   adresse: National
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: info@genie.gouv.ci
-  site_web: [VIDE]
 
 Ligne 175:
   type: ORGANISATION_INTERNATIONALE
@@ -3160,7 +2903,6 @@ Ligne 175:
   nom: Employment4Youth
   description: Projet ONUDI/Allemagne pour emploi jeunes via Industrie 4.0
   services: [Formation TIC,Agro-industrie 4.0,Nouvelles technologies,Création emplois femmes/jeunes]
-  logo_url: [VIDE]
   tags: [emploi,jeunesse,industrie 4.0,coopération]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3168,9 +2910,7 @@ Ligne 175:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: info@employment4youth.ci
-  site_web: [VIDE]
 
 Ligne 176:
   type: ASSOCIATION_ENTREPRENEURIALE
@@ -3178,7 +2918,6 @@ Ligne 176:
   nom: Code.ci
   description: Association de développeurs fondée en 2014 par Régis Bamba
   services: [Fédération développeurs,Open data CI,Solutions socio-économiques,Projets collaboratifs]
-  logo_url: [VIDE]
   tags: [développeurs,open data,tech,innovation]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3186,9 +2925,7 @@ Ligne 176:
   adresse: Abidjan
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: contact@code.ci
-  site_web: [VIDE]
 
 Ligne 177:
   type: HUB_INNOVATION
@@ -3196,7 +2933,6 @@ Ligne 177:
   nom: VITIB - Village des Technologies
   description: Association promotion écosystème tech et transformation digitale
   services: [Tech ecosystem,Innovation events,Digital transformation,Business networking]
-  logo_url: [VIDE]
   tags: [tech,innovation,digital,écosystème]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3214,7 +2950,6 @@ Ligne 178:
   nom: AFCI - Association Fintech CI
   description: Association des entreprises fintech de Côte d'Ivoire
   services: [Plaidoyer régulation,Standards fintech,Innovation financière,Networking secteur]
-  logo_url: [VIDE]
   tags: [fintech,innovation,régulation,finance]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3232,7 +2967,6 @@ Ligne 179:
   nom: REJEC - Réseau des Jeunes Entrepreneurs de CI
   description: Réseau national pour entrepreneuriat jeune
   services: [Mentorat jeunes,Pitch competitions,Formation entrepreneuriale,Networking national]
-  logo_url: [VIDE]
   tags: [jeunesse,entrepreneuriat,mentorat,réseau]
   pays: Côte d'Ivoire
   region: National
@@ -3250,7 +2984,6 @@ Ligne 180:
   nom: 225 Business Club
   description: Réseau diaspora ivoirienne connectant talents expatriés et opportunités CI
   services: [Réseau diaspora business,Afterworks networking,Webinaires sectoriels,Co-investissement,Mentorat]
-  logo_url: [VIDE]
   tags: [diaspora,business,networking,investissement]
   pays: France/Canada
   region: Paris/Montréal
@@ -3258,9 +2991,7 @@ Ligne 180:
   adresse: International
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: 225businessclub@gmail.com
-  site_web: [VIDE]
 
 Ligne 181:
   type: INCUBATEUR_ACCELERATEUR
@@ -3268,7 +2999,6 @@ Ligne 181:
   nom: MStudio VC (Magic Studio)
   description: Premier startup studio d'Afrique francophone lancé en 2021
   services: [Co-création startups,Financement pré-amorçage,Ressources mutualisées,Économie informelle tech]
-  logo_url: [VIDE]
   tags: [startup studio,mobile,économie informelle]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3276,7 +3006,6 @@ Ligne 181:
   adresse: Cocody
   longitude: -3.99
   latitude: 5.35
-  telephone: [VIDE]
   email: hello@mstudio.vc
   site_web: https://www.mstudio.vc
 
@@ -3286,7 +3015,6 @@ Ligne 182:
   nom: Akendewa Tech Hub
   description: Un des premiers tech hubs communautaires CI depuis 2009
   services: [Communauté développeurs,Barcamp Abidjan,Open source,Formations coding,Hackathons]
-  logo_url: [VIDE]
   tags: [tech community,open source,pionnier]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3304,7 +3032,6 @@ Ligne 183:
   nom: O'Village
   description: Tiers-lieu innovation sociale et numérique créé en 2014
   services: [Ubuntu culture,Logiciels libres,Ateliers pratiques,Coding dojos,Projets civiques]
-  logo_url: [VIDE]
   tags: [open source,innovation sociale,communauté]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3312,7 +3039,6 @@ Ligne 183:
   adresse: Yopougon Niangon
   longitude: -4.09
   latitude: 5.337
-  telephone: [VIDE]
   email: info@ovillage.ci
   site_web: http://www.ovillage.ci
 
@@ -3322,7 +3048,6 @@ Ligne 184:
   nom: Baby Lab
   description: Premier FabLab de Côte d'Ivoire créé en 2014 à Abobo
   services: [FabLab MIT,Formation enfants tech,Robotique,Réparation informatique,Projets communautaires]
-  logo_url: [VIDE]
   tags: [fablab,éducation numérique,inclusion]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3330,7 +3055,6 @@ Ligne 184:
   adresse: Abobo Derrière-rails
   longitude: -4.016
   latitude: 5.418
-  telephone: [VIDE]
   email: babylab@gmail.com
   site_web: https://www.fablabs.io/labs/babylab
 
@@ -3340,7 +3064,6 @@ Ligne 185:
   nom: Digital Africa
   description: Initiative 65M EUR pour soutenir entrepreneuriat tech africain
   services: [Fuzé funding 20-50K EUR,Plateforme networking,Label Digital Africa,Support incubateurs]
-  logo_url: [VIDE]
   tags: [financement,tech,innovation,panafricain]
   pays: France/Afrique
   region: International
@@ -3348,7 +3071,6 @@ Ligne 185:
   adresse: Via plateforme
   longitude: -4.0305
   latitude: 5.3364
-  telephone: [VIDE]
   email: contact@digital-africa.co
   site_web: https://digital-africa.co
 
@@ -3358,7 +3080,6 @@ Ligne 186:
   nom: Yiri by AGL
   description: Hub innovation logistique créé en 2023 par Africa Global Logistics
   services: [Accélération 6 mois,Solutions logistiques,Tech laboratory,Digital transformation,Talent catalyst]
-  logo_url: [VIDE]
   tags: [logistique,innovation,corporate,supply chain]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3366,7 +3087,6 @@ Ligne 186:
   adresse: Zone Portuaire, Marcory
   longitude: -4.0
   latitude: 5.28
-  telephone: [VIDE]
   email: yiri@aglgroup.com
   site_web: https://aglgroup.com/innovation
 
@@ -3376,7 +3096,6 @@ Ligne 187:
   nom: Programme Fin'Elle (COFINA)
   description: Programme dédié entrepreneuriat féminin par COFINA
   services: [Crédits femmes entrepreneurs,Accompagnement sur mesure,Formation business,Conditions favorables]
-  logo_url: [VIDE]
   tags: [femmes,financement,entrepreneuriat,microfinance]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3394,7 +3113,6 @@ Ligne 188:
   nom: ROADCI
   description: Réseau Ouest Africain des Femmes Entrepreneures
   services: [Leadership femmes,Commerce transfrontalier,Formation business,Mentorat régional]
-  logo_url: [VIDE]
   tags: [femmes,commerce,leadership,régional]
   pays: Côte d'Ivoire
   region: Lagunes
@@ -3412,7 +3130,6 @@ Ligne 189:
   nom: RICOMEN
   description: Réseau Ivoirien des Commerçantes
   services: [Commerce femmes,Microfinance access,Formation commerce,Plaidoyer genre]
-  logo_url: [VIDE]
   tags: [femmes,commerce,microfinance,réseau]
   pays: Côte d'Ivoire
   region: National
@@ -3422,7 +3139,6 @@ Ligne 189:
   latitude: 5.336
   telephone: +225 07 00 00 00
   email: ricomen@gmail.com
-  site_web: [VIDE]
 
 Ligne 190:
   type: ASSOCIATION_ENTREPRENEURIALE
@@ -3430,7 +3146,6 @@ Ligne 190:
   nom: AFEM-CI
   description: Association Femmes Entrepreneures et des Métiers
   services: [Formation métiers,Autonomisation femmes,Microfinance,Entrepreneuriat féminin]
-  logo_url: [VIDE]
   tags: [femmes,métiers,formation,autonomisation]
   pays: Côte d'Ivoire
   region: National
@@ -3440,7 +3155,6 @@ Ligne 190:
   latitude: 5.337
   telephone: +225 23 00 00 00
   email: afem@femmes-entrepreneurs.ci
-  site_web: [VIDE]
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -3469,7 +3183,6 @@ Ligne 1:
   fichier_telecharge: actes_uniformes_ohada_20250817_113734_20140130_acte_uniforme_révisé_relatif_au_droit_des_sociétés_commerciales_et_du_gie_30_janvier_2014.pdf
   taille_fichier: 541092
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 2:
   id: 2
@@ -3480,7 +3193,6 @@ Ligne 2:
   fichier_telecharge: actes_uniformes_ohada_20250817_114049_20101215_acte_uniforme_révisé_portant_sur_le_droit_commercial_général_15_décembre_2010.pdf
   taille_fichier: 181542
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 3:
   id: 3
@@ -3491,7 +3203,6 @@ Ligne 3:
   fichier_telecharge: actes_uniformes_ohada_20250817_114114_20170126_acte_uniforme_relatif_au_droit_comptable_et_à_linformation_financière_syscohada_26_janvier_2017.pdf
   taille_fichier: 6455004
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 4:
   id: 4
@@ -3502,7 +3213,6 @@ Ligne 4:
   fichier_telecharge: actes_uniformes_ohada_20250817_114118_20101215_acte_uniforme_révisé_portant_organisation_des_sûretés_15_décembre_2010.pdf
   taille_fichier: 128306
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 5:
   id: 5
@@ -3513,7 +3223,6 @@ Ligne 5:
   fichier_telecharge: actes_uniformes_ohada_20250817_114120_20150910_acte_uniforme_portant_organisation_des_procédures_collectives_10_septembre_2015.pdf
   taille_fichier: 642027
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 6:
   id: 6
@@ -3524,7 +3233,6 @@ Ligne 6:
   fichier_telecharge: actes_uniformes_ohada_20250817_114241_20030322_acte_uniforme_relatif_aux_contrats_transport_marchandises_par_route_22_mars_2003.pdf
   taille_fichier: 532001
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 7:
   id: 7
@@ -3535,7 +3243,6 @@ Ligne 7:
   fichier_telecharge: actes_uniformes_ohada_20250817_114245_20171123_acte_uniforme_relatif_à_la_médiation_23_novembre_2017.pdf
   taille_fichier: 96743
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 8:
   id: 8
@@ -3546,7 +3253,6 @@ Ligne 8:
   fichier_telecharge: actes_uniformes_ohada_20250817_114247_20171123_acte_uniforme_relatif_au_droit_de_larbitrage_23_novembre_2017.pdf
   taille_fichier: 111185
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 9:
   id: 9
@@ -3557,7 +3263,6 @@ Ligne 9:
   fichier_telecharge: actes_uniformes_ohada_20250817_121247_acte_uniforme_ohada_procédures_collectives_2015.pdf
   taille_fichier: 364635
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 10:
   id: 14
@@ -3568,7 +3273,6 @@ Ligne 10:
   fichier_telecharge: circulaires_20250817_114214_20231009_note_n03949mbpedgidlcd_du_09_octobre_2023_tva_plateformes_numériques.pdf
   taille_fichier: 4377599
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 11:
   id: 21
@@ -3579,7 +3283,6 @@ Ligne 11:
   fichier_telecharge: codes_20250817_114640_20190724_ordonnance_n_2019_679_du_24_juillet_2019_portant_code_des_marchés_publics.pdf
   taille_fichier: 3633008
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 12:
   id: 22
@@ -3590,7 +3293,6 @@ Ligne 12:
   fichier_telecharge: codes_20250817_114308_20210108_régime_des_microentreprises_rme_annexe_fiscale_2021.pdf
   taille_fichier: 2957639
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 13:
   id: 24
@@ -3601,7 +3303,6 @@ Ligne 13:
   fichier_telecharge: codes_20250817_114208_20221123_loi_n2022_975_du_23_novembre_2022_portant_code_des_douanes.pdf
   taille_fichier: 725552
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 14:
   id: 32
@@ -3612,7 +3313,6 @@ Ligne 14:
   fichier_telecharge: constitutions_20250817_113719_20161108_constitution_de_la_république_de_côte_divoire_du_8_novembre_2016.pdf
   taille_fichier: 574425
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 15:
   id: 34
@@ -3623,7 +3323,6 @@ Ligne 15:
   fichier_telecharge: décrets_20250817_114056_20120906_décret_n_2012_867_du_06_septembre_2012_portant_création_du_cepici.pdf
   taille_fichier: 539499
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 16:
   id: 40
@@ -3722,7 +3421,6 @@ Ligne 24:
   fichier_telecharge: ordonnances_20250817_114058_20180801_ordonnance_n2018_644_du_1er_août_2018_instituant_lidentifiant_unique_des_entreprises.pdf
   taille_fichier: 207903
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 25:
   id: 59
@@ -3733,7 +3431,6 @@ Ligne 25:
   fichier_telecharge: ordonnances_20250817_113732_20240930_ordonnance_n2024_857_du_30_septembre_2024_modifiant_lordonnance_n2018_646_portant_code_des_investiss.pdf
   taille_fichier: 908710
   type_mime: application/pdf
-  date_publication: [VIDE]
 
 Ligne 26:
   id: 63

@@ -26,7 +26,7 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="<?php echo e($conversation->id ?? ''); ?>">
+<div class="min-h-screen bg-white" x-data="(typeof chatInterfaceWithStreaming !== 'undefined' ? chatInterfaceWithStreaming : chatInterface)()" x-init="init()" data-conversation-id="<?php echo e($conversation->id ?? ''); ?>">
     <!-- Chat Header with Tabs -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
         <div class="max-w-4xl mx-auto">
@@ -102,7 +102,7 @@
                 </div>
                 
                 <!-- Assistant Message -->
-                <div x-show="message.role === 'assistant'" class="flex items-start chat-message assistant">
+                <div x-show="message.role === 'assistant' && (message.content || !message.isStreaming)" class="flex items-start chat-message assistant">
                     <div class="flex-1">
                         <div class="prose prose-sm max-w-none" x-html="processMarkdown(message.content)"></div>
                         
@@ -327,44 +327,6 @@
     color: rgba(255, 255, 255, 0.8) !important;
 }
 
-/* Forcer les alertes en blanc dans les outputs de l'agent (dark mode) */
-@media (prefers-color-scheme: dark) {
-    .prose .alert-success,
-    .prose .alert-error,
-    .prose .alert-warning,
-    .prose .alert-info {
-        color: white !important;
-    }
-    
-    .prose .alert-success *,
-    .prose .alert-error *,
-    .prose .alert-warning *,
-    .prose .alert-info * {
-        color: white !important;
-    }
-    
-    .prose .alert-success div,
-    .prose .alert-error div,
-    .prose .alert-warning div,
-    .prose .alert-info div {
-        color: white !important;
-    }
-    
-    /* Sélecteur ultra-spécifique pour x-html */
-    [x-html] .alert-success,
-    [x-html] .alert-error,
-    [x-html] .alert-warning,
-    [x-html] .alert-info {
-        color: white !important;
-    }
-    
-    [x-html] .alert-success *,
-    [x-html] .alert-error *,
-    [x-html] .alert-warning *,
-    [x-html] .alert-info * {
-        color: white !important;
-    }
-}
 </style>
 
 <script>
@@ -668,39 +630,47 @@ function chatInterface() {
                         }
                     });
                     
-                    // Étape 2: Traiter la réponse de l'agent
-                    const aiFormData = new FormData();
-                    aiFormData.append('message', message.trim() || '');
-                    aiFormData.append('conversation_id', this.currentConversationId);
-                    if (saveData.vector_memory_id) {
-                        aiFormData.append('vector_memory_id', saveData.vector_memory_id);
-                    }
-                    
-                    const response = await fetch('/chat/send', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: aiFormData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        console.log('AI response received:', data);
-                        
-                        // Ajouter la réponse AI
-                        const aiMessage = {
-                            id: data.message_id,
-                            role: 'assistant',
-                            content: data.response,
-                            created_at: new Date().toISOString()
-                        };
-                        
-                        this.messages.push(aiMessage);
-                        await this.loadConversations();
+                    // Étape 2: Traiter la réponse de l'agent avec streaming
+                    console.log('Checking streaming availability:', typeof this.streamAIResponse);
+                    if (typeof this.streamAIResponse === 'function') {
+                        console.log('Using streaming response');
+                        await this.streamAIResponse(message.trim(), saveData.vector_memory_id);
                     } else {
-                        console.error('Erreur API:', data.error);
+                        console.log('Streaming not available, fallback to regular response');
+                        // Fallback vers la méthode classique si streaming pas disponible
+                        const aiFormData = new FormData();
+                        aiFormData.append('message', message.trim() || '');
+                        aiFormData.append('conversation_id', this.currentConversationId);
+                        if (saveData.vector_memory_id) {
+                            aiFormData.append('vector_memory_id', saveData.vector_memory_id);
+                        }
+                        
+                        const response = await fetch('/chat/send', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: aiFormData
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            console.log('AI response received:', data);
+                            
+                            // Ajouter la réponse AI
+                            const aiMessage = {
+                                id: data.message_id,
+                                role: 'assistant',
+                                content: data.response,
+                                created_at: new Date().toISOString()
+                            };
+                            
+                            this.messages.push(aiMessage);
+                            await this.loadConversations();
+                        } else {
+                            console.error('Erreur API:', data.error);
+                        }
                     }
                 } else {
                     console.error('Erreur sauvegarde:', saveData.error);
@@ -820,12 +790,6 @@ function chatInterface() {
             if (!content) return '';
             
             let html = content
-                // Custom components - Alertes (spacing ultra-compacte)
-                .replace(/:::info\s*([\s\S]*?):::/g, '<div class="alert alert-info my-2"><i data-lucide="info" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
-                .replace(/:::success\s*([\s\S]*?):::/g, '<div class="alert alert-success my-2"><i data-lucide="check-circle" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
-                .replace(/:::warning\s*([\s\S]*?):::/g, '<div class="alert alert-warning my-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
-                .replace(/:::danger\s*([\s\S]*?):::/g, '<div class="alert alert-danger my-2"><i data-lucide="x-circle" class="w-4 h-4"></i><div class="flex-1">$1</div></div>')
-                
                 // Custom components - Cartes avec bouton détail (alignement horizontal coordonnées + bouton)
                 .replace(/\[carte-institution:(.*?)\|(.*?)\|(.*?)\|(.*?)\]/g, '<div class="card my-2"><div class="card-header"><h4 class="card-title flex items-center gap-2"><i data-lucide="building" class="w-4 h-4"></i>$1</h4></div><div class="card-body"><p class="text-sm text-gray-600 mb-2">$2</p><div class="flex items-center justify-between"><div class="flex items-center gap-1 text-xs text-gray-500"><i data-lucide="phone" class="w-3 h-3"></i>$3</div><a href="$4" target="_blank" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-md transition-colors" style="border: 1px solid var(--orange-primary); color: var(--orange-primary);" onmouseover="this.style.backgroundColor=\'var(--orange-primary)\'; this.style.color=\'white\'" onmouseout="this.style.backgroundColor=\'transparent\'; this.style.color=\'var(--orange-primary)\'">Détails</a></div></div></div>')
                 .replace(/\[carte-opportunite:(.*?)\|(.*?)\|(.*?)\|(.*?)\]/g, '<div class="card my-2"><div class="card-header"><h4 class="card-title flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i>$1</h4></div><div class="card-body"><p class="text-sm text-gray-600 mb-2">$2</p><div class="flex items-center justify-between"><p class="text-xs font-medium" style="color: var(--orange-primary);">$3</p><a href="$4" target="_blank" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-md transition-colors" style="border: 1px solid var(--orange-primary); color: var(--orange-primary);" onmouseover="this.style.backgroundColor=\'var(--orange-primary)\'; this.style.color=\'white\'" onmouseout="this.style.backgroundColor=\'transparent\'; this.style.color=\'var(--orange-primary)\'">Détails</a></div></div></div>')
@@ -955,6 +919,12 @@ function chatInterface() {
 // Icons are already initialized by app.js, no need to do it here
 </script>
 <?php $__env->stopPush(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+
+<?php echo $__env->make('chat-streaming', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopPush(); ?>
+
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/chat.blade.php ENDPATH**/ ?>

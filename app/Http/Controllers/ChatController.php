@@ -221,12 +221,14 @@ class ChatController extends Controller
         $request->validate([
             'message' => 'nullable|string|max:5000',
             'conversation_id' => 'required|string',
-            'vector_memory_id' => 'nullable|string'
+            'vector_memory_id' => 'nullable|string',
+            'stream' => 'nullable|string'
         ]);
 
         $user = Auth::user();
         $conversationId = $request->get('conversation_id');
         $vectorMemoryId = $request->get('vector_memory_id');
+        $useStream = $request->get('stream') === 'true' || $request->get('stream') === true;
         
         // Get conversation
         $conversation = UserConversation::where('user_id', $user->id)
@@ -242,9 +244,35 @@ class ChatController extends Controller
 
         $userMessageContent = $request->message ?? '';
         
-        // Note: User message should already be saved by saveUserMessage endpoint
-        // This endpoint only processes the AI response
+        \Log::info('Chat request', [
+            'user_id' => $user->id,
+            'conversation_id' => $conversationId,
+            'message_length' => strlen($userMessageContent),
+            'stream_requested' => $useStream,
+            'stream_param' => $request->get('stream')
+        ]);
         
+        // If streaming is requested, use SSE
+        if ($useStream) {
+            \Log::info('Using streaming response');
+            try {
+                return $this->streamResponse($userMessageContent, $user, $conversation, $vectorMemoryId);
+            } catch (\Exception $e) {
+                \Log::error('Streaming failed', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                // Fallback to standard response
+                return $this->standardResponse($userMessageContent, $user, $conversation, $vectorMemoryId);
+            }
+        }
+        
+        // Standard non-streaming response
+        return $this->standardResponse($userMessageContent, $user, $conversation, $vectorMemoryId);
+    }
+    
+    private function standardResponse($userMessageContent, $user, $conversation, $vectorMemoryId)
+    {
         // Generate title for new conversation
         $isNewConversation = $conversation->message_count === 1;
         if ($isNewConversation && $userMessageContent) {
@@ -281,12 +309,12 @@ class ChatController extends Controller
             'text_content' => $agentResult['response']
         ]);
         
-        // Update conversation (only increment by 1 for AI message, user message already counted)
+        // Update conversation
         $conversation->increment('message_count', 1);
         $conversation->update(['last_message_at' => now()]);
         
         // Track chat interaction
-        $interactionData = [
+        $this->analyticsService->trackChatInteraction($user, [
             'agent_type' => 'principal',
             'message_length' => strlen($userMessageContent),
             'tools_used' => $agentResult['tools_used'] ?? [],
@@ -294,11 +322,8 @@ class ChatController extends Controller
             'has_attachment' => !empty($vectorMemoryId),
             'conversation_id' => $conversation->id,
             'timestamp' => now()->toISOString()
-        ];
+        ]);
         
-        $this->analyticsService->trackChatInteraction($user, $interactionData);
-        
-        // Check if title needs updating
         $this->agentService->updateConversationTitleIfNeeded($conversation->id);
         
         return response()->json([
@@ -309,6 +334,199 @@ class ChatController extends Controller
             'tools_used' => $agentResult['tools_used'] ?? [],
             'metadata' => $agentResult['metadata'] ?? []
         ]);
+    }
+    
+    public function testStream(Request $request)
+    {
+        return response()->stream(function () {
+            // Disable all output buffering
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+            ini_set('output_buffering', 'off');
+            ini_set('zlib.output_compression', false);
+            
+            $testMessage = "Ceci est un test de streaming. Voici plusieurs mots qui vont arriver par chunks pour tester le streaming en temps réel.";
+            $words = explode(' ', $testMessage);
+            
+            echo "event: start\n";
+            echo "data: " . json_encode(['message' => 'Starting test stream']) . "\n\n";
+            flush();
+            
+            foreach ($words as $index => $word) {
+                echo "event: chunk\n";
+                echo "data: " . json_encode(['chunk' => $word . ' ', 'index' => $index]) . "\n\n";
+                flush();
+                usleep(200000); // 200ms delay
+            }
+            
+            echo "event: complete\n";
+            echo "data: " . json_encode(['message' => 'Stream complete']) . "\n\n";
+            flush();
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no'
+        ]);
+    }
+    
+    private function streamResponse($userMessageContent, $user, $conversation, $vectorMemoryId)
+    {
+        $headers = [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no'
+        ];
+        
+        return response()->stream(function () use ($userMessageContent, $user, $conversation, $vectorMemoryId) {
+            try {
+                \Log::info('Starting streaming response');
+                
+                // Generate title if needed
+                $isNewConversation = $conversation->message_count === 1;
+                if ($isNewConversation && $userMessageContent) {
+                    $titleResult = $this->agentService->generateTitle(
+                        $userMessageContent,
+                        'chat',
+                        $conversation->id
+                    );
+                    
+                    if ($titleResult['success']) {
+                        $conversation->update(['title' => $titleResult['title']]);
+                    }
+                }
+                
+                \Log::info('Processing message with agent service');
+                
+                // Process message and simulate streaming
+                $agentResult = $this->agentService->processMessage(
+                    $userMessageContent,
+                    $user->id,
+                    $conversation->id,
+                    $vectorMemoryId
+                );
+                
+                if (!$agentResult['success']) {
+                    \Log::error('Agent processing failed', ['error' => $agentResult['error'] ?? 'Unknown error']);
+                    echo "event: error\n";
+                    echo "data: " . json_encode(['error' => $agentResult['error'] ?? 'Erreur lors du traitement']) . "\n\n";
+                    flush();
+                    return;
+                }
+                
+                \Log::info('Agent processing successful, starting streaming');
+            } catch (\Exception $e) {
+                \Log::error('Exception in streaming response', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                echo "event: error\n";
+                echo "data: " . json_encode(['error' => 'Erreur interne du serveur']) . "\n\n";
+                flush();
+                return;
+            }
+            
+            // Create message ID first
+            $messageId = \Str::uuid();
+            
+            // Send metadata first
+            echo "event: start\n";
+            echo "data: " . json_encode([
+                'message_id' => $messageId,
+                'conversation_id' => $conversation->id,
+                'tools_used' => $agentResult['tools_used'] ?? []
+            ]) . "\n\n";
+            flush();
+            
+            // Stream the response in chunks
+            $response = $agentResult['response'];
+            $chunks = $this->createReadableChunks($response);
+            
+            foreach ($chunks as $index => $chunk) {
+                echo "event: chunk\n";
+                echo "data: " . json_encode([
+                    'chunk' => $chunk,
+                    'index' => $index
+                ]) . "\n\n";
+                flush();
+                usleep(30000); // 30ms delay for natural typing effect
+            }
+            
+            // Save complete message
+            $aiMessage = UserMessage::create([
+                'id' => $messageId,
+                'conversation_id' => $conversation->id,
+                'role' => 'assistant',
+                'text_content' => $response
+            ]);
+            
+            // Update conversation
+            $conversation->increment('message_count', 1);
+            $conversation->update(['last_message_at' => now()]);
+            
+            // Track interaction
+            $this->analyticsService->trackChatInteraction($user, [
+                'agent_type' => 'principal',
+                'message_length' => strlen($userMessageContent),
+                'tools_used' => $agentResult['tools_used'] ?? [],
+                'response_length' => strlen($response),
+                'has_attachment' => !empty($vectorMemoryId),
+                'conversation_id' => $conversation->id,
+                'timestamp' => now()->toISOString()
+            ]);
+            
+            // Send completion event
+            echo "event: complete\n";
+            echo "data: " . json_encode(['message_id' => $messageId]) . "\n\n";
+            flush();
+        }, 200, $headers);
+    }
+    
+    private function createReadableChunks($text, $chunkSize = 15)
+    {
+        $chunks = [];
+        $words = preg_split('/(\s+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $currentChunk = '';
+        $wordCount = 0;
+        
+        foreach ($words as $word) {
+            $currentChunk .= $word;
+            
+            // Count actual words (not whitespace)
+            if (!preg_match('/^\s+$/u', $word)) {
+                $wordCount++;
+            }
+            
+            // Create chunk at word boundaries
+            if ($wordCount >= $chunkSize) {
+                // Ensure we don't break markdown structures
+                if ($this->isCompleteMarkdownUnit($currentChunk)) {
+                    $chunks[] = $currentChunk;
+                    $currentChunk = '';
+                    $wordCount = 0;
+                }
+            }
+        }
+        
+        // Add remaining content
+        if (!empty($currentChunk)) {
+            $chunks[] = $currentChunk;
+        }
+        
+        return $chunks;
+    }
+    
+    private function isCompleteMarkdownUnit($text)
+    {
+        // Check if we're not in the middle of a markdown structure
+        $openBold = substr_count($text, '**') % 2 === 0;
+        $openItalic = substr_count($text, '*') % 2 === 0 || substr_count($text, '_') % 2 === 0;
+        $openLink = substr_count($text, '[') === substr_count($text, ']');
+        $openCode = substr_count($text, '`') % 2 === 0;
+        
+        return $openBold && $openItalic && $openLink && $openCode;
     }
 
     public function getSuggestions(Request $request)

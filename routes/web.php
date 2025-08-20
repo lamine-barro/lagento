@@ -89,6 +89,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/chat/conversations/{conversationId}/messages', [ChatController::class, 'getConversationMessages'])->name('chat.conversations.messages');
         Route::delete('/chat/conversations/{conversationId}', [ChatController::class, 'deleteConversation'])->name('chat.conversations.delete');
         
+        // Test streaming endpoint
+        Route::get('/test-stream', [ChatController::class, 'testStream'])->name('test.stream');
+        
         // Conversations
         Route::get('/conversations', function () {
             $conversations = \App\Models\UserConversation::where('user_id', auth()->id())

@@ -261,14 +261,6 @@ FORMAT DE SORTIE : Markdown propre et compact en 900 mots maximum:
 - Listes : ordonnées (1.) et non-ordonnées (-) - format serré, pas d'espaces
 - Paragraphes courts et lisibles avec interlignes compacts
 
-COMPOSANTS AUTORISÉS :
-
-ALERTES UNIQUEMENT (MAXIMUM 1 par réponse) :
-- :::info → Informations complémentaires importantes
-- :::success → Validation d'une démarche réussie
-- :::warning → Attention requise, points de vigilance
-- :::danger → Risques majeurs, erreurs à éviter
-
 LIENS ET URLs (OBLIGATOIRE) :
 - Pour CHAQUE opportunité mentionnée : TOUJOURS inclure [Voir détails](url){target=\"_blank\"} si URL existe dans les données
 - Pour CHAQUE institution mentionnée : TOUJOURS inclure [Site web](url){target=\"_blank\"} si URL existe
@@ -380,8 +372,12 @@ STYLE :
         $tools = [];
         $messageLower = strtolower($message);
         
-        // Toujours inclure la recherche vectorielle pour le contexte
-        $tools[] = 'recherche_vectorielle';
+        // Détecter si le message nécessite des outils (recherche, génération, etc.)
+        $needsVectorSearch = $this->messageNeedsVectorSearch($message, $messageLower);
+        
+        if ($needsVectorSearch) {
+            $tools[] = 'recherche_vectorielle';
+        }
         
         // Génération de fichier si des mots-clés spécifiques sont détectés
         $fileKeywords = [
@@ -411,6 +407,92 @@ STYLE :
         }
         
         return $tools;
+    }
+
+    protected function messageNeedsVectorSearch(string $message, string $messageLower): bool
+    {
+        // Debug log pour voir le message analysé
+        $this->logDebug('Analyzing message for vector search', [
+            'message' => $message,
+            'length' => strlen($message)
+        ]);
+        
+        // Messages très courts (< 15 caractères) sont probablement simples
+        if (strlen(trim($message)) < 15) {
+            $this->logDebug('Message too short, skipping vector search');
+            return false;
+        }
+        
+        // Messages conversationnels simples - pas besoin de recherche
+        $conversationalPatterns = [
+            // Salutations seules
+            '/^(bonjour|salut|hello|hi|bonsoir|hey)\s*[!?]?$/i',
+            
+            // Salutations avec questions simples
+            '/^(bonjour|salut|hello|hi|bonsoir)\s+(comment tu vas|comment ça va|ça va|comment allez-vous)\s*[?!]?$/i',
+            
+            // Questions simples seules
+            '/^(comment tu vas|comment ça va|ça va|comment allez-vous)\s*[?!]?$/i',
+            
+            // Remerciements et politesse
+            '/^(merci|merci beaucoup|thanks|thank you)\s*[!]?$/i',
+            '/^(au revoir|à bientôt|bye|goodbye)\s*[!]?$/i',
+            
+            // Réponses courtes
+            '/^(oui|non|ok|d\'accord|parfait|bien|super|génial)\s*[!]?$/i',
+            '/^(je comprends|compris|ça marche|très bien)\s*[!]?$/i',
+        ];
+        
+        foreach ($conversationalPatterns as $pattern) {
+            if (preg_match($pattern, $message)) {
+                $this->logDebug('Message matches conversational pattern, skipping vector search', ['pattern' => $pattern]);
+                return false;
+            }
+        }
+        
+        // Détecter si le message demande des informations spécifiques
+        $searchIndicators = [
+            // Questions sur des sujets spécifiques
+            'qu\'est-ce que', 'qu\'est ce que', 'c\'est quoi', 'c est quoi',
+            'comment', 'pourquoi', 'où', 'quand', 'qui', 'quel', 'quelle',
+            
+            // Recherche d'informations
+            'opportunité', 'projet', 'financement', 'subvention', 'aide',
+            'institution', 'organisation', 'entreprise', 'startup',
+            'formation', 'éducation', 'école', 'université',
+            'gouvernement', 'ministère', 'politique', 'loi',
+            
+            // Demandes d'aide/conseil
+            'aide', 'aidez', 'conseille', 'recommande', 'suggère',
+            'peux-tu', 'pouvez-vous', 'pourrais-tu',
+            
+            // Recherche géographique
+            'côte d\'ivoire', 'abidjan', 'bouaké', 'yamoussoukro',
+            'afrique', 'ivoirien', 'ivoirienne',
+        ];
+        
+        foreach ($searchIndicators as $indicator) {
+            if (strpos($messageLower, $indicator) !== false) {
+                return true;
+            }
+        }
+        
+        // Si le message contient des mots interrogatifs, il nécessite probablement une recherche
+        $questionWords = ['?', 'comment', 'pourquoi', 'où', 'quand', 'qui', 'que', 'quel'];
+        foreach ($questionWords as $word) {
+            if (strpos($messageLower, $word) !== false) {
+                return true;
+            }
+        }
+        
+        // Messages longs (> 100 caractères) nécessitent généralement une recherche
+        if (strlen($message) > 100) {
+            return true;
+        }
+        
+        // Par défaut, les messages courts sans indicateurs spécifiques n'ont pas besoin de recherche
+        $this->logDebug('No specific indicators found, skipping vector search');
+        return false;
     }
 
     protected function executeTool(string $tool, string $message, string $userId): ?array
@@ -728,7 +810,7 @@ case 'recherche_vectorielle':
 
     protected function formatMarkdownResponse(string $response, array $toolResults = []): string
     {
-        // Only preserve alert components, remove all custom cards (opportunities, institutions, official texts)
+        // Format response with clean markdown structure
         $formattedResponse = $response;
 
         // Ensure proper markdown structure with compact formatting
