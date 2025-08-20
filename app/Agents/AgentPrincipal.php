@@ -4,10 +4,8 @@ namespace App\Agents;
 
 use App\Models\User;
 use App\Models\Document;
-use App\Models\Institution;
-use App\Services\MemoryManagerService;
 use App\Services\LanguageModelService;
-use App\Services\VoyageVectorService;
+use App\Services\OpenAIVectorService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -17,18 +15,16 @@ use PhpOffice\PhpWord\IOFactory;
 
 class AgentPrincipal extends BaseAgent
 {
-    protected MemoryManagerService $memoryManager;
 
     public function __construct(
         ?LanguageModelService $llm = null,
-        ?VoyageVectorService $embedding = null
+        ?OpenAIVectorService $embedding = null
     ) {
         // Use service container if no dependencies provided
         $llm = $llm ?: app(LanguageModelService::class);
-        $embedding = $embedding ?: app(VoyageVectorService::class);
+        $embedding = $embedding ?: app(OpenAIVectorService::class);
         
         parent::__construct($llm, $embedding, null);
-        $this->memoryManager = app(MemoryManagerService::class);
     }
 
     protected function getConfig(): array
@@ -83,9 +79,6 @@ class AgentPrincipal extends BaseAgent
         // Get user documents context
         $userDocuments = $this->getUserDocumentsContext($userId);
         
-        // Get user institutions context
-        $userInstitutions = $this->getUserInstitutionsContext($userId);
-        
         // Prepare system instructions
         $instructions = $this->getSystemInstructions();
         $systemPrompt = $this->prepareSystemPrompt($instructions, $userContext);
@@ -93,11 +86,6 @@ class AgentPrincipal extends BaseAgent
         // Add user documents to context if available
         if (!empty($userDocuments)) {
             $systemPrompt .= "\n\nDOCUMENTS UTILISATEUR :\n" . $userDocuments;
-        }
-        
-        // Add user institutions to context if available
-        if (!empty($userInstitutions)) {
-            $systemPrompt .= "\n\nINSTITUTIONS LOCALES :\n" . $userInstitutions;
         }
 
         try {
@@ -281,17 +269,20 @@ ALERTES UNIQUEMENT (MAXIMUM 1 par réponse) :
 - :::warning → Attention requise, points de vigilance
 - :::danger → Risques majeurs, erreurs à éviter
 
-LIENS ET URLs (OBLIGATOIRE si disponible) :
-- Pour CHAQUE opportunité mentionnée : inclure [Voir détails](url){target=\"_blank\"} si URL existe
-- Pour CHAQUE institution mentionnée : inclure [Site web](url){target=\"_blank\"} si URL existe
+LIENS ET URLs (OBLIGATOIRE) :
+- Pour CHAQUE opportunité mentionnée : TOUJOURS inclure [Voir détails](url){target=\"_blank\"} si URL existe dans les données
+- Pour CHAQUE institution mentionnée : TOUJOURS inclure [Site web](url){target=\"_blank\"} si URL existe
 - Format markdown : [texte du lien](url){target=\"_blank\"}
 - TOUJOURS utiliser target=\"_blank\" pour ouvrir dans nouvel onglet
 - NE JAMAIS inventer d'URLs - utiliser UNIQUEMENT celles retournées par les outils
+- Si pas d'URL disponible pour une opportunité, ne pas mentionner de lien
 
 INTERDICTIONS STRICTES :
 - AUCUN espacement excessif entre éléments
 - AUCUNE sur-structuration
 - AUCUNE URL inventée ou fictive
+- NE JAMAIS mentionner les sources RAG ou la recherche vectorielle
+- NE JAMAIS dire \"selon les données\" ou \"d'après les informations trouvées\"
 
 FORMATAGE MOBILE :
 - Listes avec espacement minimal
@@ -327,7 +318,7 @@ OUTILS ET QUAND LES UTILISER :
   * 'user_analytics' : Diagnostic personnalisé de l'utilisateur uniquement
   
   **MÉMOIRES ADDITIONNELLES (selon demande) :**
-  * 'opportunite' : Recherche d'opportunités de financement/subventions (subvention, prêt, concours, hackathon, incubation, accélération, etc.) disponible de Septembre 2025 à Decembre 2025.
+  * 'opportunites' : Recherche d'opportunités de financement/subventions (namespace: 'opportunites') - 77 opportunités réelles disponibles de Septembre 2025 à Décembre 2025 (subvention, prêt, concours, hackathon, incubation, accélération, etc.)
   * 'conversation' : Recherche dans l'historique des conversations (si besoin)
   
   **RÈGLES :**
@@ -347,6 +338,13 @@ OUTILS ET QUAND LES UTILISER :
   - Données: {\"titre\":\"Programme X\",\"lien_externe\":null}
     → **Programme X** - [Description]
   
+  **PRÉSENTATION DES OPPORTUNITÉS (OBLIGATOIRE) :**
+  Pour CHAQUE opportunité trouvée :
+  1. **{titre}** ({type}) - {description}
+  2. Si lien_externe existe : [Voir détails](https://{lien_externe}){target=\"_blank\"}
+  3. Si date_limite existe : Date limite: {date_limite}
+  4. Si montant existe : Montant: {montant}
+  
   **PRÉSENTATION DES INSTITUTIONS (OBLIGATOIRE) :**
   Pour CHAQUE institution trouvée :
   1. **{nom}** ({type}) - {description}
@@ -356,9 +354,19 @@ OUTILS ET QUAND LES UTILISER :
   
   RÈGLE ABSOLUE : Utilise EXACTEMENT les valeurs des champs, ajoute juste https:// devant les URLs
   
-- generation_fichier (docx, csv, txt, md) : L'agent décide de générer un document selon le contexte et les besoins utilisateur (ex: business plan, executive summary, rapport, etc.). Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
-- generation_image : L'agent décide de créer des visuels (logos, affiches, schémas, bannières, etc.) selon la demande utilisateur. Utilise exclusivement gpt-image-1. Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
-- web search (integre au modele) : si besoin d'actualites/informations recentes (mots-cles : actualite, recent, 2024, 2025, prix, taux). Le modele l'activera automatiquement.
+**UTILISATION SELECTIVE DES OUTILS :**
+
+RÈGLE OPTIMISATION : N'utilise QUE les outils STRICTEMENT nécessaires pour la demande. Évite d'exécuter tous les outils par défaut.
+
+- generation_fichier : UNIQUEMENT si l'utilisateur demande explicitement un document (business plan, CV, rapport, contrat, etc.). 
+- generation_image : UNIQUEMENT si l'utilisateur demande explicitement un visuel (logo, affiche, bannière, illustration, etc.). 
+- web search (intégré) : UNIQUEMENT si besoin d'actualités/infos récentes (2024, 2025, prix actuels, etc.).
+
+**STRATÉGIE DE DÉCOUPAGE :**
+Pour des demandes complexes multi-étapes :
+1. Traiter d'abord la partie conseil/information avec recherche vectorielle
+2. Proposer ensuite les étapes suivantes (génération de documents/images)
+3. Demander confirmation avant d'exécuter les outils coûteux
 
 STYLE :
 - Bienveillant et encourageant
@@ -369,12 +377,40 @@ STYLE :
 
     protected function analyzeMessageForTools(string $message): array
     {
-        // L'agent utilise tous les outils disponibles et laisse le LLM décider
-        return [
-            'recherche_vectorielle',
-            'generation_fichier', 
-            'generation_image'
+        $tools = [];
+        $messageLower = strtolower($message);
+        
+        // Toujours inclure la recherche vectorielle pour le contexte
+        $tools[] = 'recherche_vectorielle';
+        
+        // Génération de fichier si des mots-clés spécifiques sont détectés
+        $fileKeywords = [
+            'docx', 'document', 'fichier', 'rapport', 'business plan', 'executive summary',
+            'cv', 'lettre', 'contrat', 'pdf', 'word', 'excel', 'genere', 'generer', 
+            'crée', 'creer', 'rédige', 'rediger', 'ecrire', 'écrit'
         ];
+        
+        foreach ($fileKeywords as $keyword) {
+            if (strpos($messageLower, $keyword) !== false) {
+                $tools[] = 'generation_fichier';
+                break;
+            }
+        }
+        
+        // Génération d'image UNIQUEMENT si explicitement demandée
+        $imageKeywords = [
+            'logo', 'image', 'photo', 'dessin', 'illustration', 'banner', 'bannière',
+            'affiche', 'visual', 'graphic', 'design', 'schéma', 'schema', 'diagramme'
+        ];
+        
+        foreach ($imageKeywords as $keyword) {
+            if (strpos($messageLower, $keyword) !== false) {
+                $tools[] = 'generation_image';
+                break;
+            }
+        }
+        
+        return $tools;
     }
 
     protected function executeTool(string $tool, string $message, string $userId): ?array
@@ -410,13 +446,37 @@ case 'recherche_vectorielle':
             // Détermine les types de mémoires pertinents
             $relevantTypes = $this->determineRelevantMemoryTypes($message);
             
-            // Recherche vectorielle via MemoryManagerService
-            $results = $this->memoryManager->searchAcrossMemories(
+            // Recherche vectorielle via OpenAIVectorService et Pinecone
+            $allResults = [];
+            
+            // Recherche dans le contexte LagentO (TOUJOURS inclus)
+            $contextResults = $this->embedding->searchSimilar(
                 query: $message,
-                memoryTypes: $relevantTypes,
-                limit: 8,
-                userId: $userId // Pour filtrer user_project et user_analytics
+                topK: 4,
+                filter: [],
+                namespace: 'lagento_context'
             );
+            $allResults = array_merge($allResults, $contextResults);
+            
+            // Recherche dans les diagnostics utilisateur
+            $diagnosticResults = $this->embedding->searchSimilar(
+                query: $message,
+                topK: 2,
+                filter: ['user_id' => $userId],
+                namespace: 'user_diagnostics'
+            );
+            $allResults = array_merge($allResults, $diagnosticResults);
+            
+            // Recherche dans les opportunités (namespace global)
+            $opportunityResults = $this->embedding->searchSimilar(
+                query: $message,
+                topK: 2,
+                filter: [],
+                namespace: 'opportunites'
+            );
+            $allResults = array_merge($allResults, $opportunityResults);
+            
+            $results = $allResults;
             
             Log::info('Vector search executed', [
                 'user_id' => $userId,
@@ -451,7 +511,7 @@ case 'recherche_vectorielle':
             'lagento_context',  // Corpus principal Agent O
             'user_project',     // Projets de l'utilisateur uniquement
             'user_analytics',   // Analytics de l'utilisateur uniquement
-            'opportunite',      // Opportunités de financement
+            'opportunites',     // Opportunités de financement (namespace: 'opportunites')
             'conversation'      // Historique des conversations
         ];
     }
@@ -503,70 +563,6 @@ case 'recherche_vectorielle':
         }
     }
 
-    /**
-     * Récupère le contexte des institutions locales pertinentes pour l'utilisateur
-     */
-    protected function getUserInstitutionsContext(string $userId): string
-    {
-        try {
-            $user = User::find($userId);
-            if (!$user) return '';
-            
-            // Récupérer la région du projet le plus récent de l'utilisateur
-            $projet = $user->projets()->latest()->first();
-            $userRegion = $projet?->region ?? 'Abidjan';
-            
-            // Rechercher les institutions dans la région ou nationales
-            $institutions = Institution::where(function($query) use ($userRegion) {
-                $query->where('region', $userRegion)
-                      ->orWhere('region', 'National')
-                      ->orWhere('region', 'Toutes régions');
-            })
-            ->orderBy('type')
-            ->limit(8)
-            ->get();
-
-            if ($institutions->isEmpty()) {
-                return '';
-            }
-
-            $context = "Institutions d'accompagnement disponibles :\n";
-            
-            foreach ($institutions as $institution) {
-                $context .= "• **{$institution->nom}** ({$institution->type})\n";
-                
-                if (!empty($institution->description)) {
-                    $context .= "  Description : {$institution->description}\n";
-                }
-                
-                if (!empty($institution->services)) {
-                    $services = is_array($institution->services) 
-                        ? implode(', ', $institution->services)
-                        : $institution->services;
-                    $context .= "  Services : {$services}\n";
-                }
-                
-                if (!empty($institution->telephone)) {
-                    $context .= "  Contact : {$institution->telephone}\n";
-                }
-                
-                if (!empty($institution->site_web)) {
-                    $context .= "  Site web : {$institution->site_web}\n";
-                }
-                
-                $context .= "  Région : {$institution->region}\n\n";
-            }
-
-            return $context;
-            
-        } catch (\Exception $e) {
-            Log::error('Error getting user institutions context', [
-                'user_id' => $userId,
-                'error' => $e->getMessage()
-            ]);
-            return '';
-        }
-    }
 
     protected function executeFileGeneration(string $message, string $userId): array
     {
@@ -745,12 +741,6 @@ case 'recherche_vectorielle':
     {
         $cards = "";
 
-        // Add institution cards
-        if (isset($data['institutions'])) {
-            foreach ($data['institutions'] as $institution) {
-                $cards .= $this->createInstitutionCard($institution);
-            }
-        }
 
         // Add opportunity cards
         if (isset($data['opportunities'])) {
@@ -796,13 +786,6 @@ case 'recherche_vectorielle':
                     }
                     break;
 
-                case 'institution':
-                    $card = $this->createInstitutionCardFromVector($content, $metadata);
-                    if ($card && !in_array($card, $processedEntities)) {
-                        $cards .= $card;
-                        $processedEntities[] = $card;
-                    }
-                    break;
 
                 case 'texte_officiel':
                     $card = $this->createOfficialTextCardFromVector($content, $metadata);
@@ -828,22 +811,6 @@ case 'recherche_vectorielle':
         return $response . "\n\n" . $cards;
     }
 
-    protected function createInstitutionCard(array $institution): string
-    {
-        $nom = $institution['nom'] ?? ($institution['name'] ?? 'Institution');
-        $telephone = $institution['telephone'] ?? ($institution['phone'] ?? 'N/A');
-        $site = $institution['site_web'] ?? ($institution['website'] ?? '');
-        $region = $institution['region'] ?? '';
-        $ville = $institution['ville'] ?? '';
-
-        return "\n\n:::institution\n" .
-               "**{$nom}**\n\n" .
-               ($institution['description'] ?? '') . "\n\n" .
-               "📍 **Localisation:** {$region}" . ($ville !== '' ? ", {$ville}" : '') . "\n" .
-               "📞 **Contact:** {$telephone}\n" .
-               ($site !== '' ? "🌐 **Site web:** {$site}\n" : '') .
-               ":::\n";
-    }
 
     protected function createOpportunityCard(array $opportunity): string
     {
@@ -944,39 +911,6 @@ case 'recherche_vectorielle':
         }
     }
 
-    /**
-     * Create institution card from vector content
-     */
-    protected function createInstitutionCardFromVector(string $content, array $metadata): ?string
-    {
-        $nom = '';
-        $description = '';
-        $contact = '';
-        $site = '';
-        
-        // Parser le contenu vectorisé
-        if (preg_match('/Nom:\s*([^\n]+)/i', $content, $matches)) {
-            $nom = trim($matches[1]);
-        }
-        
-        if (preg_match('/Description:\s*([^\n]+)/i', $content, $matches)) {
-            $description = trim($matches[1]);
-        }
-        
-        if (preg_match('/Contact:\s*([^\n]+)/i', $content, $matches)) {
-            $contact = trim($matches[1]);
-        }
-        
-        if (preg_match('/Site web:\s*([^\n]+)/i', $content, $matches)) {
-            $site = trim($matches[1]);
-        }
-        
-        if (empty($nom)) {
-            return null;
-        }
-
-        return "\n\n[carte-institution:{$nom}|{$description}|{$contact}|{$site}]\n";
-    }
 
     /**
      * Create official text card from vector content

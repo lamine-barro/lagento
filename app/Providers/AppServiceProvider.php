@@ -11,8 +11,8 @@ use App\Models\UserAnalytics;
 use App\Observers\UserActivityObserver;
 use App\Observers\ProjetObserver;
 use App\Observers\UserAnalyticsObserver;
-use App\Services\VoyageVectorService;
-use App\Services\MemoryManagerService;
+use App\Services\OpenAIVectorService;
+use App\Services\AutoVectorizationService;
 use App\Services\PdfExtractionService;
 use App\Services\DocumentAnalysisService;
 use Illuminate\Support\Facades\Auth;
@@ -26,18 +26,17 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Register vector services as singletons
-        $this->app->singleton(VoyageVectorService::class, function ($app) {
-            return new VoyageVectorService();
+        $this->app->singleton(OpenAIVectorService::class, function ($app) {
+            return new OpenAIVectorService();
         });
 
         $this->app->singleton(PdfExtractionService::class, function ($app) {
             return new PdfExtractionService();
         });
 
-        $this->app->singleton(MemoryManagerService::class, function ($app) {
-            return new MemoryManagerService(
-                $app->make(VoyageVectorService::class),
-                $app->make(PdfExtractionService::class)
+        $this->app->singleton(AutoVectorizationService::class, function ($app) {
+            return new AutoVectorizationService(
+                $app->make(OpenAIVectorService::class)
             );
         });
 

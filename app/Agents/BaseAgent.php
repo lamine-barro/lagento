@@ -3,19 +3,19 @@
 namespace App\Agents;
 
 use App\Services\LanguageModelService;
-use App\Services\VoyageVectorService;
+use App\Services\OpenAIVectorService;
 use Illuminate\Support\Facades\Log;
 
 abstract class BaseAgent
 {
     protected LanguageModelService $llm;
-    protected VoyageVectorService $embedding;
+    protected OpenAIVectorService $embedding;
     protected ?object $search;
     protected string $agentName;
 
     public function __construct(
         LanguageModelService $llm,
-        VoyageVectorService $embedding,
+        OpenAIVectorService $embedding,
         ?object $search = null
     ) {
         $this->llm = $llm;

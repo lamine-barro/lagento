@@ -12,16 +12,20 @@
         <form id="step3-form" method="POST" action="{{ route('onboarding.step3.process') }}" class="space-y-6 mt-4">
             @csrf
 
-            <!-- Alerte de validation LLM -->
-            @error('content_validation')
+            <!-- Alertes d'erreurs -->
+            @if ($errors->any())
                 <div class="alert alert-error">
                     <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                     <div>
-                        <strong>Validation échouée</strong>
-                        <p>{{ $message }}</p>
+                        <strong>Erreurs de validation</strong>
+                        <ul class="mt-2 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
-            @enderror
+            @endif
         
             <!-- Secteurs d'activité (max 5) -->
             <div>
@@ -98,15 +102,36 @@
                     @endforeach
                 </div>
             </div>
+
+            <!-- Bouton dans le formulaire -->
+            <div class="flex justify-between items-center mt-12 pt-6">
+                <div class="w-full max-w-4xl mx-auto flex justify-between items-center gap-4 mt-4">
+                    <a href="{{ route('onboarding.step2') }}" class="btn btn-ghost">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
+                        Retour
+                    </a>
+                    
+                    <button type="button" class="btn btn-primary" onclick="submitForm(this)">
+                        <span id="btn-text">Suivant</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1" id="btn-icon"></i>
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
-
-    <x-onboarding.footer :next-form-id="'step3-form'" next-label="Suivant" />
 </div>
 @endsection
 
 @push('scripts')
 <script>
+function submitForm(button) {
+    button.disabled = true;
+    button.style.opacity = '0.7';
+    document.getElementById('btn-text').textContent = 'Traitement...';
+    document.getElementById('btn-icon').style.display = 'none';
+    document.getElementById('step3-form').submit();
+}
+
 function checkboxLimit(max, nameAttr) {
     return {
         max: max,

@@ -19,12 +19,18 @@ class OnboardingController extends Controller
     public function showStep1()
     {
         $user = Auth::user();
+        \Log::info('Showing step 1', ['user_id' => $user ? $user->id : 'null']);
         $projet = Projet::where('user_id', $user->id)->latest()->first();
         return view('onboarding.step1', compact('projet'));
     }
     
     public function processStep1(Request $request)
     {
+        \Log::info('Step 1 form submitted', [
+            'request_data' => $request->all(),
+            'user_id' => auth()->id()
+        ]);
+
         $request->validate([
             'nom_projet' => 'required|string|max:255',
             'raison_sociale' => 'nullable|string|max:255',
@@ -37,13 +43,22 @@ class OnboardingController extends Controller
             'longitude' => 'nullable|numeric',
         ]);
 
+        \Log::info('Step 1 validation passed, starting LLM validation');
+
         // Validation LLM pour détecter les faux contenus
-        $validation = $this->validator->validateOnboardingStep($request->all(), 'step1');
-        
-        if (!$validation['valid']) {
-            return back()
-                ->withErrors(['content_validation' => 'Les informations saisies semblent être des données factices. ' . ($validation['reason'] ?? 'Veuillez fournir des informations réelles sur votre projet.')])
-                ->withInput();
+        try {
+            $validation = $this->validator->validateOnboardingStep($request->all(), 'step1');
+            \Log::info('LLM validation result', ['validation' => $validation]);
+            
+            if (!$validation['valid']) {
+                \Log::info('LLM validation failed, redirecting back');
+                return back()
+                    ->withErrors(['content_validation' => 'Les informations saisies semblent être des données factices. ' . ($validation['reason'] ?? 'Veuillez fournir des informations réelles sur votre projet.')])
+                    ->withInput();
+            }
+        } catch (\Exception $e) {
+            \Log::error('LLM validation error: ' . $e->getMessage());
+            // Continue without LLM validation if there's an error
         }
 
         $user = Auth::user();
@@ -74,6 +89,11 @@ class OnboardingController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'is_public' => true,
+        ]);
+
+        \Log::info('Step 1 completed successfully, redirecting to step 2', [
+            'projet_id' => $projet->id,
+            'user_id' => $user->id
         ]);
 
         // Sauvegarde de progression effectuée, poursuivre
@@ -263,26 +283,7 @@ class OnboardingController extends Controller
             'redirecting_to' => 'diagnostic'
         ]);
 
-        // Lancer automatiquement le diagnostic après finalisation de l'onboarding
-        try {
-            $diagnosticController = app(\App\Http\Controllers\DiagnosticController::class);
-            $request = new \Illuminate\Http\Request();
-            $diagnosticResult = $diagnosticController->runDiagnostic($request);
-            
-            \Log::info('Auto-diagnostic launched after onboarding completion', [
-                'projet_id' => $projet->id,
-                'user_id' => $user->id
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Failed to auto-launch diagnostic after onboarding', [
-                'projet_id' => $projet->id,
-                'user_id' => $user->id,
-                'error' => $e->getMessage()
-            ]);
-        }
-
-        // Si on arrive ici, c'est que step 4 a été soumis avec succès
-        // Forcer la finalisation de l'onboarding
-        return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet et votre diagnostic sera généré automatiquement.');
+        // Redirection vers la page diagnostic
+        return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet. Vous pouvez maintenant lancer votre diagnostic.');
     }
 }

@@ -35,12 +35,14 @@ return [
         ],
     ],
 
-    'voyage' => [
-        'api_key' => env('VOYAGE_API_KEY'),
-    ],
 
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),
+    ],
+
+    'pinecone' => [
+        'api_key' => env('PINECONE_API_KEY'),
+        'host' => env('PINECONE_HOST', 'https://lagento-sdl4p80.svc.aped-4627-b74a.pinecone.io'),
     ],
 
     'mapbox' => [

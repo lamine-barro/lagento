@@ -128,8 +128,6 @@ class LanguageModelService
                 'prompt' => $prompt,
                 'n' => 1,
                 'size' => $size,
-                // gpt-image-1 always returns base64; keep explicit for clarity
-                'response_format' => 'b64_json',
             ]);
 
             $b64 = $resp->data[0]->b64_json ?? null;

@@ -155,159 +155,155 @@ function documentUpload() {
                 @php
                     $docId = str_replace('-', '_', $document->id);
                 @endphp
-                <div class="document-card group relative bg-white rounded-xl border border-gray-200 hover:border-orange-200 transition-all duration-200" 
+                <div class="document-card group relative bg-white rounded-xl border border-gray-200 hover:border-orange-200 transition-all duration-200 mt-4" 
                      x-data="{ showDetails: false, showPreview: false }">
                     
                     <div class="p-6 w-full">
                         <!-- Contenu principal -->
-                        <div class="w-full space-y-4">
+                        <div class="w-full">
                             <!-- En-tête du document -->
-                            <div class="">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="flex-1 min-w-0">
-                                            <h3 class="text-lg font-semibold text-gray-900 truncate mb-1" title="{{ $document->original_name }}">
-                                                {{ strlen($document->original_name) > 50 ? substr($document->original_name, 0, 47) . '...' : $document->original_name }}
-                                            </h3>
-                                            <div class="flex items-center gap-4 text-sm text-gray-600">
-                                                <span class="flex items-center gap-1">
-                                                    <i data-lucide="hard-drive" class="w-4 h-4"></i>
-                                                    {{ $document->formatted_file_size }}
-                                                </span>
-                                                <span class="flex items-center gap-1">
-                                                    <i data-lucide="folder" class="w-4 h-4"></i>
-                                                    @php
-                                                        $categoryTranslations = [
-                                                            'other' => 'Autre',
-                                                            'official' => 'Officiel',
-                                                            'business' => 'Business',
-                                                            'legal' => 'Juridique',
-                                                            'financial' => 'Financier'
-                                                        ];
-                                                    @endphp
-                                                    {{ $categoryTranslations[$document->category] ?? ucfirst($document->category) }}
-                                                </span>
-                                                @if($document->is_processed)
-                                                    <span class="text-gray-500">
-                                                        {{ $document->processed_at->format('d/m/Y H:i') }}
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        
-                                    <!-- Actions rapides -->
-                                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            @if(in_array($document->file_extension, ['pdf', 'png', 'jpg', 'jpeg']))
-                                                <a href="{{ route('documents.view', $document->filename) }}" 
-                                                   target="_blank"
-                                                   class="p-2 rounded-lg hover:bg-blue-50 transition-colors"
-                                                   title="Ouvrir dans un nouvel onglet">
-                                                    <i data-lucide="external-link" class="w-4 h-4 text-blue-600"></i>
-                                                </a>
-                                            @endif
-                                            
-                                            <a href="{{ route('documents.download', $document->filename) }}" 
-                                               download
-                                               class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                               title="Télécharger">
-                                                <i data-lucide="download" class="w-4 h-4 text-gray-600"></i>
-                                            </a>
-                                            
-                                            <button @click="window.openDeleteModal({ id: '{{ $document->id }}', name: '{{ $document->original_name }}', filename: '{{ $document->filename }}' })" 
-                                                    class="p-2 rounded-lg hover:bg-red-50 transition-colors"
-                                                    title="Supprimer">
-                                                <i data-lucide="trash-2" class="w-4 h-4 text-red-600"></i>
-                                            </button>
+                            <div class="flex items-start justify-between gap-4 mb-4">
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-lg font-semibold text-gray-900 truncate mb-2" title="{{ $document->original_name }}">
+                                        {{ strlen($document->original_name) > 50 ? substr($document->original_name, 0, 47) . '...' : $document->original_name }}
+                                    </h3>
+                                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                                        <span class="flex items-center gap-1">
+                                            <i data-lucide="hard-drive" class="w-4 h-4"></i>
+                                            {{ $document->formatted_file_size }}
+                                        </span>
+                                        <span class="flex items-center gap-1">
+                                            <i data-lucide="folder" class="w-4 h-4"></i>
+                                            @php
+                                                $categoryTranslations = [
+                                                    'other' => 'Autre',
+                                                    'official' => 'Officiel',
+                                                    'business' => 'Business',
+                                                    'legal' => 'Juridique',
+                                                    'financial' => 'Financier'
+                                                ];
+                                            @endphp
+                                            {{ $categoryTranslations[$document->category] ?? ucfirst($document->category) }}
+                                        </span>
+                                        @if($document->is_processed)
+                                            <span class="text-gray-500">
+                                                {{ $document->processed_at->format('d/m/Y H:i') }}
+                                            </span>
+                                        @endif
                                     </div>
+                                </div>
+                                
+                                <!-- Actions rapides -->
+                                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    @if(in_array($document->file_extension, ['pdf', 'png', 'jpg', 'jpeg']))
+                                        <a href="{{ route('documents.view', $document->filename) }}" 
+                                           target="_blank"
+                                           class="p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                                           title="Ouvrir dans un nouvel onglet">
+                                            <i data-lucide="external-link" class="w-4 h-4 text-blue-600"></i>
+                                        </a>
+                                    @endif
+                                    
+                                    <a href="{{ route('documents.download', $document->filename) }}" 
+                                       download
+                                       class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                       title="Télécharger">
+                                        <i data-lucide="download" class="w-4 h-4 text-gray-600"></i>
+                                    </a>
+                                    
+                                    <button @click="window.openDeleteModal({ id: '{{ $document->id }}', name: '{{ $document->original_name }}', filename: '{{ $document->filename }}' })" 
+                                            class="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                                            title="Supprimer">
+                                        <i data-lucide="trash-2" class="w-4 h-4 text-red-600"></i>
+                                    </button>
                                 </div>
                             </div>
                             
                             <!-- Tags détectés avec design amélioré -->
-                                @if($document->is_processed && $document->detected_tags && is_array($document->detected_tags))
-                                    @php
-                                        $filteredTags = array_filter($document->detected_tags, function($tag) {
-                                            return strtolower($tag) !== 'autre';
-                                        });
-                                    @endphp
-                                    @if(count($filteredTags) > 0)
-                                <div class="">
-                                    <div class="flex flex-wrap gap-2">
-                                                @foreach($filteredTags as $tag)
-                                                    <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium border" 
-                                                          style="background: var(--orange-50); color: var(--orange-700); border-color: var(--orange-200);">
-                                                        <i data-lucide="tag" class="w-3 h-3"></i>
-                                                        {{ str_replace('_', ' ', $tag) }}
-                                                    </span>
-                                                @endforeach
-                                    </div>
-                                </div>
-                                    @endif
-                                @endif
-                                
-                                <!-- État du document avec messages informatifs -->
-                                @if($document->is_processed && $document->ai_summary)
-                                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 mt-4">
-                                        <div class="flex items-start justify-between mb-3">
-                                            <h4 class="text-sm font-semibold text-gray-900">Résumé synthétique</h4>
-                                            <button @click="showDetails = !showDetails" 
-                                                    class="text-xs text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1">
-                                                <span x-text="showDetails ? 'Réduire' : 'Voir plus'"></span>
-                                                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" :class="showDetails && 'rotate-180'"></i>
-                                            </button>
+                            @if($document->is_processed && $document->detected_tags && is_array($document->detected_tags))
+                                @php
+                                    $filteredTags = array_filter($document->detected_tags, function($tag) {
+                                        return strtolower($tag) !== 'autre';
+                                    });
+                                @endphp
+                                @if(count($filteredTags) > 0)
+                                    <div class="mb-4">
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($filteredTags as $tag)
+                                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border" 
+                                                      style="background: var(--orange-50); color: var(--orange-700); border-color: var(--orange-200);">
+                                                    <i data-lucide="tag" class="w-3 h-3 mr-1"></i>
+                                                    {{ str_replace('_', ' ', $tag) }}
+                                                </span>
+                                            @endforeach
                                         </div>
+                                    </div>
+                                @endif
+                            @endif
+                            <!-- État du document avec messages informatifs -->
+                            @if($document->is_processed && $document->ai_summary)
+                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <h4 class="text-sm font-semibold text-gray-900">Résumé synthétique</h4>
+                                        <button @click="showDetails = !showDetails" 
+                                                class="text-xs text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1">
+                                            <span x-text="showDetails ? 'Réduire' : 'Voir plus'"></span>
+                                            <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" :class="showDetails && 'rotate-180'"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-700 leading-relaxed" :class="!showDetails && 'line-clamp-2'">
+                                        {{ $document->ai_summary }}
+                                    </p>
                                         
-                                        <p class="text-sm text-gray-700 leading-relaxed" :class="!showDetails && 'line-clamp-2'">
-                                            {{ $document->ai_summary }}
-                                        </p>
-                                        
-                                        @if($document->ai_metadata && isset($document->ai_metadata['document_type']))
-                                            <div x-show="showDetails" x-transition class="mt-3 pt-3 border-t border-gray-200">
-                                                <div class="flex items-center justify-between text-sm">
+                                    @if($document->ai_metadata && isset($document->ai_metadata['document_type']))
+                                        <div x-show="showDetails" x-transition class="mt-3 pt-3 border-t border-gray-200">
+                                            <div class="flex items-center justify-between text-sm">
+                                                <div class="flex items-center gap-2">
+                                                    <i data-lucide="file-search" class="w-4 h-4 text-gray-500"></i>
+                                                    <span class="text-gray-600">{{ $document->ai_metadata['document_type'] }}</span>
+                                                </div>
+                                                @if(isset($document->ai_metadata['confidence']))
                                                     <div class="flex items-center gap-2">
-                                                        <i data-lucide="file-search" class="w-4 h-4 text-gray-500"></i>
-                                                        <span class="text-gray-600">{{ $document->ai_metadata['document_type'] }}</span>
+                                                        <span class="text-xs text-gray-500">Confiance:</span>
+                                                        <span class="font-medium text-gray-900">{{ round($document->ai_metadata['confidence'] * 100) }}%</span>
                                                     </div>
-                                                    @if(isset($document->ai_metadata['confidence']))
-                                                        <div class="flex items-center gap-2">
-                                                            <span class="text-xs text-gray-500">Confiance:</span>
-                                                            <span class="font-medium text-gray-900">{{ round($document->ai_metadata['confidence'] * 100) }}%</span>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                @elseif(!$document->is_processed)
-                                    @if(in_array($document->file_extension, ['png', 'jpg', 'jpeg']))
-                                        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                                                <div class="flex-1">
-                                                    <p class="text-sm text-blue-700 font-medium mb-1">
-                                                        🤖 IA Vision GPT-4 analyse votre image...
-                                                    </p>
-                                                    <p class="text-xs text-blue-600">
-                                                        Extraction intelligente du contenu, OCR et détection automatique
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <div class="bg-orange-50 rounded-xl p-4 border border-orange-200">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-                                                <div class="flex-1">
-                                                    <p class="text-sm text-orange-700 font-medium mb-1">
-                                                        Intelligence artificielle en cours d'analyse...
-                                                    </p>
-                                                    <p class="text-xs text-orange-600">
-                                                        Résumé et tags automatiques bientôt disponibles
-                                                    </p>
-                                                </div>
+                                                @endif
                                             </div>
                                         </div>
                                     @endif
+                                </div>
+                            @elseif(!$document->is_processed)
+                                @if(in_array($document->file_extension, ['png', 'jpg', 'jpeg']))
+                                    <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                            <div class="flex-1">
+                                                <p class="text-sm text-blue-700 font-medium mb-1">
+                                                    🤖 IA Vision GPT-4 analyse votre image...
+                                                </p>
+                                                <p class="text-xs text-blue-600">
+                                                    Extraction intelligente du contenu, OCR et détection automatique
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+                                            <div class="flex-1">
+                                                <p class="text-sm text-orange-700 font-medium mb-1">
+                                                    Intelligence artificielle en cours d'analyse...
+                                                </p>
+                                                <p class="text-xs text-orange-600">
+                                                    Résumé et tags automatiques bientôt disponibles
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endif
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>

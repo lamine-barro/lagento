@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Models\Projet;
 use App\Observers\UserActivityObserver;
 use App\Services\UserAnalyticsService;
-use App\Services\VoyageVectorService;
-use App\Services\VectorAccessService;
+use App\Services\OpenAIVectorService;
+use App\Services\AutoVectorizationService;
 use Illuminate\Support\ServiceProvider;
 
 class AnalyticsServiceProvider extends ServiceProvider
@@ -19,8 +19,8 @@ class AnalyticsServiceProvider extends ServiceProvider
     {
         $this->app->singleton(UserAnalyticsService::class, function ($app) {
             return new UserAnalyticsService(
-                $app->make(VoyageVectorService::class),
-                $app->make(VectorAccessService::class)
+                $app->make(OpenAIVectorService::class),
+                $app->make(AutoVectorizationService::class)
             );
         });
     }

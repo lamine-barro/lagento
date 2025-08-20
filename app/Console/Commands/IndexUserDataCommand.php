@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\MemoryManagerService;
+use App\Services\AutoVectorizationService;
 use App\Models\Projet;
 use App\Models\UserAnalytics;
 use Illuminate\Support\Facades\Log;
@@ -13,12 +13,12 @@ class IndexUserDataCommand extends Command
     protected $signature = 'vector:index-user-data {--type=all : Type to index (projects|analytics|all)}';
     protected $description = 'Index user projects and analytics into vector memory for AI agent access';
 
-    private MemoryManagerService $memoryManager;
+    private AutoVectorizationService $autoVectorService;
 
-    public function __construct(MemoryManagerService $memoryManager)
+    public function __construct(AutoVectorizationService $autoVectorService)
     {
         parent::__construct();
-        $this->memoryManager = $memoryManager;
+        $this->autoVectorService = $autoVectorService;
     }
 
     public function handle()
@@ -26,10 +26,6 @@ class IndexUserDataCommand extends Command
         $type = $this->option('type');
         
         $this->info('🚀 Starting user data indexation...');
-        
-        if ($type === 'all' || $type === 'projects') {
-            $this->indexProjects();
-        }
         
         if ($type === 'all' || $type === 'analytics') {
             $this->indexAnalytics();
@@ -39,45 +35,6 @@ class IndexUserDataCommand extends Command
         return 0;
     }
     
-    private function indexProjects(): void
-    {
-        $this->info('Indexing user projects...');
-        
-        $projects = Projet::all();
-        $bar = $this->output->createProgressBar($projects->count());
-        $bar->start();
-        
-        $successful = 0;
-        $failed = 0;
-        
-        foreach ($projects as $project) {
-            try {
-                $this->memoryManager->indexMemory('user_project', $project);
-                $successful++;
-                
-                Log::info('Project indexed successfully', [
-                    'project_id' => $project->id,
-                    'user_id' => $project->user_id,
-                    'name' => $project->nom_projet
-                ]);
-            } catch (\Exception $e) {
-                $failed++;
-                $this->error("\n❌ Failed to index project {$project->id}: " . $e->getMessage());
-                
-                Log::error('Failed to index project', [
-                    'project_id' => $project->id,
-                    'error' => $e->getMessage()
-                ]);
-            }
-            
-            $bar->advance();
-        }
-        
-        $bar->finish();
-        $this->newLine();
-        
-        $this->info("✅ Projects indexed: $successful successful, $failed failed");
-    }
     
     private function indexAnalytics(): void
     {
@@ -92,7 +49,7 @@ class IndexUserDataCommand extends Command
         
         foreach ($analytics as $analytic) {
             try {
-                $this->memoryManager->indexMemory('user_analytics', $analytic);
+                $this->autoVectorService->vectorizeDiagnostic($analytic);
                 $successful++;
                 
                 Log::info('Analytics indexed successfully', [

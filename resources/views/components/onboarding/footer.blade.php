@@ -5,7 +5,17 @@
     $isFinal = $isFinal ?? false;
 @endphp
 
-<div class="flex justify-between items-center mt-12 pt-6" x-data="{ isSubmitting: false }">
+<div class="flex justify-between items-center mt-12 pt-6" x-data="{ 
+    isSubmitting: false,
+    init() {
+        // Reset isSubmitting if form submission fails or returns error
+        setTimeout(() => {
+            if (this.isSubmitting && document.querySelector('.alert-error')) {
+                this.isSubmitting = false;
+            }
+        }, 1000);
+    }
+}">
     <div class="w-full max-w-4xl mx-auto flex justify-between items-center gap-4 mt-4">
     <a href="{{ $prevUrl }}" class="btn btn-ghost" x-bind:disabled="isSubmitting">
         <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
@@ -15,7 +25,12 @@
     @if ($nextFormId)
         <button type="submit" form="{{ $nextFormId }}" class="btn btn-primary" 
                 x-bind:disabled="isSubmitting"
-                @click="isSubmitting = true"
+                @click="isSubmitting = true; 
+                        setTimeout(() => { 
+                            if (isSubmitting && !document.querySelector('.loading')) {
+                                isSubmitting = false;
+                            }
+                        }, 10000)"
                 x-bind:class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
             <template x-if="!isSubmitting">
                 <span class="flex items-center">

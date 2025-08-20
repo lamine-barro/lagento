@@ -3,16 +3,16 @@
 namespace App\Observers;
 
 use App\Models\UserAnalytics;
-use App\Services\MemoryManagerService;
+use App\Services\AutoVectorizationService;
 use Illuminate\Support\Facades\Log;
 
 class UserAnalyticsObserver
 {
-    private MemoryManagerService $memoryManager;
+    private AutoVectorizationService $autoVectorService;
 
-    public function __construct(MemoryManagerService $memoryManager)
+    public function __construct(AutoVectorizationService $autoVectorService)
     {
-        $this->memoryManager = $memoryManager;
+        $this->autoVectorService = $autoVectorService;
     }
 
     /**
@@ -21,13 +21,13 @@ class UserAnalyticsObserver
     public function created(UserAnalytics $analytics): void
     {
         try {
-            $this->memoryManager->indexMemory('user_analytics', $analytics);
-            Log::info('User analytics automatically indexed on creation', [
+            $this->autoVectorService->vectorizeDiagnostic($analytics);
+            Log::info('User analytics automatically vectorized on creation', [
                 'id' => $analytics->id,
                 'user_id' => $analytics->user_id
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to index user analytics on creation', [
+            Log::error('Failed to vectorize user analytics on creation', [
                 'id' => $analytics->id,
                 'error' => $e->getMessage()
             ]);
@@ -44,14 +44,14 @@ class UserAnalyticsObserver
             if ($analytics->wasChanged(['entrepreneur_profile', 'score_sante', 'niveau_maturite', 
                 'message_principal', 'nombre_opportunites', 'position_marche'])) {
                 
-                $this->memoryManager->indexMemory('user_analytics', $analytics);
-                Log::info('User analytics automatically re-indexed on update', [
+                $this->autoVectorService->vectorizeDiagnostic($analytics);
+                Log::info('User analytics automatically re-vectorized on update', [
                     'id' => $analytics->id,
                     'user_id' => $analytics->user_id
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Failed to re-index user analytics on update', [
+            Log::error('Failed to re-vectorize user analytics on update', [
                 'id' => $analytics->id,
                 'error' => $e->getMessage()
             ]);
@@ -64,18 +64,14 @@ class UserAnalyticsObserver
     public function deleted(UserAnalytics $analytics): void
     {
         try {
-            // Remove from vector memory
-            \DB::table('vector_memories')
-                ->where('memory_type', 'user_analytics')
-                ->where('source_id', $analytics->id)
-                ->delete();
-            
-            Log::info('User analytics vectors removed on deletion', [
+            // Note: Vector deletion from Pinecone could be implemented here if needed
+            // For now, we just log the deletion
+            Log::info('User analytics deleted (vector removal from Pinecone not implemented)', [
                 'id' => $analytics->id,
                 'user_id' => $analytics->user_id
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to remove user analytics vectors on deletion', [
+            Log::error('Failed to handle user analytics deletion', [
                 'id' => $analytics->id,
                 'error' => $e->getMessage()
             ]);

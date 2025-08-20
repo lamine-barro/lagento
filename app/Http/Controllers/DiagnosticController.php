@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Opportunite;
 use App\Models\Projet;
 use App\Models\UserAnalytics;
 use App\Services\UserAnalyticsService;
@@ -18,16 +17,8 @@ class DiagnosticController extends Controller
         $user = Auth::user();
         
         try {
-            // Get matched opportunities
-            $opportunities = collect(); // Empty collection by default
-            if ($user->business_sector) {
-                $opportunities = Opportunite::where('business_sector', $user->business_sector)
-                    ->orWhere('business_sector', 'all')
-                    ->where('deadline', '>=', now())
-                    ->latest()
-                    ->limit(5)
-                    ->get();
-            }
+            // Get matched opportunities - data now comes from vectorized context
+            $opportunities = collect(); // Empty collection - opportunities are handled via vector search
             
             // Récupérer les projets récents
             $recentProjects = Projet::where('user_id', $user->id)
@@ -228,6 +219,13 @@ class DiagnosticController extends Controller
             
             // Générer les insights complets
             $insights = $analyticsService->generateUserInsights($user);
+            
+            // Vectorize the final diagnostic only once at the end
+            $analytics = \App\Models\UserAnalytics::where('user_id', $user->id)->first();
+            if ($analytics) {
+                $autoVectorService = app(\App\Services\AutoVectorizationService::class);
+                $autoVectorService->vectorizeDiagnostic($analytics);
+            }
             
             // MAINTENANT comptabiliser le diagnostic car génération réussie
             if (!$user->useDiagnostic()) {

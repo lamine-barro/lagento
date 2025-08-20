@@ -183,51 +183,32 @@ class ChatController extends Controller
     
     private function vectorizeFileContent($file, $userId, $conversationId)
     {
-        // Utiliser le service de vectorisation existant
-        $vectorService = app(\App\Services\VoyageVectorService::class);
-        $pdfService = app(\App\Services\PdfExtractionService::class);
+        // Utiliser le nouveau service d'auto-vectorisation
+        $autoVectorService = app(\App\Services\AutoVectorizationService::class);
         
         try {
-            // Extraire le contenu selon le type de fichier
-            $content = '';
-            $mimeType = $file->getMimeType();
+            // Store the file temporarily
+            $tempPath = $file->store('temp_uploads');
+            $fullPath = storage_path('app/' . $tempPath);
             
-            if ($mimeType === 'application/pdf') {
-                $content = $pdfService->extractTextFromFile($file->getPathname());
-            } elseif (str_starts_with($mimeType, 'text/')) {
-                $content = file_get_contents($file->getPathname());
-            } elseif (in_array($mimeType, ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])) {
-                // Pour les fichiers Word, on peut utiliser une librairie ou simplement stocker le nom
-                $content = "Document Word: " . $file->getClientOriginalName();
-            } else {
-                // Pour les images et autres fichiers, on stocke juste les métadonnées
-                $content = "Fichier: " . $file->getClientOriginalName() . " (type: " . $mimeType . ")";
-            }
-            
-            if (empty($content)) {
-                throw new \Exception("Impossible d'extraire le contenu du fichier");
-            }
-            
-            // Créer l'entrée vector_memory
-            $vectorMemory = \App\Models\VectorMemory::create([
+            // Use the auto-vectorization service
+            $success = $autoVectorService->vectorizeAttachment($fullPath, [
                 'user_id' => $userId,
-                'content' => $content,
-                'metadata' => [
-                    'source' => 'chat_attachment',
-                    'conversation_id' => $conversationId,
-                    'filename' => $file->getClientOriginalName(),
-                    'mime_type' => $mimeType,
-                    'size' => $file->getSize()
-                ],
-                'source_type' => 'chat_attachment',
-                'source_id' => $conversationId
+                'conversation_id' => $conversationId,
+                'filename' => $file->getClientOriginalName(),
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'uploaded_at' => now()->toISOString()
             ]);
             
-            // Vectoriser le contenu
-            $embedding = $vectorService->createEmbedding($content);
-            $vectorMemory->update(['embedding' => $embedding]);
+            // Clean up temp file
+            \Storage::delete($tempPath);
             
-            return $vectorMemory->id;
+            if (!$success) {
+                throw new \Exception("Impossible de vectoriser le fichier");
+            }
+            
+            return true;
             
         } catch (\Exception $e) {
             \Log::error('Erreur vectorisation fichier: ' . $e->getMessage());

@@ -91,9 +91,9 @@ return new class extends Migration
             // Partenaires Suggérés
             $table->integer('nombre_partenaires')->default(0);
             $table->json('top_partenaires')->nullable();
-            $table->integer('clients_potentiels')->default(0);
-            $table->integer('fournisseurs_potentiels')->default(0);
-            $table->integer('partenaires_complementaires')->default(0);
+            $table->text('clients_potentiels')->nullable();
+            $table->text('fournisseurs_potentiels')->nullable();
+            $table->text('partenaires_complementaires')->nullable();
             
             // Résumé Exécutif
             $table->text('message_principal')->nullable();

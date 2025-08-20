@@ -5,15 +5,17 @@ namespace App\Services;
 use App\Agents\AgentPrincipal;
 use App\Agents\AgentSuggestionsConversation;
 use App\Agents\AgentTitreConversation;
+use App\Services\LanguageModelService;
+use App\Services\OpenAIVectorService;
 
 class AgentService
 {
     private LanguageModelService $llm;
-    private VoyageVectorService $embedding;
+    private OpenAIVectorService $embedding;
 
     public function __construct(
         LanguageModelService $llm,
-        VoyageVectorService $embedding
+        OpenAIVectorService $embedding
     ) {
         $this->llm = $llm;
         $this->embedding = $embedding;
@@ -89,7 +91,7 @@ class AgentService
         }
         
         // Générer nouvelles suggestions si pas en cache
-        $agent = new AgentSuggestionsConversation($this->llm, $this->embedding, $this->search);
+        $agent = new AgentSuggestionsConversation($this->llm, $this->embedding);
         
         $result = $agent->execute([
             'user_id' => $userId,
@@ -119,7 +121,7 @@ class AgentService
         array $recentMessages = [],
         int $messageCount = 0
     ): array {
-        $agent = new AgentTitreConversation($this->llm, $this->embedding, $this->search);
+        $agent = new AgentTitreConversation($this->llm, $this->embedding);
         
         return $agent->execute([
             'user_first_message' => $userFirstMessage,
@@ -143,7 +145,7 @@ class AgentService
 
         $messageCount = $conversation->message_count ?? $conversation->messages->count();
         
-        // Update title every 10 messages
+        // Update title and auto-vectorize every 10 messages
         if ($messageCount > 0 && $messageCount % 10 === 0) {
             $recentMessages = $conversation->messages()
                 ->latest()
@@ -170,13 +172,15 @@ class AgentService
             if ($result['success'] && !empty($result['title'])) {
                 $conversation->update(['title' => $result['title']]);
 
-                // Générer le résumé (500 tokens max) via gpt-5-nano et indexer l'embedding
+                // Générer le résumé (500 tokens max) via gpt-5-nano et l'auto-vectoriser
                 $summary = $this->generateConversationSummary($conversation);
                 if ($summary) {
                     $conversation->summary = $summary;
-                    $emb = $this->embedding->embed([$summary]);
-                    $conversation->summary_embedding = $emb[0] ?? null;
                     $conversation->save();
+                    
+                    // Auto-vectoriser le résumé de conversation
+                    $autoVectorService = app(\App\Services\AutoVectorizationService::class);
+                    $autoVectorService->vectorizeConversationSummary($conversation);
                 }
 
                 return $result['title'];
@@ -205,7 +209,7 @@ class AgentService
                 ['role' => 'system', 'content' => 'Tu es un assistant qui produit des résumés concis et factuels en français.'],
                 ['role' => 'user', 'content' => $prompt],
             ];
-            $raw = $this->llm->chat($messages, 'gpt-4.1-nano', 0.2, 1200);
+            $raw = $this->llm->chat($messages, 'gpt-5-mini', 0.2, 1200);
             return trim($raw);
         } catch (\Throwable $e) {
             \Log::error('Conversation summary generation failed', ['id' => $conversation->id, 'error' => $e->getMessage()]);
@@ -228,7 +232,7 @@ class AgentService
         \Cache::forget($cacheKey);
         
         // Générer de nouvelles suggestions
-        $agent = new AgentSuggestionsConversation($this->llm, $this->embedding, $this->search);
+        $agent = new AgentSuggestionsConversation($this->llm, $this->embedding);
         
         $result = $agent->execute([
             'user_id' => $userId,

@@ -143,7 +143,7 @@ document.addEventListener('alpine:init', () => {
     <div class="mb-4 flex items-center justify-between">
         <div>
             <h1 class="text-primary mb-1">Diagnostic</h1>
-            <p class="text-secondary text-sm">{{ isset($analytics) ? 'MAJ: ' . ($analytics->metadata['derniere_maj'] ?? 'N/A') : 'Vue d\'ensemble entrepreneuriale' }}</p>
+            <p class="text-secondary text-sm">{{ isset($analytics) ? 'MAJ: ' . ($analytics->updated_at ? $analytics->updated_at->format('d/m/Y H:i') : 'N/A') : 'Vue d\'ensemble entrepreneuriale' }}</p>
         </div>
         
         <!-- Actions -->
@@ -493,11 +493,11 @@ document.addEventListener('alpine:init', () => {
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">{{ $opportunite['pourquoi_vous'] ?? 'N/A' }}</p>
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-orange">{{ $opportunite['montant_ou_valeur'] ?? 'N/A' }}</span>
-                            @if(isset($opportunite['lien']))
+                            @if(isset($opportunite['lien']) && !empty($opportunite['lien']) && $opportunite['lien'] !== 'non disponible' && $opportunite['lien'] !== 'N/A')
                                 @php
                                     $lien = $opportunite['lien'];
                                     // Ajouter https:// si pas de protocole
-                                    if (!str_starts_with($lien, 'http')) {
+                                    if (!str_starts_with($lien, 'http') && !str_starts_with($lien, 'mailto:')) {
                                         $lien = 'https://' . ltrim($lien, '/');
                                     }
                                 @endphp
@@ -698,52 +698,6 @@ document.addEventListener('alpine:init', () => {
                 </div>
             </div>
             
-            <!-- Shimmer cards preview avec structure réaliste -->
-            <div class="space-y-6">
-                <!-- Résumé Exécutif Preview -->
-                <div class="skeleton rounded-lg p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="skeleton w-6 h-6 rounded"></div>
-                        <div class="skeleton skeleton-title" style="width: 200px;"></div>
-                    </div>
-                    <div class="space-y-2">
-                        <div class="skeleton skeleton-text"></div>
-                        <div class="skeleton skeleton-text" style="width: 75%;"></div>
-                    </div>
-                </div>
-                
-                <!-- Profil Entrepreneur Preview -->
-                <div class="skeleton rounded-lg p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="skeleton w-6 h-6 rounded"></div>
-                        <div class="skeleton skeleton-title" style="width: 180px;"></div>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-3">
-                            <div class="skeleton h-4" style="width: 120px;"></div>
-                            <div class="skeleton h-8"></div>
-                            <div class="skeleton h-8"></div>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="skeleton h-4" style="width: 140px;"></div>
-                            <div class="skeleton h-8"></div>
-                            <div class="skeleton h-8"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Opportunités Preview -->
-                <div class="skeleton rounded-lg p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="skeleton w-6 h-6 rounded"></div>
-                        <div class="skeleton skeleton-title" style="width: 220px;"></div>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="skeleton h-16 rounded"></div>
-                        <div class="skeleton h-16 rounded"></div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     @endif
@@ -976,27 +930,6 @@ document.addEventListener('alpine:init', () => {
     border: 1px solid var(--warning-200) !important;
 }
 
-/* Skeleton loaders - couleurs système */
-.skeleton {
-    background: var(--gray-100);
-    border: 1px solid var(--gray-200);
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.skeleton-title {
-    height: 1.25rem;
-    border-radius: var(--radius-sm);
-}
-
-.skeleton-text {
-    height: 1rem;
-    border-radius: var(--radius-sm);
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
 
 /* En-têtes hover - couleur système */
 .diagnostic-cards .card-header:hover {

@@ -12,16 +12,20 @@
         <form id="step4-form" method="POST" action="{{ route('onboarding.step4.process') }}" class="space-y-6 mt-4">
             @csrf
 
-            <!-- Alerte de validation LLM -->
-            @error('content_validation')
+            <!-- Alertes d'erreurs -->
+            @if ($errors->any())
                 <div class="alert alert-error">
                     <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                     <div>
-                        <strong>Validation échouée</strong>
-                        <p>{{ $message }}</p>
+                        <strong>Erreurs de validation</strong>
+                        <ul class="mt-2 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
-            @enderror
+            @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: {{ old('founders_count', $projet->nombre_fondateurs ?? 1) }}, female: {{ old('female_founders_count', $projet->nombre_fondatrices ?? 0) }}, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
                 <!-- Nombre de fondateurs -->
@@ -130,21 +134,35 @@
                 <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Détails des besoins</label>
                 <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..." maxlength="800">{{ old('additional_info', $projet->details_besoins ?? '') }}</textarea>
             </div>
-        </form>
-    </div>
 
-    <x-onboarding.footer :next-form-id="'step4-form'" next-label="Finaliser" :is-final="true" />
-    
-    <!-- Debug: Bouton temporaire de contournement -->
-    <div class="text-center mt-4">
-        <a href="{{ route('diagnostic') }}" class="text-sm text-gray-500 underline">
-            [DEBUG] Aller directement au diagnostic
-        </a>
+            <!-- Bouton dans le formulaire -->
+            <div class="flex justify-between items-center mt-12 pt-6">
+                <div class="w-full max-w-4xl mx-auto flex justify-between items-center gap-4 mt-4">
+                    <a href="{{ route('onboarding.step3') }}" class="btn btn-ghost">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
+                        Retour
+                    </a>
+                    
+                    <button type="button" class="btn btn-primary" onclick="submitForm(this)">
+                        <span id="btn-text">Finaliser</span>
+                        <i data-lucide="check" class="w-4 h-4 ml-1" id="btn-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
 @push('scripts')
 <script>
+function submitForm(button) {
+    button.disabled = true;
+    button.style.opacity = '0.7';
+    document.getElementById('btn-text').textContent = 'Finalisation...';
+    document.getElementById('btn-icon').style.display = 'none';
+    document.getElementById('step4-form').submit();
+}
+
 function checkboxLimit(max, nameAttr) {
     return {
         max: max,

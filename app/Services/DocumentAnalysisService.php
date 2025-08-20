@@ -94,8 +94,70 @@ class DocumentAnalysisService
                 // Pour Word, on peut utiliser une librairie comme PhpWord ou simplement le nom
                 return "Document Word: " . $document->original_name . "\nContenu non extrait automatiquement.";
                 
+            case 'jpeg':
+            case 'jpg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+            case 'webp':
+                return $this->extractContentFromImage($document);
+                
             default:
                 return "Fichier: " . $document->original_name . "\nType: " . $document->mime_type;
+        }
+    }
+
+    /**
+     * Extraire le contenu d'une image avec GPT-5-mini Vision
+     */
+    private function extractContentFromImage(Document $document): string
+    {
+        try {
+            $filePath = Storage::disk('private')->path($document->file_path);
+            
+            // Encoder l'image en base64
+            $imageData = file_get_contents($filePath);
+            $base64Image = base64_encode($imageData);
+            $mimeType = $document->mime_type ?: 'image/jpeg';
+            
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => 'Tu es un expert OCR et analyste de documents entrepreneuriaux. Ta mission est d\'extraire TOUT le texte visible dans cette image, même si l\'image est de mauvaise qualité. Utilise tes capacités de vision avancées pour déchiffrer le texte flou, en biais ou mal éclairé.'
+                ],
+                [
+                    'role' => 'user',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'IMPORTANT: Même si l\'image est floue ou de mauvaise qualité, essaie d\'extraire TOUT le texte visible. Fournis:\n1. Tout le texte que tu peux lire (même partiellement)\n2. Le type de document identifié\n3. Les informations clés (noms, dates, montants, etc.)\n4. Si vraiment aucun texte n\'est lisible, décris ce que tu vois visuellement'
+                        ],
+                        [
+                            'type' => 'image_url',
+                            'image_url' => [
+                                'url' => "data:{$mimeType};base64,{$base64Image}",
+                                'detail' => 'high'
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+
+            $extractedText = $this->languageModel->chat(
+                messages: $messages,
+                model: 'gpt-5-mini',
+                temperature: 0.1,
+                maxTokens: 1500
+            );
+
+            return $extractedText ?: "Impossible d'extraire le contenu de l'image.";
+            
+        } catch (\Exception $e) {
+            Log::error('Image content extraction failed', [
+                'document_id' => $document->id,
+                'error' => $e->getMessage()
+            ]);
+            return "Erreur lors de l'extraction du contenu de l'image: " . $e->getMessage();
         }
     }
 
@@ -113,7 +175,7 @@ class DocumentAnalysisService
             $messages = [
                 [
                     'role' => 'system',
-                    'content' => 'Tu es un expert en analyse documentaire pour entrepreneurs. Tu dois analyser des documents officiels et business.'
+                    'content' => 'Tu es un expert en analyse documentaire pour entrepreneurs. Tu dois analyser des documents officiels et business et retourner UNIQUEMENT du JSON valide.'
                 ],
                 [
                     'role' => 'user',
@@ -124,12 +186,18 @@ class DocumentAnalysisService
             $analysisText = $this->languageModel->chat(
                 messages: $messages,
                 model: 'gpt-5-mini',
-                maxTokens: 500,
+                temperature: 0.2,
+                maxTokens: 1000,
                 options: [
-                    'reasoning_effort' => 'low',
-                    'verbosity' => 'medium'
+                    'response_format' => ['type' => 'json_object']
                 ]
             );
+
+            // Log pour debug
+            Log::info('GPT analysis response received', [
+                'response_length' => strlen($analysisText),
+                'response_preview' => substr($analysisText, 0, 200)
+            ]);
 
             return $this->parseGPTResponse($analysisText);
         } catch (\Exception $e) {
@@ -165,8 +233,23 @@ RÉPONSE (JSON uniquement):";
     private function parseGPTResponse(string $response): array
     {
         try {
+            // Check if response is empty
+            if (empty(trim($response))) {
+                Log::warning('Empty GPT response, using fallback');
+                throw new \Exception('Empty response from GPT');
+            }
+            
+            Log::debug('Parsing GPT response', ['raw_response' => $response]);
+
             // Nettoyer la réponse (enlever markdown, etc.)
             $cleanResponse = preg_replace('/```json\s*|\s*```/', '', trim($response));
+            $cleanResponse = preg_replace('/```\s*|\s*```/', '', $cleanResponse);
+            
+            // Remove any text before the first { and after the last }
+            if (preg_match('/\{.*\}/s', $cleanResponse, $matches)) {
+                $cleanResponse = $matches[0];
+            }
+            
             $data = json_decode($cleanResponse, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -187,12 +270,12 @@ RÉPONSE (JSON uniquement):";
 
             // Fallback
             return [
-                'summary' => 'Analyse automatique non disponible. Document téléchargé avec succès.',
+                'summary' => 'Document téléchargé avec succès. Pour une analyse optimale, assurez-vous que l\'image soit nette, bien éclairée et que le texte soit lisible. Vous pouvez également essayer de re-télécharger le document en meilleure qualité.',
                 'tags' => ['Autre'],
                 'metadata' => [
-                    'document_type' => 'Indéterminé',
-                    'confidence' => 0,
-                    'key_info' => 'Analyse manuelle requise'
+                    'document_type' => 'Analyse en attente',
+                    'confidence' => 0.1,
+                    'key_info' => 'Qualité d\'image insuffisante pour l\'extraction automatique. Recommandation : re-télécharger en haute qualité.'
                 ]
             ];
         }

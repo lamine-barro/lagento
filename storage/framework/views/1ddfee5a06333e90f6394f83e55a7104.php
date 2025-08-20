@@ -26,26 +26,23 @@
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form id="step1-form" method="POST" action="<?php echo e(route('onboarding.step1.process')); ?>" enctype="multipart/form-data" class="space-y-6 mt-4">
+        <form id="step1-form" method="POST" action="<?php echo e(route('onboarding.step1.process')); ?>" enctype="multipart/form-data" class="space-y-6 mt-4" onsubmit="console.log('Form submitted via native onsubmit!'); return true;">
             <?php echo csrf_field(); ?>
 
-            <!-- Alerte de validation LLM -->
-            <?php $__errorArgs = ['content_validation'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
+            <!-- Alertes d'erreurs -->
+            <?php if($errors->any()): ?>
                 <div class="alert alert-error">
                     <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                     <div>
-                        <strong>Validation échouée</strong>
-                        <p><?php echo e($message); ?></p>
+                        <strong>Erreurs de validation</strong>
+                        <ul class="mt-2 space-y-1">
+                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li><?php echo e($error); ?></li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </ul>
                     </div>
                 </div>
-            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
+            <?php endif; ?>
 
             <!-- Identité & Contact -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -56,14 +53,6 @@ unset($__errorArgs, $__bag); ?>
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale</label>
                     <input type="text" name="raison_sociale" value="<?php echo e(old('raison_sociale', $projet->raison_sociale ?? '')); ?>" placeholder="Ex: AgroTech CI SAS" class="input-field w-full" maxlength="120" />
-                    <?php $__errorArgs = ['raison_sociale'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><p class="text-sm mt-1" style="color: var(--danger);"><?php echo e($message); ?></p><?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Description</label>
@@ -166,33 +155,40 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
             </div>
+
+            <!-- Bouton dans le formulaire -->
+            <div class="flex justify-between items-center mt-12 pt-6">
+                <div class="w-full max-w-4xl mx-auto flex justify-between items-center gap-4 mt-4">
+                    <a href="<?php echo e(url()->previous()); ?>" class="btn btn-ghost" id="back-btn">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
+                        Retour
+                    </a>
+                    
+                    <button type="button" class="btn btn-primary" onclick="submitForm(this)">
+                        <span id="btn-text">Suivant</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1" id="btn-icon"></i>
+                    </button>
+                </div>
+            </div>
+
         </form>
     </div>
-
-    <?php if (isset($component)) { $__componentOriginal4973fa7765c1d7ef7e43a98d4867113c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal4973fa7765c1d7ef7e43a98d4867113c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.onboarding.footer','data' => ['nextFormId' => 'step1-form','nextLabel' => 'Suivant']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('onboarding.footer'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['next-form-id' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute('step1-form'),'next-label' => 'Suivant']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal4973fa7765c1d7ef7e43a98d4867113c)): ?>
-<?php $attributes = $__attributesOriginal4973fa7765c1d7ef7e43a98d4867113c; ?>
-<?php unset($__attributesOriginal4973fa7765c1d7ef7e43a98d4867113c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal4973fa7765c1d7ef7e43a98d4867113c)): ?>
-<?php $component = $__componentOriginal4973fa7765c1d7ef7e43a98d4867113c; ?>
-<?php unset($__componentOriginal4973fa7765c1d7ef7e43a98d4867113c); ?>
-<?php endif; ?>
 </div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('scripts'); ?>
+<script>
+function submitForm(button) {
+    // Afficher le loader
+    button.disabled = true;
+    button.style.opacity = '0.7';
+    document.getElementById('btn-text').textContent = 'Traitement...';
+    document.getElementById('btn-icon').style.display = 'none';
+    
+    // Soumettre le formulaire
+    document.getElementById('step1-form').submit();
+}
+</script>
 <script>
 // Logo upload component
 function logoUpload() {

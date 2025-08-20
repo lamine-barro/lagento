@@ -20,14 +20,14 @@
             <section class="mb-8">
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Éditeur du site</h2>
                 <div class="space-y-2">
-                    <p><strong>Organisation :</strong> Think Tank Horizon O</p>
+                    <p><strong>Organisation :</strong> Think Tank Agento</p>
                     <p><strong>Mission :</strong> Ensemble, construisons l'horizon entrepreneurial de la Côte d'Ivoire</p>
-                    <p><strong>Produit :</strong> LagentO - Assistant IA développé par Horizon O</p>
+                    <p><strong>Produit :</strong> LagentO - Assistant IA développé par Agento</p>
                     <p><strong>Siège social :</strong> CHU d'Angré, Abidjan, Côte d'Ivoire</p>
                     <p><strong>Boîte postale :</strong> 28 BP 942 ABJ 28</p>
                     <p><strong>Email :</strong> info@horizon-o.ci</p>
                     <p><strong>Téléphone :</strong> 01 72 939 595 / 07 47 94 42 22</p>
-                    <p><strong>Directeur de publication :</strong> Équipe Horizon O</p>
+                    <p><strong>Directeur de publication :</strong> Équipe Agento</p>
                 </div>
             </section>
 
@@ -46,16 +46,16 @@
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Propriété intellectuelle</h2>
                 <p class="mb-4">
                     L'ensemble du site Agent O, incluant mais non limité aux textes, images, sons, logiciels, 
-                    et tout autre élément composant le site, est la propriété exclusive de Think Tank Horizon O, 
+                    et tout autre élément composant le site, est la propriété exclusive de Think Tank Agento, 
                     sauf mention contraire.
                 </p>
                 <p class="mb-4">
                     Toute reproduction, représentation, modification, publication, adaptation de tout ou partie 
                     des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, 
-                    sauf autorisation écrite préalable de Think Tank Horizon O.
+                    sauf autorisation écrite préalable de Think Tank Agento.
                 </p>
                 <p>
-                    La marque "Agent O" et le logo associé sont des marques déposées de Think Tank Horizon O.
+                    La marque "Agent O" et le logo associé sont des marques déposées de Think Tank Agento.
                 </p>
             </section>
 
@@ -65,7 +65,7 @@
                 
                 <h3 class="text-base font-medium mb-3" style="color: var(--gray-900);">Responsable de traitement</h3>
                 <p class="mb-4">
-                    Think Tank Horizon O est responsable du traitement 
+                    Think Tank Agento est responsable du traitement 
                     de vos données personnelles.
                 </p>
 
@@ -89,7 +89,7 @@
                 <h3 class="text-base font-medium mb-3" style="color: var(--gray-900);">Base légale</h3>
                 <p class="mb-4">
                     Le traitement de vos données repose sur l'exécution du contrat de service, 
-                    l'intérêt légitime de Think Tank Horizon O, et le cas échéant votre consentement.
+                    l'intérêt légitime de Think Tank Agento, et le cas échéant votre consentement.
                 </p>
 
                 <h3 class="text-base font-medium mb-3" style="color: var(--gray-900);">Durée de conservation</h3>
@@ -131,7 +131,7 @@
             <section class="mb-8">
                 <h2 class="text-lg font-medium mb-4" style="color: var(--gray-900);">Limitation de responsabilité</h2>
                 <p class="mb-4">
-                    Think Tank Horizon O s'efforce de fournir des informations exactes et à jour sur Agent O. 
+                    Think Tank Agento s'efforce de fournir des informations exactes et à jour sur Agent O. 
                     Cependant, nous ne pouvons garantir l'exactitude, la complétude ou l'actualité 
                     des informations fournies par l'IA.
                 </p>
@@ -141,7 +141,7 @@
                     qualifiés pour vos besoins spécifiques.
                 </p>
                 <p>
-                    Think Tank Horizon O ne saurait être tenue responsable des dommages directs ou indirects 
+                    Think Tank Agento ne saurait être tenue responsable des dommages directs ou indirects 
                     résultant de l'utilisation du service Agent O.
                 </p>
             </section>
@@ -159,7 +159,7 @@
                     fournies avant de prendre des décisions basées sur ces informations.
                 </p>
                 <p>
-                    Think Tank Horizon O améliore continuellement ses algorithmes d'IA, mais ne garantit 
+                    Think Tank Agento améliore continuellement ses algorithmes d'IA, mais ne garantit 
                     pas la perfection du contenu généré.
                 </p>
             </section>

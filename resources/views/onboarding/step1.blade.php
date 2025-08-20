@@ -9,19 +9,23 @@
     <!-- Main Content -->
     <div class="flex-1 w-full max-w-4xl mx-auto">
 
-        <form id="step1-form" method="POST" action="{{ route('onboarding.step1.process') }}" enctype="multipart/form-data" class="space-y-6 mt-4">
+        <form id="step1-form" method="POST" action="{{ route('onboarding.step1.process') }}" enctype="multipart/form-data" class="space-y-6 mt-4" onsubmit="console.log('Form submitted via native onsubmit!'); return true;">
             @csrf
 
-            <!-- Alerte de validation LLM -->
-            @error('content_validation')
+            <!-- Alertes d'erreurs -->
+            @if ($errors->any())
                 <div class="alert alert-error">
                     <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                     <div>
-                        <strong>Validation échouée</strong>
-                        <p>{{ $message }}</p>
+                        <strong>Erreurs de validation</strong>
+                        <ul class="mt-2 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
-            @enderror
+            @endif
 
             <!-- Identité & Contact -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -32,7 +36,6 @@
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Raison sociale</label>
                     <input type="text" name="raison_sociale" value="{{ old('raison_sociale', $projet->raison_sociale ?? '') }}" placeholder="Ex: AgroTech CI SAS" class="input-field w-full" maxlength="120" />
-                    @error('raison_sociale')<p class="text-sm mt-1" style="color: var(--danger);">{{ $message }}</p>@enderror
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Description</label>
@@ -135,14 +138,40 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Bouton dans le formulaire -->
+            <div class="flex justify-between items-center mt-12 pt-6">
+                <div class="w-full max-w-4xl mx-auto flex justify-between items-center gap-4 mt-4">
+                    <a href="{{ url()->previous() }}" class="btn btn-ghost" id="back-btn">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
+                        Retour
+                    </a>
+                    
+                    <button type="button" class="btn btn-primary" onclick="submitForm(this)">
+                        <span id="btn-text">Suivant</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1" id="btn-icon"></i>
+                    </button>
+                </div>
+            </div>
+
         </form>
     </div>
-
-    <x-onboarding.footer :next-form-id="'step1-form'" next-label="Suivant" />
 </div>
 @endsection
 
 @push('scripts')
+<script>
+function submitForm(button) {
+    // Afficher le loader
+    button.disabled = true;
+    button.style.opacity = '0.7';
+    document.getElementById('btn-text').textContent = 'Traitement...';
+    document.getElementById('btn-icon').style.display = 'none';
+    
+    // Soumettre le formulaire
+    document.getElementById('step1-form').submit();
+}
+</script>
 <script>
 // Logo upload component
 function logoUpload() {
