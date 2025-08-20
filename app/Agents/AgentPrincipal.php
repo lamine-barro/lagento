@@ -163,7 +163,7 @@ class AgentPrincipal extends BaseAgent
             $messages = $this->formatMessages($systemPrompt . $contextBlock, $userMessage);
             
             $llmStartTime = microtime(true);
-            $webSearchNeeded = (bool) preg_match('/(actualité|récent|nouveau|2024|2025|prix|taux)/i', $userMessage);
+            $webSearchNeeded = (bool) preg_match('/(actualité|récent|nouveau|2024|2025|taux)/i', $userMessage);
             
             $this->logDebug('LLM call parameters', [
                 'web_search_needed' => $webSearchNeeded,
@@ -275,6 +275,7 @@ INTERDICTIONS STRICTES :
 - AUCUNE URL inventée ou fictive
 - NE JAMAIS mentionner les sources RAG ou la recherche vectorielle
 - NE JAMAIS dire \"selon les données\" ou \"d'après les informations trouvées\"
+- NE JAMAIS mentionner les montants, sommes d'argent, ou valeurs financières des opportunités
 
 FORMATAGE MOBILE :
 - Listes avec espacement minimal
@@ -310,7 +311,7 @@ OUTILS ET QUAND LES UTILISER :
   * 'user_analytics' : Diagnostic personnalisé de l'utilisateur uniquement
   
   **MÉMOIRES ADDITIONNELLES (selon demande) :**
-  * 'opportunites' : Recherche d'opportunités de financement/subventions (namespace: 'opportunites') - 77 opportunités réelles disponibles de Septembre 2025 à Décembre 2025 (subvention, prêt, concours, hackathon, incubation, accélération, etc.)
+  * 'opportunites' : Recherche d'opportunités d'accompagnement (namespace: 'opportunites') - 77 opportunités réelles disponibles de Septembre 2025 à Décembre 2025 (concours, hackathon, incubation, accélération, formation, etc.)
   * 'conversation' : Recherche dans l'historique des conversations (si besoin)
   
   **RÈGLES :**
@@ -351,7 +352,7 @@ RÈGLE OPTIMISATION : N'utilise QUE les outils STRICTEMENT nécessaires pour la 
 
 - generation_fichier : UNIQUEMENT si l'utilisateur demande explicitement un document (business plan, CV, rapport, contrat, etc.). 
 - generation_image : UNIQUEMENT si l'utilisateur demande explicitement un visuel (logo, affiche, bannière, illustration, etc.). 
-- web search (intégré) : UNIQUEMENT si besoin d'actualités/infos récentes (2024, 2025, prix actuels, etc.).
+- web search (intégré) : UNIQUEMENT si besoin d'actualités/infos récentes (2024, 2025, taux actuels, etc.).
 
 **STRATÉGIE DE DÉCOUPAGE :**
 Pour des demandes complexes multi-étapes :
