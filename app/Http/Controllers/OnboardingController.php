@@ -73,9 +73,11 @@ class OnboardingController extends Controller
             $image = Image::read($request->file('logo'));
             $image->scaleDown(1024, 1024); // limite dimensions
             $encoded = $image->toJpeg(quality: 80);
-            $filename = 'logos/' . uniqid('logo_', true) . '.jpg';
-            \Storage::disk('public')->put($filename, (string) $encoded);
-            $logoUrl = '/storage/' . $filename;
+            
+            // Use centralized file storage service
+            $fileStorage = app(\App\Services\FileStorageService::class);
+            $result = $fileStorage->storeLogo($encoded, $request->user()->id);
+            $logoUrl = $result['url'];
         }
 
         $projet->update([

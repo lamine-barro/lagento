@@ -42,10 +42,13 @@ class DocumentController extends Controller
         }
         
         $file = $request->file('document');
-        $filename = time() . '_' . $file->getClientOriginalName();
         
-        // Stocker le fichier
-        $filePath = $file->storeAs('documents/' . $user->id, $filename, 'private');
+        // Store the file using centralized service
+        $fileStorage = app(\App\Services\FileStorageService::class);
+        $result = $fileStorage->storeDocument($file, $user->id);
+        
+        $filename = basename($result['path']);
+        $filePath = $result['path'];
         
         // Créer l'enregistrement Document
         $document = Document::create([
@@ -53,6 +56,7 @@ class DocumentController extends Controller
             'filename' => $filename,
             'original_name' => $file->getClientOriginalName(),
             'file_path' => $filePath,
+            'file_url' => $result['url'],
             'mime_type' => $file->getClientMimeType(),
             'file_size' => $file->getSize(),
             'category' => $request->get('category', 'other'),

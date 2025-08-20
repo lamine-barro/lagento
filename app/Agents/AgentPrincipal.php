@@ -693,9 +693,12 @@ case 'recherche_vectorielle':
                 $writer = IOFactory::createWriter($phpWord, 'Word2007');
                 $writer->save($tempFile);
                 $stream = fopen($tempFile, 'r');
-                Storage::disk('public')->put($path, $stream);
+                // Use centralized file storage service
+                $fileStorage = app(\App\Services\FileStorageService::class);
+                $result = $fileStorage->storeGenerated(stream_get_contents($stream), $filename);
                 if (is_resource($stream)) fclose($stream);
                 @unlink($tempFile);
+                $url = $result['url'];
             } elseif ($ext === 'csv') {
                 $lines = [
                     ['Titre', 'Valeur'],
@@ -706,16 +709,22 @@ case 'recherche_vectorielle':
                 foreach ($lines as $row) {
                     $csv .= implode(',', array_map(fn($c) => '"' . str_replace('"', '""', (string)$c) . '"', $row)) . "\n";
                 }
-                Storage::disk('public')->put($path, $csv);
+                // Use centralized file storage service
+                $fileStorage = app(\App\Services\FileStorageService::class);
+                $result = $fileStorage->storeGenerated($csv, $filename);
+                $url = $result['url'];
             } else {
                 // txt or md
                 $content = ($ext === 'md')
                     ? ("# Document généré\n\n- Date: " . now()->toDateTimeString() . "\n\n## Contexte\n\n" . $message)
                     : ("Document généré le " . now()->toDateTimeString() . "\n\n" . $message);
-                Storage::disk('public')->put($path, $content);
+                // Use centralized file storage service
+                $fileStorage = app(\App\Services\FileStorageService::class);
+                $result = $fileStorage->storeGenerated($content, $filename);
+                $url = $result['url'];
             }
 
-            $url = asset('storage/' . $path);
+            // $url is already set by the centralized service above
             
             // Use document generation count
             $user->useFeature('documents');
@@ -763,12 +772,13 @@ case 'recherche_vectorielle':
                     ]
                 ];
             }
-            $dir = 'chat-attachments';
             $filename = 'img_' . $userId . '_' . now()->format('Ymd_His') . '_' . Str::random(6) . '.png';
-            $path = $dir . '/' . $filename;
             $binary = base64_decode($b64);
-            Storage::disk('public')->put($path, $binary);
-            $url = asset('storage/' . $path);
+            
+            // Use centralized file storage service
+            $fileStorage = app(\App\Services\FileStorageService::class);
+            $result = $fileStorage->storeGenerated($binary, $filename, 'generated-images');
+            $url = $result['url'];
             
             // Use image generation count
             $user->useFeature('images');

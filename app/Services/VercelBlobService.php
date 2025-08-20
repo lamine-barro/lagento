@@ -34,7 +34,22 @@ class VercelBlobService
                 $filename = $filename ?? basename($file);
             } else {
                 $content = $file;
-                $mimeType = 'application/octet-stream';
+                // Detect mime type based on filename or content
+                if (str_ends_with($filename, '.png')) {
+                    $mimeType = 'image/png';
+                } elseif (str_ends_with($filename, '.jpg') || str_ends_with($filename, '.jpeg')) {
+                    $mimeType = 'image/jpeg';
+                } elseif (str_ends_with($filename, '.txt')) {
+                    $mimeType = 'text/plain';
+                } elseif (str_ends_with($filename, '.md')) {
+                    $mimeType = 'text/markdown';
+                } elseif (str_ends_with($filename, '.csv')) {
+                    $mimeType = 'text/csv';
+                } elseif (str_ends_with($filename, '.docx')) {
+                    $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                } else {
+                    $mimeType = 'application/octet-stream';
+                }
             }
         }
 

@@ -117,15 +117,16 @@ class ChatController extends Controller
             $file = $request->file('file');
             
             try {
-                // Store file locally
-                $filePath = $file->store('chat-attachments', 'public');
+                // Store file using centralized service
+                $fileStorage = app(\App\Services\FileStorageService::class);
+                $result = $fileStorage->storeChatAttachment($file, $user->id);
                 
                 $attachmentData = [
                     'name' => $file->getClientOriginalName(),
                     'type' => $file->getMimeType(),
                     'size' => $file->getSize(),
-                    'path' => $filePath,
-                    'url' => asset('storage/' . $filePath)
+                    'path' => $result['path'],
+                    'url' => $result['url']
                 ];
                 
                 // Vectoriser le fichier pour le contexte
@@ -187,9 +188,10 @@ class ChatController extends Controller
         $autoVectorService = app(\App\Services\AutoVectorizationService::class);
         
         try {
-            // Store the file temporarily
-            $tempPath = $file->store('temp_uploads');
-            $fullPath = storage_path('app/' . $tempPath);
+            // Store the file temporarily using centralized service
+            $fileStorage = app(\App\Services\FileStorageService::class);
+            $tempResult = $fileStorage->storeTemp($file);
+            $fullPath = $tempResult['url'];
             
             // Use the auto-vectorization service
             $success = $autoVectorService->vectorizeAttachment($fullPath, [
@@ -202,7 +204,7 @@ class ChatController extends Controller
             ]);
             
             // Clean up temp file
-            \Storage::delete($tempPath);
+            $fileStorage->delete($tempResult['url']);
             
             if (!$success) {
                 throw new \Exception("Impossible de vectoriser le fichier");
