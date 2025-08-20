@@ -335,7 +335,6 @@ OUTILS ET QUAND LES UTILISER :
   1. **{titre}** ({type}) - {description}
   2. Si lien_externe existe : [Voir détails](https://{lien_externe}){target=\"_blank\"}
   3. Si date_limite existe : Date limite: {date_limite}
-  4. Si montant existe : Montant: {montant}
   
   **PRÉSENTATION DES INSTITUTIONS (OBLIGATOIRE) :**
   Pour CHAQUE institution trouvée :

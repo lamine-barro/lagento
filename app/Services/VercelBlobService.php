@@ -66,14 +66,12 @@ class VercelBlobService
             }
         }
 
-        // Use multipart form data for binary files
+        // Use PUT request with correct Vercel Blob API
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
-        ])->post($this->baseUrl, [
-            'pathname' => $filename,
-            'content' => base64_encode($content),
-            'contentType' => $mimeType,
-        ]);
+            'Content-Type' => $mimeType,
+            'x-vercel-filename' => basename($filename),
+        ])->put($this->baseUrl . '/' . $filename, $content);
 
         if ($response->successful()) {
             return $response->json();
