@@ -233,7 +233,11 @@ function documentUpload() {
                                                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border" 
                                                       style="background: var(--orange-50); color: var(--orange-700); border-color: var(--orange-200);">
                                                     <i data-lucide="tag" class="w-3 h-3 mr-1"></i>
-                                                    {{ str_replace('_', ' ', $tag) }}
+                                                    @php
+                                                        $displayTag = str_replace('_', ' ', $tag);
+                                                        $displayTag = ucfirst($displayTag);
+                                                    @endphp
+                                                    {{ $displayTag }}
                                                 </span>
                                             @endforeach
                                         </div>
@@ -242,7 +246,7 @@ function documentUpload() {
                             @endif
                             <!-- État du document avec messages informatifs -->
                             @if($document->is_processed && $document->ai_summary)
-                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                <div class="bg-gray-50 rounded-xl border border-gray-100" style="padding: var(--space-4);">
                                     <div class="flex items-start justify-between mb-3">
                                         <h4 class="text-sm font-semibold text-gray-900">Résumé synthétique</h4>
                                         <button @click="showDetails = !showDetails" 
@@ -360,7 +364,7 @@ function documentUpload() {
         // Créer un formulaire pour la suppression
         const form = window.document.createElement('form');
         form.method = 'POST';
-        form.action = '{{ url("documents/delete") }}/' + doc.filename;
+        form.action = '{{ route("documents.delete", "") }}/' + doc.filename;
         
         // Ajouter le token CSRF
         const csrfToken = window.document.createElement('input');
