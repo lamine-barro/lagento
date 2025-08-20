@@ -1068,14 +1068,29 @@ case 'recherche_vectorielle':
         $lines = explode("\n", $content);
         $processedLines = [];
         $inNumberedList = false;
-        $currentNumber = 1;
+        $currentNumber = 0;
+        $emptyLineCount = 0;
         
         foreach ($lines as $line) {
             $trimmedLine = trim($line);
             
+            if (empty($trimmedLine)) {
+                $emptyLineCount++;
+                $processedLines[] = $line;
+                // Reset numbered list after 2+ empty lines (indicates new section)
+                if ($emptyLineCount >= 2) {
+                    $inNumberedList = false;
+                }
+                continue;
+            }
+            
+            $emptyLineCount = 0;
+            
             // Check if this is a numbered list item
             if (preg_match('/^(\d+)\.\s+(.+)/', $trimmedLine, $matches)) {
-                if (!$inNumberedList) {
+                $originalNumber = (int)$matches[1];
+                
+                if (!$inNumberedList || $originalNumber == 1) {
                     // Starting a new numbered list
                     $inNumberedList = true;
                     $currentNumber = 1;
@@ -1085,15 +1100,14 @@ case 'recherche_vectorielle':
                 }
                 $processedLines[] = "{$currentNumber}. {$matches[2]}";
             } elseif (preg_match('/^[*-]\s+/', $trimmedLine)) {
-                // Bullet list item
-                $inNumberedList = false;
-                $processedLines[] = $line;
-            } elseif (empty($trimmedLine)) {
-                // Empty line - reset numbered list context if we hit two empty lines
+                // Bullet list item - don't reset numbered list context
                 $processedLines[] = $line;
             } else {
-                // Regular line - reset numbered list if it's not a continuation
-                $inNumberedList = false;
+                // Regular text line - don't reset if it might be continuation
+                // Only reset if this looks like a new section (header, paragraph)
+                if (preg_match('/^#{1,6}\s+/', $trimmedLine) || strlen($trimmedLine) > 50) {
+                    $inNumberedList = false;
+                }
                 $processedLines[] = $line;
             }
         }
