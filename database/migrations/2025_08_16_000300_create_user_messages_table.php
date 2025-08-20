@@ -18,8 +18,6 @@ return new class extends Migration
             $table->longText('markdown_content')->nullable();
             $table->json('attachments')->nullable();
             $table->json('executed_tools')->nullable();
-            $table->uuid('vector_memory_id')->nullable();
-            $table->foreign('vector_memory_id')->references('id')->on('vector_memories')->nullOnDelete();
             $table->unsignedInteger('tokens_used')->nullable();
             $table->boolean('is_retried')->default(false);
             $table->boolean('is_copied')->default(false);
