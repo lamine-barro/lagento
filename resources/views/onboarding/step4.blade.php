@@ -12,15 +12,24 @@
         <form id="step4-form" method="POST" action="{{ route('onboarding.step4.process') }}" class="space-y-6 mt-4">
             @csrf
 
+            <!-- Debug des erreurs -->
+            @if(config('app.debug'))
+                <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
+                    Debug: Errors count = {{ $errors->count() }}<br>
+                    All errors: {{ json_encode($errors->all()) }}<br>
+                    Session errors: {{ json_encode(session()->get('errors')) }}
+                </div>
+            @endif
+
             <!-- Alertes d'erreurs -->
             @if ($errors->any())
-                <div class="alert alert-error">
+                <div class="alert alert-error" style="display: block !important; background-color: #FEF2F2 !important; border-left: 4px solid #DC2626 !important; color: #B91C1C !important; padding: 16px !important; border-radius: 8px !important; margin: 16px 0 !important;">
                     <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                     <div>
                         <strong>Erreurs de validation</strong>
                         <ul class="mt-2 space-y-1">
                             @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
+                                <li>• {{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
