@@ -75,7 +75,7 @@
             
             <!-- Subtitle -->
             <p class="text-lg mb-8 mt-4" style="color: var(--gray-700);">
-                LagentO a cartographié plus de <span class="text-2xl font-semibold" style="color: #ff6b35;">2 000 milliards de FCFA</span> d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire à travers les initiatives gouvernementales et les écosystèmes. Il est disponible 24h/7 pour vous accompagner à les saisir.
+                LagentO a cartographié plus de <span class="text-2xl font-semibold" style="color: #ff6b35;">1,000+ milliards de FCFA</span> d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire à travers les initiatives gouvernementales et les écosystèmes. Il est disponible 24h/7 pour vous accompagner à les saisir.
             </p>
 
             <!-- Email Form -->
