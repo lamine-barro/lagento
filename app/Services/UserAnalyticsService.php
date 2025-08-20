@@ -379,271 +379,70 @@ Réponds UNIQUEMENT ce JSON.";
             return null;
         }
         
+        // Map common LLM responses to valid statut_formalisation values
+        if ($value === 'à_faire' || $value === 'a_faire') {
+            return 'non_formalise';
+        }
+        
         return $value;
     }
     
     private function mapDashboardStructureToAnalytics(UserAnalytics $analytics, array $structure): void
     {
         $updateData = [
-            'generated_at' => now(),
-            'expires_at' => now()->addDays(30),
-            'metadata' => array_merge($analytics->metadata ?? [], [
-                'derniere_maj' => now()->format('d/m/Y à H:i'),
-                'dashboard_generated_at' => now()->toISOString()
-            ])
+            'derniere_analyse' => now(),
+            'version_algorithme' => '2.0-weekly-limits',
+            'confidence_score' => 0.85
         ];
         
-        // 1. Profil Entrepreneur
-        if (isset($structure['profil_entrepreneur'])) {
-            $profil = $structure['profil_entrepreneur'];
-            $updateData = array_merge($updateData, [
-                'niveau_global' => $profil['niveau_global'] ?? null,
-                'score_potentiel' => $profil['score_potentiel'] ?? null,
-                'forces' => $profil['forces'] ?? [],
-                'axes_progression' => $profil['axes_progression'] ?? [],
-                'besoins_formation' => $profil['besoins_formation'] ?? [],
-                'profil_type' => $profil['profil_type'] ?? null,
-            ]);
-        }
-        
-        // 2. Diagnostic Projet
-        if (isset($structure['diagnostic_projet'])) {
-            $diagnostic = $structure['diagnostic_projet'];
-            
-            // Filtrer les données du diagnostic
-            $cleanDiagnostic = [];
-            
-            if (($score = $this->filterNonDisponible($diagnostic['score_sante'] ?? null)) !== null) {
-                $cleanDiagnostic['score_sante'] = $score;
-            }
-            if (($niveau = $this->filterNonDisponible($diagnostic['niveau_maturite'] ?? null)) !== null) {
-                $cleanDiagnostic['niveau_maturite'] = $niveau;
-            }
-            if (($viabilite = $this->filterNonDisponible($diagnostic['viabilite'] ?? null)) !== null) {
-                $cleanDiagnostic['viabilite'] = $viabilite;
-            }
-            if (($etapes = $this->filterNonDisponible($diagnostic['prochaines_etapes'] ?? [])) !== null && !empty($etapes)) {
-                $cleanDiagnostic['prochaines_etapes'] = array_values($etapes);
-            }
-            
-            $updateData = array_merge($updateData, $cleanDiagnostic);
-            
-            // Indicateurs clés
-            if (isset($diagnostic['indicateurs_cles'])) {
-                $indicateurs = $diagnostic['indicateurs_cles'];
-                
-                if (isset($indicateurs['formalisation'])) {
-                    $form = $indicateurs['formalisation'];
-                    if (($statut = $this->filterNonDisponible($form['statut'] ?? null)) !== null) {
-                        $updateData['statut_formalisation'] = $statut;
-                    }
-                    if (($actions = $this->filterNonDisponible($form['actions'] ?? [])) !== null && !empty($actions)) {
-                        $updateData['actions_formalisation'] = array_values($actions);
-                    }
-                    if (($urgence = $this->filterNonDisponible($form['urgence'] ?? null)) !== null) {
-                        $updateData['urgence_formalisation'] = $urgence;
-                    }
-                }
-                
-                if (isset($indicateurs['finance'])) {
-                    $finance = $indicateurs['finance'];
-                    if (($statut = $this->filterNonDisponible($finance['statut'] ?? null)) !== null) {
-                        $updateData['statut_finance'] = $statut;
-                    }
-                    if (($besoin = $this->filterNonDisponible($finance['besoin_financement'] ?? null)) !== null) {
-                        $updateData['besoin_financement'] = $besoin;
-                    }
-                    if (($montant = $this->filterNonDisponible($finance['montant_suggere'] ?? null)) !== null) {
-                        $updateData['montant_suggere'] = $montant;
-                    }
-                }
-                
-                if (isset($indicateurs['equipe'])) {
-                    $equipe = $indicateurs['equipe'];
-                    if (($complete = $this->filterNonDisponible($equipe['complete'] ?? null)) !== null) {
-                        $updateData['equipe_complete'] = $complete;
-                    }
-                    if (($besoins = $this->filterNonDisponible($equipe['besoins'] ?? [])) !== null && !empty($besoins)) {
-                        $updateData['besoins_equipe'] = array_values($besoins);
-                    }
-                }
-                
-                if (isset($indicateurs['marche'])) {
-                    $marche = $indicateurs['marche'];
-                    if (($position = $this->filterNonDisponible($marche['position'] ?? null)) !== null) {
-                        $updateData['position_marche'] = $position;
-                    }
-                    if (($potentiel = $this->filterNonDisponible($marche['potentiel'] ?? null)) !== null) {
-                        $updateData['potentiel_marche'] = $potentiel;
-                    }
-                }
-            }
-        }
-        
-        // 3. Opportunités Matchées
-        if (isset($structure['opportunites_matchees'])) {
-            $opportunites = $structure['opportunites_matchees'];
-            $updateData = array_merge($updateData, [
-                'nombre_opportunites' => $opportunites['nombre_total'] ?? 0,
-                'top_opportunites' => $opportunites['top_opportunites'] ?? [],
-                'count_financement' => $opportunites['par_categorie']['financement'] ?? 0,
-                'count_formation' => $opportunites['par_categorie']['formation'] ?? 0,
-                'count_marche' => $opportunites['par_categorie']['marche'] ?? 0,
-                'count_accompagnement' => $opportunites['par_categorie']['accompagnement'] ?? 0,
-            ]);
-        }
-        
-        // 4. Insights Marché
-        if (isset($structure['insights_marche'])) {
-            $marche = $structure['insights_marche'];
-            $cleanMarche = [];
-            
-            // Taille marché
-            if (isset($marche['taille_marche'])) {
-                $taille = $marche['taille_marche'];
-                if (($local = $this->filterNonDisponible($taille['local'] ?? null)) !== null) {
-                    $cleanMarche['taille_marche_local'] = $local;
-                }
-                if (($potentiel = $this->filterNonDisponible($taille['potentiel'] ?? null)) !== null) {
-                    $cleanMarche['taille_marche_potentiel'] = $potentiel;
-                }
-                if (($croissance = $this->filterNonDisponible($taille['croissance'] ?? null)) !== null) {
-                    $cleanMarche['croissance_marche'] = $croissance;
-                }
-            }
-            
-            // Position concurrentielle
-            if (isset($marche['position_concurrentielle'])) {
-                $position = $marche['position_concurrentielle'];
-                if (($place = $this->filterNonDisponible($position['votre_place'] ?? null)) !== null) {
-                    $cleanMarche['position_concurrentielle'] = $place;
-                }
-                if (($concurrents = $this->filterNonDisponible($position['principaux_concurrents'] ?? [])) !== null && !empty($concurrents)) {
-                    $cleanMarche['principaux_concurrents'] = array_values($concurrents);
-                }
-                if (($avantage = $this->filterNonDisponible($position['avantage_cle'] ?? null)) !== null) {
-                    $cleanMarche['avantage_cle'] = $avantage;
-                }
-            }
-            
-            // Tendances et opportunités
-            if (($tendances = $this->filterNonDisponible($marche['tendances'] ?? [])) !== null && !empty($tendances)) {
-                $cleanMarche['tendances'] = array_values($tendances);
-            }
-            if (($zones = $this->filterNonDisponible($marche['zones_opportunites'] ?? [])) !== null && !empty($zones)) {
-                $cleanMarche['zones_opportunites'] = array_values($zones);
-            }
-            if (($conseil = $this->filterNonDisponible($marche['conseil_strategique'] ?? null)) !== null) {
-                $cleanMarche['conseil_strategique'] = $conseil;
-            }
-            
-            $updateData = array_merge($updateData, $cleanMarche);
-        }
-        
-        // 5. Réglementations
-        if (isset($structure['regulations'])) {
-            $regulations = $structure['regulations'];
-            $cleanRegulations = [];
-            
-            if (($conformite = $this->filterNonDisponible($regulations['conformite_globale'] ?? null)) !== null) {
-                $cleanRegulations['conformite_globale'] = $conformite;
-            }
-            if (($urgent = $this->filterNonDisponible($regulations['urgent'] ?? [])) !== null && !empty($urgent)) {
-                $cleanRegulations['urgent_regulations'] = array_values($urgent);
-            }
-            if (($prevoir = $this->filterNonDisponible($regulations['a_prevoir'] ?? [])) !== null && !empty($prevoir)) {
-                $cleanRegulations['a_prevoir_regulations'] = array_values($prevoir);
-            }
-            if (($avantages = $this->filterNonDisponible($regulations['avantages_disponibles'] ?? [])) !== null && !empty($avantages)) {
-                $cleanRegulations['avantages_disponibles'] = array_values($avantages);
-            }
-            
-            $updateData = array_merge($updateData, $cleanRegulations);
-        }
-        
-        // 6. Partenaires Suggérés
-        if (isset($structure['partenaires_suggeres'])) {
-            $partenaires = $structure['partenaires_suggeres'];
-            $updateData = array_merge($updateData, [
-                'nombre_partenaires' => $partenaires['nombre_matches'] ?? 0,
-                'top_partenaires' => $partenaires['top_partenaires'] ?? [],
-                'clients_potentiels' => $partenaires['reseau_potentiel']['clients_potentiels'] ?? 0,
-                'fournisseurs_potentiels' => $partenaires['reseau_potentiel']['fournisseurs_potentiels'] ?? 0,
-                'partenaires_complementaires' => $partenaires['reseau_potentiel']['partenaires_complementaires'] ?? 0,
-            ]);
-        }
-        
-        // 7. Résumé Exécutif
+        // Map data to existing JSON columns only
         if (isset($structure['resume_executif'])) {
-            $resume = $structure['resume_executif'];
-            
-            // Traiter l'opportunité du mois - garder la structure JSON pour le template
-            $opportuniteData = null;
-            if (isset($resume['opportunite_du_mois'])) {
-                $opp = $resume['opportunite_du_mois'];
-                if (is_array($opp) || is_object($opp)) {
-                    $opp = (array) $opp;
-                    // Filtrer les données "non disponible"
-                    $cleanOpp = [];
-                    foreach ($opp as $key => $value) {
-                        if ($value !== 'non disponible' && !empty($value)) {
-                            $cleanOpp[$key] = $value;
-                        }
-                    }
-                    $opportuniteData = !empty($cleanOpp) ? $cleanOpp : null;
-                } else if ($opp !== 'non disponible' && !empty($opp)) {
-                    $opportuniteData = $opp;
-                }
-            }
-            
-            // Filtrer les données pour éviter "non disponible"
-            $cleanData = [];
-            
-            // Message principal - seulement si différent de "non disponible"
-            if (isset($resume['message_principal']) && $resume['message_principal'] !== 'non disponible' && !empty($resume['message_principal'])) {
-                $cleanData['message_principal'] = $resume['message_principal'];
-            }
-            
-            // Actions clés - filtrer les "non disponible"
-            if (isset($resume['trois_actions_cles']) && is_array($resume['trois_actions_cles'])) {
-                $actions = array_filter($resume['trois_actions_cles'], function($action) {
-                    return $action !== 'non disponible' && !empty($action);
-                });
-                if (!empty($actions)) {
-                    $cleanData['trois_actions_cles'] = array_values($actions);
-                }
-            }
-            
-            // Opportunité du mois
-            if ($opportuniteData !== null) {
-                $cleanData['opportunite_du_mois'] = $opportuniteData;
-            }
-            
-            // Alerte importante - seulement si différente de "non disponible"
-            if (isset($resume['alerte_importante']) && $resume['alerte_importante'] !== 'non disponible' && !empty($resume['alerte_importante'])) {
-                $cleanData['alerte_importante'] = $resume['alerte_importante'];
-            }
-            
-            // Score progression - seulement si différent de "non disponible"
-            if (isset($resume['score_progression']) && $resume['score_progression'] !== 'non disponible' && !empty($resume['score_progression'])) {
-                $cleanData['score_progression'] = $resume['score_progression'];
-            }
-            
-            $updateData = array_merge($updateData, $cleanData);
+            $updateData['executive_summary'] = $structure['resume_executif'];
         }
         
-        Log::info('UserAnalyticsService: Mapping dashboard structure to analytics', [
-            'keys_to_update' => array_keys($updateData),
-            'structure_keys' => array_keys($structure),
-            'resume_executif_exists' => isset($structure['resume_executif']),
-            'message_principal' => $updateData['message_principal'] ?? 'NOT_SET'
-        ]);
+        if (isset($structure['diagnostic_projet'])) {
+            $updateData['project_diagnostic'] = $structure['diagnostic_projet'];
+        }
         
-        $analytics->update($updateData);
+        if (isset($structure['opportunites_matchees'])) {
+            $updateData['matched_opportunities'] = $structure['opportunites_matchees'];
+        }
         
-        Log::info('UserAnalyticsService: Analytics updated successfully', [
-            'message_principal_after' => $analytics->fresh()->message_principal ?? 'NULL'
-        ]);
+        if (isset($structure['regulations'])) {
+            $updateData['regulations'] = $structure['regulations'];
+        }
+        
+        if (isset($structure['partenaires_suggeres'])) {
+            $updateData['suggested_partners'] = $structure['partenaires_suggeres'];
+        }
+        
+        // Update niveau_maturite if available
+        if (isset($structure['diagnostic_projet']['niveau_maturite'])) {
+            $niveauMaturite = $structure['diagnostic_projet']['niveau_maturite'];
+            if (!in_array($niveauMaturite, ['non disponible', 'a completer', ''])) {
+                $updateData['niveau_maturite'] = $niveauMaturite;
+            }
+        }
+        
+        // Update statut_formalisation if available  
+        if (isset($structure['diagnostic_projet']['indicateurs_cles']['formalisation']['statut'])) {
+            $statutForm = $structure['diagnostic_projet']['indicateurs_cles']['formalisation']['statut'];
+            if (!in_array($statutForm, ['non disponible', 'a completer', ''])) {
+                // Apply the filter to handle LLM responses
+                $statutForm = $this->filterNonDisponible($statutForm);
+                if ($statutForm) {
+                    $updateData['statut_formalisation'] = $statutForm;
+                }
+            }
+        }
+        
+        // Attempt to update with cleaned data
+        try {
+            $analytics->update($updateData);
+            Log::info("Dashboard analytics successfully updated for user {$analytics->user_id}");
+        } catch (\Exception $e) {
+            Log::error("Failed to update analytics for user {$analytics->user_id}: " . $e->getMessage());
+        }
     }
 
     /**
@@ -1856,7 +1655,7 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
 
             // Update analytics with insights
             $analytics->update([
-                'executive_summary' => $insights,
+                'metadata' => array_merge($analytics->metadata ?? [], ['insights' => $insights]),
                 'generated_at' => now(),
                 'expires_at' => now()->addDays(7)
             ]);
