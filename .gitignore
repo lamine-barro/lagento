@@ -24,3 +24,4 @@ Homestead.yaml
 Thumbs.db
 data/textes_officiels_downloads/
 __pycache__/
+.vercel
