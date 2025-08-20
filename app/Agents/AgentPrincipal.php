@@ -1063,13 +1063,48 @@ case 'recherche_vectorielle':
         // Compact spacing for headers - no extra line before headers
         $content = preg_replace('/\n\n+(#{1,6})\s/', "\n\n$1 ", $content);
         
-        // Ensure proper list formatting with tight spacing
+        // Handle numbered lists properly - preserve numbering sequence
+        // Split content into lines to handle numbered lists more carefully
+        $lines = explode("\n", $content);
+        $processedLines = [];
+        $inNumberedList = false;
+        $currentNumber = 1;
+        
+        foreach ($lines as $line) {
+            $trimmedLine = trim($line);
+            
+            // Check if this is a numbered list item
+            if (preg_match('/^(\d+)\.\s+(.+)/', $trimmedLine, $matches)) {
+                if (!$inNumberedList) {
+                    // Starting a new numbered list
+                    $inNumberedList = true;
+                    $currentNumber = 1;
+                } else {
+                    // Continue numbered list with sequential numbering
+                    $currentNumber++;
+                }
+                $processedLines[] = "{$currentNumber}. {$matches[2]}";
+            } elseif (preg_match('/^[*-]\s+/', $trimmedLine)) {
+                // Bullet list item
+                $inNumberedList = false;
+                $processedLines[] = $line;
+            } elseif (empty($trimmedLine)) {
+                // Empty line - reset numbered list context if we hit two empty lines
+                $processedLines[] = $line;
+            } else {
+                // Regular line - reset numbered list if it's not a continuation
+                $inNumberedList = false;
+                $processedLines[] = $line;
+            }
+        }
+        
+        $content = implode("\n", $processedLines);
+        
+        // Ensure proper list formatting with tight spacing (only bullet lists now)
         $content = preg_replace('/\n\n([*-])\s/', "\n$1 ", $content);
-        $content = preg_replace('/\n\n(\d+\.)\s/', "\n$1 ", $content);
         
         // Remove excessive spacing between list items
         $content = preg_replace('/([*-] .+)\n\n([*-] )/', '$1' . "\n" . '$2', $content);
-        $content = preg_replace('/(\d+\. .+)\n\n(\d+\. )/', '$1' . "\n" . '$2', $content);
         
         return trim($content);
     }
