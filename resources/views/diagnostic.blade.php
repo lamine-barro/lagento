@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Diagnostic Entreprise')
-@section('page_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Agento')
-@section('seo_title', 'Diagnostic Entreprise Gratuit - Analysez votre Startup avec l\'IA | Agento')
+@section('title', 'Diagnostic entreprise')
+@section('page_title', 'Diagnostic entreprise gratuit - Analysez votre startup avec l\'IA | Agento')
+@section('seo_title', 'Diagnostic entreprise gratuit - Analysez votre startup avec l\'IA | Agento')
 @section('meta_description', 'Obtenez un diagnostic complet et gratuit de votre entreprise avec l\'intelligence artificielle. Analyse des forces, faiblesses, opportunités de financement et conseils personnalisés pour entrepreneurs ivoiriens.')
 @section('meta_keywords', 'diagnostic entreprise gratuit, analyse startup, conseil business CI, diagnostic IA, évaluation entreprise côte ivoire, audit business abidjan')
 @section('canonical_url', route('diagnostic'))
-@section('og_title', 'Diagnostic Entreprise IA Gratuit - Agento Côte d\'Ivoire')
+@section('og_title', 'Diagnostic entreprise IA gratuit - Agento Côte d\'Ivoire')
 @section('og_description', 'Diagnostic IA complet de votre entreprise : forces, faiblesses, opportunités de financement et plan d\'action personnalisé. Gratuit pour entrepreneurs ivoiriens.')
 @section('schema_org')
 @verbatim

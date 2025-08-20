@@ -5,7 +5,7 @@
 @section('meta_keywords', 'opportunités business ci, appels offres abidjan, concours entrepreneur ivoirien, partenariats startup, veille business côte ivoire')
 @section('canonical_url', route('seo.opportunites'))
 
-@section('og_title', 'Opportunités Entrepreneur Côte d\'Ivoire - Agento')
+@section('og_title', 'Opportunités entrepreneur Côte d\'Ivoire - Agento')
 @section('og_description', 'Toutes les opportunités business pour entrepreneurs ivoiriens : concours, appels d\'offres, partenariats. Veille intelligente Agento.')
 @section('og_type', 'website')
 

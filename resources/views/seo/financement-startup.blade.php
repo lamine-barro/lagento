@@ -5,7 +5,7 @@
 @section('meta_keywords', 'financement startup abidjan, pme côte ivoire, investisseur ivoirien, subvention entreprise ci, prêt startup, concours entrepreneur, levée fonds afrique')
 @section('canonical_url', route('seo.financement'))
 
-@section('og_title', 'Financement Startup PME Abidjan - Agento')
+@section('og_title', 'Financement startup PME Abidjan - Agento')
 @section('og_description', 'Toutes les solutions de financement pour startups et PME en Côte d\'Ivoire. Agento vous guide vers les bonnes opportunités.')
 @section('og_type', 'website')
 

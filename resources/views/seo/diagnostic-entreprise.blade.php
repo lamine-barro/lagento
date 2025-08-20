@@ -5,7 +5,7 @@
 @section('meta_keywords', 'diagnostic entreprise gratuit, analyse business ci, évaluation startup abidjan, audit stratégique côte ivoire, conseil entreprise ivoirien')
 @section('canonical_url', route('seo.diagnostic'))
 
-@section('og_title', 'Diagnostic Entreprise Gratuit CI - Agento')
+@section('og_title', 'Diagnostic entreprise gratuit CI - Agento')
 @section('og_description', 'Diagnostic complet et gratuit de votre entreprise en Côte d\'Ivoire. Analyse IA personnalisée avec recommandations stratégiques.')
 @section('og_type', 'website')
 

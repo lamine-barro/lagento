@@ -1,12 +1,12 @@
 @extends('layouts.guest')
 
-@section('seo_title', 'Agento - Assistant IA Entrepreneurial N°1 en Côte d\'Ivoire')
+@section('seo_title', 'Agento - Assistant IA entrepreneurial n°1 en Côte d\'Ivoire')
 @section('meta_description', 'Découvrez Agento, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens. Conseils personnalisés, opportunités de financement, réseau d\'affaires et accompagnement 24/7 pour réussir votre entreprise en Côte d\'Ivoire.')
 @section('meta_keywords', 'assistant IA côte ivoire, entrepreneur abidjan, startup CI, financement pme, conseil business, innovation afrique, lamine barro, etudesk, agento')
-@section('og_title', 'Agento - Votre Assistant IA Entrepreneurial en Côte d\'Ivoire')
+@section('og_title', 'Agento - Votre assistant IA entrepreneurial en Côte d\'Ivoire')
 @section('og_description', 'Rejoignez plus de 15M+ entrepreneurs qui font confiance à Agento pour développer leur business en Afrique. Gratuit et disponible 24/7.')
 @section('canonical_url', route('landing'))
-@section('title', 'Agento - Assistant IA Entrepreneurial')
+@section('title', 'Agento - Assistant IA entrepreneurial')
 
 @section('vite')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,7 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
 @endpush
 
-@section('page_title', 'Agento - Assistant IA Entrepreneurial')
+@section('page_title', 'Agento - Assistant IA entrepreneurial')
 
 @section('schema_org')
 @verbatim

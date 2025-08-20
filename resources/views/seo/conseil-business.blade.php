@@ -5,7 +5,7 @@
 @section('meta_keywords', 'conseil business afrique, innovation entrepreneur, stratégie commerciale ci, consultant business abidjan, développement entreprise ivoirienne')
 @section('canonical_url', route('seo.conseil'))
 
-@section('og_title', 'Conseil Business Innovation Afrique - Agento')
+@section('og_title', 'Conseil business innovation Afrique - Agento')
 @section('og_description', 'Conseil business expert et innovation pour entrepreneurs africains. Stratégie, croissance et transformation digitale avec Agento.')
 @section('og_type', 'website')
 

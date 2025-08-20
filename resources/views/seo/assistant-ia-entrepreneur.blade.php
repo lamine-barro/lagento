@@ -5,7 +5,7 @@
 @section('meta_keywords', 'assistant IA entrepreneur, côte ivoire startup, conseiller business abidjan, assistant entrepreneur ivoirien, IA business africaine, lagento tech agro tech')
 @section('canonical_url', route('seo.assistant-ia'))
 
-@section('og_title', 'Assistant IA Entrepreneur Côte d\'Ivoire - Agento')
+@section('og_title', 'Assistant IA entrepreneur Côte d\'Ivoire - Agento')
 @section('og_description', 'Premier assistant IA spécialisé pour entrepreneurs ivoiriens. Conseils business, financement, diagnostic et accompagnement 24/7.')
 @section('og_type', 'website')
 

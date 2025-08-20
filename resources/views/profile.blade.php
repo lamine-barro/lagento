@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Mon Profil Entrepreneur')
-@section('seo_title', 'Profil Entrepreneur - Gérez vos Informations Business | Agento')
+@section('title', 'Mon profil entrepreneur')
+@section('seo_title', 'Profil entrepreneur - Gérez vos informations business | Agento')
 @section('meta_description', 'Gérez votre profil entrepreneur sur Agento : informations personnelles, projets d\'entreprise, préférences et paramètres de votre assistant IA business personnalisé.')
 @section('meta_keywords', 'profil entrepreneur, gestion compte business, paramètres assistant IA, profil startup, dashboard entrepreneur')
 @section('meta_robots', 'noindex, nofollow')
 @section('canonical_url', route('profile'))
-@section('og_title', 'Mon Profil Entrepreneur - Agento')
+@section('og_title', 'Mon profil entrepreneur - Agento')
 @section('og_description', 'Gérez votre profil et paramètres sur Agento, votre assistant IA entrepreneurial personnalisé.')
 @section('page_title', 'Mon Profil Entrepreneur')
 

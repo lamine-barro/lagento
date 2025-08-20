@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Chat Assistant IA')
-@section('page_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | Agento')
-@section('seo_title', 'Chat avec Assistant IA Entrepreneurial - Conseils Business 24/7 | Agento')
+@section('title', 'Chat assistant IA')
+@section('page_title', 'Chat avec assistant IA entrepreneurial - Conseils business 24/7 | Agento')
+@section('seo_title', 'Chat avec assistant IA entrepreneurial - Conseils business 24/7 | Agento')
 @section('meta_description', 'Chattez avec votre assistant IA entrepreneurial 24/7. Conseils business personnalisés, opportunités de financement, stratégie d\'entreprise et accompagnement pour entrepreneurs ivoiriens.')
 @section('meta_keywords', 'chat assistant IA, conseil business 24/7, assistant entrepreneur, aide startup, conseil IA côte ivoire')
 @section('meta_robots', 'noindex, nofollow')
 @section('canonical_url', route('chat.index'))
-@section('og_title', 'Chat Assistant IA Entrepreneurial - Agento')
+@section('og_title', 'Chat assistant IA entrepreneurial - Agento')
 @section('og_description', 'Obtenez des conseils business instantanés avec votre assistant IA entrepreneurial personnalisé.')
 @section('schema_org')
 @verbatim

@@ -5,7 +5,7 @@
 @section('meta_keywords', 'réseau entrepreneur ivoirien, networking business ci, communauté startup abidjan, partenariats entrepreneurs, mentoring business côte ivoire')
 @section('canonical_url', route('seo.reseau'))
 
-@section('og_title', 'Réseau Entrepreneurs Ivoiriens - Agento Community')
+@section('og_title', 'Réseau entrepreneurs ivoiriens - Agento community')
 @section('og_description', 'Le plus grand réseau d\'entrepreneurs ivoiriens. Networking, partenariats et collaborations business avec Agento Community.')
 @section('og_type', 'website')
 
