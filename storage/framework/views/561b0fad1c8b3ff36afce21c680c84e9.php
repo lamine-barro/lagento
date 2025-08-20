@@ -220,7 +220,7 @@ function chatInterfaceWithStreaming() {
             messages: [],
             currentConversationId: '',
             showDeleteModal: false,
-            conversationToDelete: null,
+            conversationToDelete: { id: null, title: '' },
             isDeleting: false,
             init() {},
             loadConversations() {},
