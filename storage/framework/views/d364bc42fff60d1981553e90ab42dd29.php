@@ -26,10 +26,7 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-
-<?php echo $__env->make('chat-streaming', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-
-<div class="min-h-screen bg-white" x-data="(typeof chatInterfaceWithStreaming !== 'undefined' ? chatInterfaceWithStreaming : chatInterface)()" x-init="init()" data-conversation-id="<?php echo e($conversation->id ?? ''); ?>">
+<div class="min-h-screen bg-white" x-data="chatInterface()" x-init="init()" data-conversation-id="<?php echo e($conversation->id ?? ''); ?>">
     <!-- Chat Header with Tabs -->
     <div class="bg-white border-b p-4" style="border-color: var(--gray-100);">
         <div class="max-w-4xl mx-auto">

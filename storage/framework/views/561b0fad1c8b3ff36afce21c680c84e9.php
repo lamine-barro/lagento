@@ -204,17 +204,17 @@ function enhanceChatWithStreaming() {
     };
 }
 
-// Store original chatInterface function if it exists
-if (typeof window.chatInterface === 'function') {
-    window.originalChatInterface = window.chatInterface;
-}
-
 // Override chatInterface with streaming enhancements
 function chatInterfaceWithStreaming() {
-    // Get base chat interface data from original function
-    const baseData = typeof window.originalChatInterface === 'function' 
-        ? window.originalChatInterface() 
-        : {
+    // Get base chat interface data - first try to get it from the already defined chatInterface
+    let baseData;
+    
+    // Try to get the original chatInterface function that should be defined later
+    if (typeof window.chatInterface === 'function') {
+        baseData = window.chatInterface();
+    } else {
+        // Fallback with complete implementation
+        baseData = {
             isTyping: false,
             conversations: [],
             messages: [],
@@ -222,16 +222,33 @@ function chatInterfaceWithStreaming() {
             showDeleteModal: false,
             conversationToDelete: { id: null, title: '' },
             isDeleting: false,
-            init() {},
-            loadConversations() {},
-            createNewConversation() {},
-            switchToConversation() {},
-            deleteConversation() {},
-            sendQuickMessage() {},
-            sendDirectMessage() {},
-            copyMessage() {},
-            scrollToBottom() {},
-            processMarkdown() {}
+            init() {
+                console.log('Using fallback chatInterface - waiting for real implementation...');
+                // Wait for the main chat script to load, then replace functions
+                const tryToUpgrade = () => {
+                    if (typeof window.chatInterface === 'function') {
+                        console.log('Real chatInterface found! Upgrading...');
+                        const realInterface = window.chatInterface();
+                        Object.assign(this, realInterface);
+                        // Call real init
+                        if (this.init !== tryToUpgrade && typeof this.init === 'function') {
+                            this.init();
+                        }
+                    } else {
+                        setTimeout(tryToUpgrade, 100);
+                    }
+                };
+                setTimeout(tryToUpgrade, 0);
+            },
+            loadConversations() { console.log('Fallback: loadConversations'); },
+            createNewConversation() { console.log('Fallback: createNewConversation'); },
+            switchToConversation() { console.log('Fallback: switchToConversation'); },
+            deleteConversation() { console.log('Fallback: deleteConversation'); },
+            sendQuickMessage() { console.log('Fallback: sendQuickMessage'); },
+            sendDirectMessage() { console.log('Fallback: sendDirectMessage'); },
+            copyMessage() { console.log('Fallback: copyMessage'); },
+            scrollToBottom() { console.log('Fallback: scrollToBottom'); },
+            processMarkdown(content) { return content || ''; }
         };
     
     const streamingEnhancements = enhanceChatWithStreaming.call(this);
@@ -319,4 +336,34 @@ function chatInterfaceWithStreaming() {
 
 // Make function available globally
 window.chatInterfaceWithStreaming = chatInterfaceWithStreaming;
+
+// Also ensure we can fallback to the regular chatInterface if needed
+window.getChatInterface = function() {
+    if (typeof window.chatInterfaceWithStreaming === 'function') {
+        return window.chatInterfaceWithStreaming();
+    } else if (typeof window.chatInterface === 'function') {
+        return window.chatInterface();
+    } else {
+        console.error('No chat interface function available - using emergency fallback');
+        return {
+            isTyping: false,
+            conversations: [],
+            messages: [],
+            currentConversationId: '',
+            showDeleteModal: false,
+            conversationToDelete: { id: null, title: '' },
+            isDeleting: false,
+            init() { console.log('Emergency fallback init'); },
+            loadConversations() { console.log('Emergency fallback: loadConversations'); },
+            createNewConversation() { console.log('Emergency fallback: createNewConversation'); },
+            switchToConversation() { console.log('Emergency fallback: switchToConversation'); },
+            deleteConversation() { console.log('Emergency fallback: deleteConversation'); },
+            sendQuickMessage() { console.log('Emergency fallback: sendQuickMessage'); },
+            sendDirectMessage() { console.log('Emergency fallback: sendDirectMessage'); },
+            copyMessage() { console.log('Emergency fallback: copyMessage'); },
+            scrollToBottom() { console.log('Emergency fallback: scrollToBottom'); },
+            processMarkdown(content) { return content || ''; }
+        };
+    }
+};
 </script><?php /**PATH /Users/laminebarro/agent-O/resources/views/chat-streaming.blade.php ENDPATH**/ ?>
