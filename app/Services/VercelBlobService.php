@@ -66,10 +66,14 @@ class VercelBlobService
             }
         }
 
+        // Use multipart form data for binary files
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
-            'Content-Type' => $mimeType,
-        ])->put($this->baseUrl . '/' . $filename, $content);
+        ])->post($this->baseUrl, [
+            'pathname' => $filename,
+            'content' => base64_encode($content),
+            'contentType' => $mimeType,
+        ]);
 
         if ($response->successful()) {
             return $response->json();
