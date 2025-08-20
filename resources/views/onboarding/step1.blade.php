@@ -12,6 +12,17 @@
         <form id="step1-form" method="POST" action="{{ route('onboarding.step1.process') }}" enctype="multipart/form-data" class="space-y-6 mt-4">
             @csrf
 
+            <!-- Alerte de validation LLM -->
+            @error('content_validation')
+                <div class="alert alert-error">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    <div>
+                        <strong>Validation échouée</strong>
+                        <p>{{ $message }}</p>
+                    </div>
+                </div>
+            @enderror
+
             <!-- Identité & Contact -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

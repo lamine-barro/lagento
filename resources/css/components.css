@@ -1,9 +1,51 @@
 /* === MOBILE INPUT ZOOM PREVENTION === */
-/* Empêche le zoom automatique sur mobile lors du focus sur les inputs */
-input, textarea, select {
+/* Empêche le zoom automatique sur mobile lors du focus sur les inputs de texte uniquement */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+textarea {
   font-size: 16px !important;
   -webkit-appearance: none;
-  border-radius: 0;
+  /* Garder les bordures arrondies pour les inputs de texte */
+}
+
+/* Préserver l'apparence native pour select et checkbox/radio */
+select {
+  font-size: 16px !important;
+  /* Conserver l'apparence par défaut des select */
+}
+
+input[type="checkbox"] {
+  -webkit-appearance: checkbox !important;
+  -moz-appearance: checkbox !important;
+  appearance: checkbox !important;
+  width: 1rem !important;
+  height: 1rem !important;
+  cursor: pointer;
+  border-radius: 0 !important; /* Garder les coins carrés pour les checkboxes */
+}
+
+input[type="radio"] {
+  -webkit-appearance: radio !important;
+  -moz-appearance: radio !important;
+  appearance: radio !important;
+  width: 1rem !important;
+  height: 1rem !important;
+  cursor: pointer;
+}
+
+/* Correction spécifique pour les checkboxes dans les formulaires onboarding */
+.w-4.h-4[type="checkbox"] {
+  width: 1rem !important;
+  height: 1rem !important;
+  -webkit-appearance: checkbox !important;
+  -moz-appearance: checkbox !important;
+  appearance: checkbox !important;
+  border-radius: 0 !important;
 }
 
 /* Styles responsifs pour iOS Safari */
@@ -15,7 +57,11 @@ input, textarea, select {
   input[type="tel"],
   input[type="url"],
   input[type="number"],
-  textarea,
+  textarea {
+    font-size: 16px !important;
+    line-height: 1.4;
+  }
+  
   select {
     font-size: 16px !important;
     line-height: 1.4;
@@ -229,7 +275,7 @@ input, textarea, select {
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-base);
   border: 1px solid var(--gray-300);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-lg); /* Bordures arrondies jolies */
   background-color: var(--white);
   transition: border-color var(--transition), box-shadow var(--transition);
   
@@ -271,9 +317,11 @@ input, textarea, select {
 .textarea-field {
   min-height: 120px;
   resize: vertical;
+  border-radius: var(--radius-lg); /* Bordures arrondies pour textarea aussi */
 }
 
-.select-field {
+/* Classe optionnelle pour select custom - non utilisée par défaut */
+.select-field-custom {
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right var(--space-3) center;

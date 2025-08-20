@@ -34,8 +34,11 @@ class User extends Authenticatable
         'onboarding_completed',
         'is_public',
         'email_notifications',
-        'diagnostics_used_this_month',
-        'diagnostics_month_reset',
+        'diagnostics_used_this_week',
+        'messages_used_this_week', 
+        'images_used_this_week',
+        'documents_used_this_week',
+        'rate_limits_week_start',
         'last_diagnostic_at',
     ];
 
@@ -63,7 +66,7 @@ class User extends Authenticatable
             'onboarding_completed' => 'boolean',
             'is_public' => 'boolean',
             'email_notifications' => 'boolean',
-            'diagnostics_month_reset' => 'date',
+            'rate_limits_week_start' => 'date',
             'last_diagnostic_at' => 'datetime',
         ];
     }
@@ -83,51 +86,103 @@ class User extends Authenticatable
         return $this->hasMany(Projet::class);
     }
 
+    // Weekly rate limits constants
+    const WEEKLY_LIMITS = [
+        'diagnostics' => 3,
+        'messages' => 100,
+        'images' => 3,
+        'documents' => 3,
+    ];
+
     /**
-     * Get remaining diagnostics for this month
+     * Get remaining usage for a specific feature this week
      */
-    public function getRemainingDiagnostics(): int
+    public function getRemainingUsage(string $feature): int
     {
-        $this->resetDiagnosticsIfNewMonth();
-        return max(0, 50 - $this->diagnostics_used_this_month);
+        $this->resetWeeklyLimitsIfNewWeek();
+        
+        $used = match($feature) {
+            'diagnostics' => $this->diagnostics_used_this_week,
+            'messages' => $this->messages_used_this_week,
+            'images' => $this->images_used_this_week,
+            'documents' => $this->documents_used_this_week,
+            default => 0,
+        };
+        
+        return max(0, self::WEEKLY_LIMITS[$feature] - $used);
     }
 
     /**
-     * Check if user can run a diagnostic
+     * Check if user can use a feature
      */
-    public function canRunDiagnostic(): bool
+    public function canUseFeature(string $feature): bool
     {
-        return $this->getRemainingDiagnostics() > 0;
+        return $this->getRemainingUsage($feature) > 0;
     }
 
     /**
-     * Use a diagnostic (increment counter)
+     * Use a feature (increment counter)
      */
-    public function useDiagnostic(): bool
+    public function useFeature(string $feature): bool
     {
-        if (!$this->canRunDiagnostic()) {
+        if (!$this->canUseFeature($feature)) {
             return false;
         }
 
-        $this->resetDiagnosticsIfNewMonth();
-        $this->increment('diagnostics_used_this_month');
-        $this->update(['last_diagnostic_at' => now()]);
+        $this->resetWeeklyLimitsIfNewWeek();
+        
+        $field = match($feature) {
+            'diagnostics' => 'diagnostics_used_this_week',
+            'messages' => 'messages_used_this_week',
+            'images' => 'images_used_this_week',
+            'documents' => 'documents_used_this_week',
+            default => null,
+        };
+        
+        if ($field) {
+            $this->increment($field);
+            
+            if ($feature === 'diagnostics') {
+                $this->update(['last_diagnostic_at' => now()]);
+            }
+        }
         
         return true;
     }
 
     /**
-     * Reset diagnostics counter if new month
+     * Legacy methods for backward compatibility
      */
-    private function resetDiagnosticsIfNewMonth(): void
+    public function getRemainingDiagnostics(): int
     {
-        $currentMonth = now()->format('Y-m');
-        $resetMonth = $this->diagnostics_month_reset?->format('Y-m');
+        return $this->getRemainingUsage('diagnostics');
+    }
 
-        if ($resetMonth !== $currentMonth) {
+    public function canRunDiagnostic(): bool
+    {
+        return $this->canUseFeature('diagnostics');
+    }
+
+    public function useDiagnostic(): bool
+    {
+        return $this->useFeature('diagnostics');
+    }
+
+    /**
+     * Reset weekly counters if new week
+     */
+    private function resetWeeklyLimitsIfNewWeek(): void
+    {
+        $currentWeekStart = now()->startOfWeek()->format('Y-m-d');
+        $resetWeekStart = $this->rate_limits_week_start?->format('Y-m-d');
+
+        if ($resetWeekStart !== $currentWeekStart) {
             $this->update([
-                'diagnostics_used_this_month' => 0,
-                'diagnostics_month_reset' => now()->startOfMonth(),
+                'diagnostics_used_this_week' => 0,
+                'messages_used_this_week' => 0,
+                'images_used_this_week' => 0,
+                'documents_used_this_week' => 0,
+                'rate_limits_week_start' => now()->startOfWeek(),
             ]);
         }
     }

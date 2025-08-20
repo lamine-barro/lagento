@@ -30,7 +30,7 @@ class UserAnalyticsService
         try {
             $analytics = $this->getOrCreateUserAnalytics($user);
             
-            // Enrich with lightweight LLM pass (gpt-4.1-mini) to extract salient tags and summary
+            // Enrich with lightweight LLM pass (gpt-5-mini) to extract salient tags and summary
             // Enhanced with vector memory context
             $lmSummary = $this->summarizeBusinessData($onboardingData, $user);
 
@@ -66,14 +66,28 @@ class UserAnalyticsService
                 $profile['business_info']['nombre_fondateurs'] = (int)max(0, (int)$male) + (int)max(0, (int)$female);
             }
 
+            // Map to existing table structure
+            $executive_summary = [
+                'niveau_global' => $lmSummary['level'] ?? null,
+                'score_potentiel' => $lmSummary['potential_score'] ?? null,
+                'profil_type' => $lmSummary['profile_type'] ?? null,
+                'summary' => $lmSummary['summary'] ?? null,
+                'keywords' => $lmSummary['keywords'] ?? [],
+                'risks' => $lmSummary['risks'] ?? []
+            ];
+            
+            $project_diagnostic = [
+                'forces' => $lmSummary['strengths'] ?? [],
+                'axes_progression' => $lmSummary['improvements'] ?? [],
+                'besoins_formation' => $lmSummary['training_needs'] ?? []
+            ];
+            
             $analytics->update([
-                'entrepreneur_profile' => $profile,
-                'generated_at' => now(),
-                'expires_at' => now()->addDays(30),
-                'metadata' => array_merge($analytics->metadata ?? [], [
-                    'profile_updates' => ($analytics->metadata['profile_updates'] ?? 0) + 1,
-                    'last_profile_update' => now()->toISOString()
-                ])
+                'niveau_maturite' => $lmSummary['level'] ?? 'débutant',
+                'score_global' => $lmSummary['potential_score'] ?? 0,
+                'executive_summary' => $executive_summary,
+                'project_diagnostic' => $project_diagnostic,
+                'derniere_analyse' => now()
             ]);
 
             Log::info("Entrepreneur profile updated for user {$user->id}");
@@ -94,9 +108,9 @@ class UserAnalyticsService
             
             Log::info('UserAnalyticsService: Starting enhanced business data summarization', ['data_size' => strlen($text), 'user_id' => $user->id]);
 
-            // Get contextual insights from vector memories
-            $vectorContext = $this->getVectorContextForDiagnostic($data, $user);
-            $contextualInfo = $this->formatVectorContextForPrompt($vectorContext);
+            // Get user project context directly (no more vectorization)
+            $projectContext = $this->getUserProjectContext($user);
+            $contextualInfo = $this->formatProjectContextForPrompt($projectContext);
             
             $systemPrompt = "Tu es un analyste business expert de l'écosystème entrepreneurial ivoirien. 
 
@@ -130,7 +144,11 @@ Réponds UNIQUEMENT ce JSON.";
             ];
 
             $lm = app(\App\Services\LanguageModelService::class);
-            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 30000, ['response_format' => ['type' => 'json_object']]);
+            $raw = $lm->chat($messages, 'gpt-5-mini', null, 30000, [
+                'response_format' => ['type' => 'json_object'],
+                'reasoning_effort' => 'low',
+                'verbosity' => 'medium'
+            ]);
             
             Log::info('UserAnalyticsService: Enhanced LLM response received', [
                 'raw_length' => strlen($raw), 
@@ -777,10 +795,14 @@ Réponds UNIQUEMENT ce JSON.";
             // );
             $officialTexts = [];
             
+            // Rechercher les projets partenaires potentiels
+            $partnerProjects = $this->getPartnerProjectsForDiagnostic($data, $userModel);
+            
             return [
                 'institutions' => $this->formatInstitutionsForContext($institutions),
                 'opportunities' => $this->formatOpportunitiesForContext($opportunities),
                 'official_texts' => $this->formatOfficialTextsForContext($officialTexts),
+                'partner_projects' => $partnerProjects,
                 'search_terms' => $searchTerms
             ];
             
@@ -795,6 +817,210 @@ Réponds UNIQUEMENT ce JSON.";
                 'opportunities' => [],
                 'search_terms' => []
             ];
+        }
+    }
+    
+    /**
+     * Récupérer les projets partenaires potentiels de la plateforme
+     */
+    private function getPartnerProjectsForDiagnostic(array $data, $userModel = null): array
+    {
+        try {
+            $currentUserId = null;
+            
+            // Identifier l'utilisateur actuel pour l'exclure
+            if ($userModel instanceof User) {
+                $currentUserId = $userModel->id;
+            } elseif (isset($data['user_info']['id'])) {
+                $currentUserId = $data['user_info']['id'];
+            } elseif (isset($data['projet_data']['user_id'])) {
+                $currentUserId = $data['projet_data']['user_id'];
+            }
+            
+            // Extraire les informations du projet actuel pour le matching
+            $currentSecteurs = [];
+            $currentRegion = null;
+            $currentMaturite = null;
+            
+            if (isset($data['projet_data'])) {
+                $projet = $data['projet_data'];
+                $currentSecteurs = $projet['secteurs'] ?? [];
+                $currentRegion = $projet['region'] ?? null;
+                $currentMaturite = $projet['maturite'] ?? null;
+            }
+            
+            // Rechercher les autres projets visibles de la plateforme
+            $query = Projet::where('visibilite', true)
+                ->whereNotNull('nom_projet')
+                ->where('nom_projet', '!=', '');
+            
+            // Exclure le projet de l'utilisateur actuel
+            if ($currentUserId) {
+                $query->where('user_id', '!=', $currentUserId);
+            }
+            
+            $projets = $query->with('user')->get();
+            
+            $partnerProjects = [];
+            
+            foreach ($projets as $projet) {
+                // Calculer le score de synergie
+                $score = $this->calculateProjectSynergy($currentSecteurs, $currentRegion, $currentMaturite, $projet);
+                
+                if ($score > 30) { // Seuil minimum de compatibilité
+                    $synergies = $this->identifyPossibleSynergies($currentSecteurs, $currentMaturite, $projet);
+                    
+                    $partnerProjects[] = [
+                        'id' => $projet->id,
+                        'nom_projet' => $projet->nom_projet,
+                        'raison_sociale' => $projet->raison_sociale,
+                        'secteurs' => $projet->secteurs ?? [],
+                        'region' => $projet->region,
+                        'maturite' => $projet->maturite,
+                        'description' => substr($projet->description ?? '', 0, 200) . '...',
+                        'contact_email' => $projet->user->email ?? null,
+                        'contact_nom' => $projet->user->name ?? null,
+                        'score_synergie' => $score,
+                        'synergies_possibles' => $synergies,
+                        'type_synergie' => $this->determinePartnershipType($synergies)
+                    ];
+                }
+            }
+            
+            // Trier par score de synergie et prendre les 8 meilleurs
+            usort($partnerProjects, function($a, $b) {
+                return $b['score_synergie'] <=> $a['score_synergie'];
+            });
+            
+            return array_slice($partnerProjects, 0, 8);
+            
+        } catch (\Exception $e) {
+            Log::error('Error getting partner projects for diagnostic', [
+                'error' => $e->getMessage(),
+                'user_id' => $currentUserId
+            ]);
+            
+            return [];
+        }
+    }
+    
+    /**
+     * Calculer le score de synergie entre deux projets
+     */
+    private function calculateProjectSynergy($currentSecteurs, $currentRegion, $currentMaturite, $projet): int
+    {
+        $score = 0;
+        
+        // Score basé sur les secteurs (40% du score total)
+        $projetSecteurs = $projet->secteurs ?? [];
+        if (!empty($currentSecteurs) && !empty($projetSecteurs)) {
+            $intersection = array_intersect($currentSecteurs, $projetSecteurs);
+            $union = array_unique(array_merge($currentSecteurs, $projetSecteurs));
+            
+            if (!empty($intersection)) {
+                $score += 40; // Secteurs communs
+            } elseif (count($union) <= 4) {
+                $score += 25; // Secteurs complémentaires
+            }
+        }
+        
+        // Score basé sur la région (25% du score total)
+        if ($currentRegion && $projet->region) {
+            if ($currentRegion === $projet->region) {
+                $score += 25; // Même région
+            } else {
+                $score += 10; // Régions différentes mais synergie possible
+            }
+        }
+        
+        // Score basé sur la maturité (35% du score total)
+        if ($currentMaturite && $projet->maturite) {
+            $maturiteScores = [
+                'idée' => 1,
+                'lancement' => 2,
+                'croissance' => 3,
+                'expansion' => 4
+            ];
+            
+            $currentScore = $maturiteScores[$currentMaturite] ?? 2;
+            $projetScore = $maturiteScores[$projet->maturite] ?? 2;
+            $diff = abs($currentScore - $projetScore);
+            
+            if ($diff === 0) {
+                $score += 35; // Même niveau de maturité
+            } elseif ($diff === 1) {
+                $score += 25; // Niveaux adjacents
+            } elseif ($diff === 2) {
+                $score += 15; // Complémentarité possible
+            }
+        }
+        
+        return min($score, 100);
+    }
+    
+    /**
+     * Identifier les synergies possibles entre projets
+     */
+    private function identifyPossibleSynergies($currentSecteurs, $currentMaturite, $projet): array
+    {
+        $synergies = [];
+        
+        $projetSecteurs = $projet->secteurs ?? [];
+        
+        // Synergies sectorielles
+        $intersection = array_intersect($currentSecteurs, $projetSecteurs);
+        if (!empty($intersection)) {
+            $synergies[] = "Collaboration sectorielle en " . implode(', ', $intersection);
+        }
+        
+        // Synergies technologiques
+        $techSectors = ['Technologie', 'FinTech', 'EdTech', 'HealthTech', 'AgriTech'];
+        $currentTech = array_intersect($currentSecteurs, $techSectors);
+        $projetTech = array_intersect($projetSecteurs, $techSectors);
+        
+        if (!empty($currentTech) && !empty($projetTech)) {
+            $synergies[] = "Partage d'expertise technologique";
+        }
+        
+        // Synergies commerciales
+        if ($currentMaturite === 'lancement' && $projet->maturite === 'croissance') {
+            $synergies[] = "Mentoring et accompagnement expérience marché";
+        } elseif ($currentMaturite === 'croissance' && $projet->maturite === 'lancement') {
+            $synergies[] = "Opportunité de mentoring et développement réseau";
+        }
+        
+        // Synergies géographiques
+        if ($projet->region) {
+            $synergies[] = "Développement réseau régional " . $projet->region;
+        }
+        
+        // Synergies de ressources
+        $resourceSectors = ['Finance', 'Logistique', 'Marketing', 'Ressources humaines'];
+        $complementaryResources = array_diff($resourceSectors, $currentSecteurs);
+        $projetResources = array_intersect($projetSecteurs, $complementaryResources);
+        
+        if (!empty($projetResources)) {
+            $synergies[] = "Échange de compétences : " . implode(', ', $projetResources);
+        }
+        
+        return array_slice($synergies, 0, 3); // Maximum 3 synergies
+    }
+    
+    /**
+     * Déterminer le type de partenariat principal
+     */
+    private function determinePartnershipType($synergies): string
+    {
+        $synergyText = implode(' ', $synergies);
+        
+        if (strpos($synergyText, 'technologique') !== false) {
+            return 'strategique';
+        } elseif (strpos($synergyText, 'commercial') !== false || strpos($synergyText, 'marché') !== false) {
+            return 'commerciale';
+        } elseif (strpos($synergyText, 'mentoring') !== false || strpos($synergyText, 'accompagnement') !== false) {
+            return 'operationnelle';
+        } else {
+            return 'strategique';
         }
     }
     
@@ -946,7 +1172,7 @@ Réponds UNIQUEMENT ce JSON.";
      */
     private function formatVectorContextForPrompt(array $vectorContext): string
     {
-        $contextualInfo = "🏛️ INSTITUTIONS PARTENAIRES DISPONIBLES :\n";
+        $contextualInfo = "🏛️ INSTITUTIONS ACCOMPAGNEMENT DISPONIBLES :\n";
         
         if (!empty($vectorContext['institutions'])) {
             foreach ($vectorContext['institutions'] as $institution) {
@@ -963,6 +1189,28 @@ Réponds UNIQUEMENT ce JSON.";
             }
         } else {
             $contextualInfo .= "Aucune institution trouvée dans la base de données.\n\n";
+        }
+        
+        $contextualInfo .= "PROJETS PARTENAIRES POTENTIELS DE LA PLATEFORME :\n";
+        
+        if (!empty($vectorContext['partner_projects'])) {
+            foreach ($vectorContext['partner_projects'] as $projet) {
+                $contextualInfo .= "• **{$projet['nom_projet']}**";
+                if (!empty($projet['raison_sociale'])) {
+                    $contextualInfo .= " ({$projet['raison_sociale']})";
+                }
+                $contextualInfo .= "\n";
+                $contextualInfo .= "  📍 Région: {$projet['region']}\n";
+                $contextualInfo .= "  🏭 Secteurs: " . implode(', ', $projet['secteurs']) . "\n";
+                $contextualInfo .= "  📈 Maturité: {$projet['maturite']}\n";
+                $contextualInfo .= "  📝 Description: {$projet['description']}\n";
+                $contextualInfo .= "  📧 Contact: {$projet['contact_nom']} ({$projet['contact_email']})\n";
+                $contextualInfo .= "  🎯 Synergies possibles: " . implode(', ', $projet['synergies_possibles']) . "\n";
+                $contextualInfo .= "  💼 Type partenariat: {$projet['type_synergie']}\n";
+                $contextualInfo .= "  ⭐ Score de synergie: {$projet['score_synergie']}%\n\n";
+            }
+        } else {
+            $contextualInfo .= "Aucun projet partenaire compatible trouvé sur la plateforme.\n\n";
         }
         
         $contextualInfo .= "🎯 OPPORTUNITÉS DISPONIBLES :\n";
@@ -1009,15 +1257,22 @@ Réponds UNIQUEMENT ce JSON.";
     private function generateDashboardStructureWithLLM(array $data): array
     {
         try {
-            // Récupérer les institutions et opportunités vectorisées pour enrichir le contexte
+            // Get user project context directly (no more vectorization)
             $user = $data['user_info'] ?? null;
-            $vectorContext = $this->getVectorContextForDiagnostic($data, $user);
+            $userModel = null;
+            if ($user instanceof User) {
+                $userModel = $user;
+            } elseif (is_array($user) && isset($user['id'])) {
+                $userModel = User::find($user['id']);
+            }
+            
+            $projectContext = $userModel ? $this->getUserProjectContext($userModel) : [];
             
             // Récupérer aussi les opportunités depuis la base de données
             $dbOpportunities = $this->getOpportunitiesFromDatabase($data);
             
-            // Formater le contexte vectoriel pour le prompt
-            $contextualInfo = $this->formatVectorContextForPrompt($vectorContext);
+            // Formater le contexte projet pour le prompt
+            $contextualInfo = $this->formatProjectContextForPrompt($projectContext);
             
             // Ajouter les opportunités de la base de données au contexte
             if (!empty($dbOpportunities)) {
@@ -1052,7 +1307,7 @@ RÈGLE ABSOLUE POUR LES OPPORTUNITÉS :
 {$contextualInfo}
 
 🚨 RÈGLES STRICTES :
-- Utilise UNIQUEMENT les institutions, opportunites et donnees du contexte ci-dessus
+- Utilise UNIQUEMENT les institutions, les textes officiels, opportunites et donnees du projet dans le contexte ci-dessus
 - AUCUNE invention d'opportunites, montants, ou partenaires fictifs  
 - Si pas de donnees disponibles -> indique 'non disponible' ou 'a completer'
 - Reste factuel et base toutes recommendations sur le contexte fourni
@@ -1132,11 +1387,16 @@ TYPE_SYNERGIE: strategique, operationnelle, commerciale
     ]
   },
   \"partenaires_suggeres\": {
-    \"nombre_matches\": 5,
+    \"nombre_matches\": 3,
     \"top_partenaires\": [
-      {\"nom_projet\": \"Jokkolabs Abidjan\", \"secteur\": \"Hub d'innovation et incubation\", \"localisation\": \"Abidjan, Plateau\", \"proposition_collaboration\": \"Accès à un écosystème de 200+ startups, événements networking hebdomadaires, mentors experts secteur public, espaces de coworking premium.\", \"score_pertinence\": 91, \"type_synergie\": \"strategique\"},
-      {\"nom_projet\": \"Hub Ivoire Tech\", \"secteur\": \"Accélération et financement tech\", \"localisation\": \"Abidjan, Cocody\", \"proposition_collaboration\": \"Programme d'accélération 6 mois, accès aux financements partenaires, mise en relation avec clients B2G, formations spécialisées.\", \"score_pertinence\": 87, \"type_synergie\": \"operationnelle\"}
-    ]
+      {\"id\": \"proj_123\", \"nom_projet\": \"AgroConnect CI\", \"raison_sociale\": \"AgroConnect SARL\", \"secteurs\": [\"Agriculture\", \"Technologie\"], \"region\": \"Abidjan\", \"maturite\": \"croissance\", \"contact_nom\": \"Kofi Asante\", \"contact_email\": \"kofi@agroconnect.ci\", \"proposition_collaboration\": \"Partage de réseau de distributeurs agricoles et collaboration sur solutions IoT pour fermes connectées\", \"score_pertinence\": 85, \"type_synergie\": \"strategique\", \"synergies_possibles\": [\"Collaboration sectorielle en Agriculture\", \"Partage d'expertise technologique\"]},
+      {\"id\": \"proj_456\", \"nom_projet\": \"EduTech Plateau\", \"raison_sociale\": \"EdTech Solutions SAS\", \"secteurs\": [\"Education\", \"Technologie\"], \"region\": \"Abidjan\", \"maturite\": \"lancement\", \"contact_nom\": \"Aya Touré\", \"contact_email\": \"aya@edutech.ci\", \"proposition_collaboration\": \"Échange de compétences techniques et accès au marché B2B éducation\", \"score_pertinence\": 78, \"type_synergie\": \"operationnelle\", \"synergies_possibles\": [\"Mentoring et accompagnement expérience marché\", \"Développement réseau régional Abidjan\"]}
+    ],
+    \"reseau_potentiel\": {
+      \"clients_potentiels\": 45,
+      \"fournisseurs_potentiels\": 12,
+      \"partenaires_complementaires\": 8
+    }
   }
 }
 
@@ -1179,12 +1439,14 @@ TYPE_SYNERGIE: strategique, operationnelle, commerciale
    - Si pas de texte officiel pertinent dans le contexte: reste générique
    - Coûts et délais : uniquement s'ils sont mentionnés dans les textes officiels
 
-7. PARTENAIRES - STRICTEMENT du contexte fourni:
-   - OBLIGATOIRE: Utilise UNIQUEMENT les institutions listées dans le CONTEXTE TEMPS RÉEL ci-dessus
-   - Si aucune institution dans le contexte: marque nombre_matches à 0 et top_partenaires comme tableau vide []
-   - INTERDIT de créer des institutions fictives (Jokkolabs, Impact Hub, etc.)
-   - Noms, secteurs, localisations : reprendre EXACTEMENT du contexte
-   - Score de pertinence basé sur le similarity_score fourni dans le contexte
+7. PARTENAIRES - PROJETS DE LA PLATEFORME:
+   - OBLIGATOIRE: Utilise UNIQUEMENT les projets partenaires listés dans la section PROJETS PARTENAIRES POTENTIELS ci-dessus
+   - Si aucun projet partenaire dans le contexte: marque nombre_matches à 0 et top_partenaires comme tableau vide []
+   - INTERDIT de créer des projets fictifs - utilise seulement les vrais projets de la plateforme
+   - Noms projets, secteurs, régions, contacts : reprendre EXACTEMENT du contexte fourni
+   - Score de pertinence basé sur le score_synergie fourni dans le contexte
+   - Inclure les informations de contact réelles (nom et email) des porteurs de projet
+   - proposition_collaboration basée sur les synergies_possibles identifiées
 
 8. OPTIMISATION RENDU:
    - Messages principaux: max 150 caractères, impact clair
@@ -1218,8 +1480,10 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             
             Log::info('UserAnalyticsService: Starting dashboard analytics generation', ['prompt_size' => strlen($prompt)]);
             
-            $raw = $lm->chat($messages, 'gpt-4.1-mini', 0.2, 25000, [
-                'response_format' => ['type' => 'json_object']
+            $raw = $lm->chat($messages, 'gpt-5-mini', null, 25000, [
+                'response_format' => ['type' => 'json_object'],
+                'reasoning_effort' => 'medium',
+                'verbosity' => 'high'
             ]);
             
             Log::info('UserAnalyticsService: Dashboard analytics LLM response', ['raw_length' => strlen($raw), 'raw_preview' => substr($raw, 0, 300)]);
@@ -1528,14 +1792,18 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
                                 'properties' => [
                                     'id' => ['type' => 'string'],
                                     'nom_projet' => ['type' => 'string'],
-                                    'secteur' => ['type' => 'string'],
-                                    'localisation' => ['type' => 'string'],
-                                    'type_synergie' => ['type' => 'string', 'enum' => ['client', 'fournisseur', 'complémentaire', 'stratégique']],
+                                    'raison_sociale' => ['type' => 'string'],
+                                    'secteurs' => ['type' => 'array', 'items' => ['type' => 'string']],
+                                    'region' => ['type' => 'string'],
+                                    'maturite' => ['type' => 'string'],
+                                    'contact_nom' => ['type' => 'string'],
+                                    'contact_email' => ['type' => 'string'],
+                                    'type_synergie' => ['type' => 'string', 'enum' => ['strategique', 'operationnelle', 'commerciale']],
                                     'score_pertinence' => ['type' => 'integer', 'minimum' => 0, 'maximum' => 100],
                                     'proposition_collaboration' => ['type' => 'string'],
-                                    'benefice_mutuel' => ['type' => 'string']
+                                    'synergies_possibles' => ['type' => 'array', 'items' => ['type' => 'string']]
                                 ],
-                                'required' => ['id', 'nom_projet', 'secteur', 'localisation', 'type_synergie', 'score_pertinence', 'proposition_collaboration', 'benefice_mutuel'],
+                                'required' => ['id', 'nom_projet', 'secteurs', 'region', 'contact_nom', 'contact_email', 'type_synergie', 'score_pertinence', 'proposition_collaboration', 'synergies_possibles'],
                                 'additionalProperties' => false
                             ]
                         ],
@@ -1609,9 +1877,7 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
         return UserAnalytics::firstOrCreate(
             ['user_id' => $user->id],
             [
-                'generated_at' => now(),
-                'expires_at' => now()->addDays(30),
-                'metadata' => []
+                'derniere_analyse' => now()
             ]
         );
     }
@@ -2134,5 +2400,111 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             
             return [];
         }
+    }
+
+    /**
+     * Get user project context directly without vectorization
+     */
+    private function getUserProjectContext(User $user): array
+    {
+        try {
+            $projet = Projet::where('user_id', $user->id)->latest()->first();
+            
+            if (!$projet) {
+                return [];
+            }
+
+            return [
+                'project_name' => $projet->nom_projet,
+                'company_name' => $projet->raison_sociale,
+                'description' => $projet->description,
+                'sectors' => $projet->secteurs ?? [],
+                'products_services' => $projet->produits_services ?? [],
+                'targets' => $projet->cibles ?? [],
+                'maturity' => $projet->maturite,
+                'funding_stage' => $projet->stade_financement,
+                'revenue_models' => $projet->modeles_revenus ?? [],
+                'region' => $projet->region,
+                'team_size' => $projet->taille_equipe,
+                'founders_count' => $projet->nombre_fondateurs,
+                'female_founders_count' => $projet->nombre_fondatrices,
+                'founders_age_ranges' => $projet->tranches_age_fondateurs ?? [],
+                'founders_location' => $projet->localisation_fondateurs,
+                'support_structures' => $projet->structures_accompagnement ?? [],
+                'support_types' => $projet->types_soutien ?? [],
+                'additional_needs' => $projet->details_besoins,
+                'formalized' => $projet->formalise,
+                'creation_year' => $projet->annee_creation,
+                'is_public' => $projet->is_public,
+                'contact_phone' => $projet->telephone,
+                'contact_email' => $projet->email,
+                'website' => $projet->site_web,
+                'representative_name' => $projet->nom_representant,
+                'representative_role' => $projet->role_representant,
+                'social_networks' => $projet->reseaux_sociaux ?? []
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to get user project context', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Format project context for LLM prompt
+     */
+    private function formatProjectContextForPrompt(array $projectContext): string
+    {
+        if (empty($projectContext)) {
+            return "Aucune information de projet disponible.";
+        }
+
+        $formattedContext = "INFORMATIONS DU PROJET:\n";
+        
+        if (!empty($projectContext['project_name'])) {
+            $formattedContext .= "- Nom du projet: {$projectContext['project_name']}\n";
+        }
+        
+        if (!empty($projectContext['company_name'])) {
+            $formattedContext .= "- Raison sociale: {$projectContext['company_name']}\n";
+        }
+        
+        if (!empty($projectContext['description'])) {
+            $formattedContext .= "- Description: {$projectContext['description']}\n";
+        }
+        
+        if (!empty($projectContext['sectors'])) {
+            $sectors = is_array($projectContext['sectors']) ? implode(', ', $projectContext['sectors']) : $projectContext['sectors'];
+            $formattedContext .= "- Secteurs d'activité: {$sectors}\n";
+        }
+        
+        if (!empty($projectContext['maturity'])) {
+            $formattedContext .= "- Niveau de maturité: {$projectContext['maturity']}\n";
+        }
+        
+        if (!empty($projectContext['funding_stage'])) {
+            $formattedContext .= "- Stade de financement: {$projectContext['funding_stage']}\n";
+        }
+        
+        if (!empty($projectContext['region'])) {
+            $formattedContext .= "- Région: {$projectContext['region']}\n";
+        }
+        
+        if (!empty($projectContext['team_size'])) {
+            $formattedContext .= "- Taille de l'équipe: {$projectContext['team_size']}\n";
+        }
+        
+        if (isset($projectContext['founders_count']) && isset($projectContext['female_founders_count'])) {
+            $formattedContext .= "- Fondateurs: {$projectContext['founders_count']} total dont {$projectContext['female_founders_count']} femmes\n";
+        }
+        
+        if (!empty($projectContext['support_types'])) {
+            $support = is_array($projectContext['support_types']) ? implode(', ', $projectContext['support_types']) : $projectContext['support_types'];
+            $formattedContext .= "- Types de soutien recherchés: {$support}\n";
+        }
+        
+        return $formattedContext;
     }
 }

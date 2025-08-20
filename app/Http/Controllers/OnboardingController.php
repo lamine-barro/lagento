@@ -3,12 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Projet;
+use App\Services\ContentValidationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Laravel\Facades\Image;
 
 class OnboardingController extends Controller
 {
+    protected ContentValidationService $validator;
+    
+    public function __construct(ContentValidationService $validator)
+    {
+        $this->validator = $validator;
+    }
     public function showStep1()
     {
         $user = Auth::user();
@@ -29,6 +36,15 @@ class OnboardingController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
+
+        // Validation LLM pour détecter les faux contenus
+        $validation = $this->validator->validateOnboardingStep($request->all(), 'step1');
+        
+        if (!$validation['valid']) {
+            return back()
+                ->withErrors(['content_validation' => 'Les informations saisies semblent être des données factices. ' . ($validation['reason'] ?? 'Veuillez fournir des informations réelles sur votre projet.')])
+                ->withInput();
+        }
 
         $user = Auth::user();
         // Récupérer ou créer le projet de l'utilisateur
@@ -94,6 +110,15 @@ class OnboardingController extends Controller
             'reseaux_whatsapp' => 'nullable|url',
         ]);
 
+        // Validation LLM pour détecter les faux contenus
+        $validation = $this->validator->validateOnboardingStep($request->all(), 'step2');
+        
+        if (!$validation['valid']) {
+            return back()
+                ->withErrors(['content_validation' => 'Les informations de contact saisies semblent être des données factices. ' . ($validation['reason'] ?? 'Veuillez fournir des informations de contact réelles.')])
+                ->withInput();
+        }
+
         $user = Auth::user();
         $projet = Projet::where('user_id', $user->id)->latest()->first();
         if (!$projet) {
@@ -144,6 +169,16 @@ class OnboardingController extends Controller
             'modeles_revenus' => 'nullable|array|max:5',
             'revenus' => 'nullable|string',
         ]);
+
+        // Validation LLM pour détecter les faux contenus
+        $validation = $this->validator->validateOnboardingStep($request->all(), 'step3');
+        
+        if (!$validation['valid']) {
+            return back()
+                ->withErrors(['content_validation' => 'Les informations business saisies semblent être des données factices. ' . ($validation['reason'] ?? 'Veuillez fournir des informations réelles sur votre activité.')])
+                ->withInput();
+        }
+
         $user = Auth::user();
         $projet = Projet::where('user_id', $user->id)->latest()->first();
         if (!$projet) {
@@ -193,6 +228,15 @@ class OnboardingController extends Controller
             'additional_info' => 'nullable|string|max:1000'
         ]);
 
+        // Validation LLM pour détecter les faux contenus
+        $validation = $this->validator->validateOnboardingStep($request->all(), 'step4');
+        
+        if (!$validation['valid']) {
+            return back()
+                ->withErrors(['content_validation' => 'Les informations d\'équipe saisies semblent être des données factices. ' . ($validation['reason'] ?? 'Veuillez fournir des informations réelles sur votre équipe.')])
+                ->withInput();
+        }
+
         \Log::info('Step 4 validation passed');
 
         $user = Auth::user();
@@ -219,8 +263,26 @@ class OnboardingController extends Controller
             'redirecting_to' => 'diagnostic'
         ]);
 
+        // Lancer automatiquement le diagnostic après finalisation de l'onboarding
+        try {
+            $diagnosticController = app(\App\Http\Controllers\DiagnosticController::class);
+            $request = new \Illuminate\Http\Request();
+            $diagnosticResult = $diagnosticController->runDiagnostic($request);
+            
+            \Log::info('Auto-diagnostic launched after onboarding completion', [
+                'projet_id' => $projet->id,
+                'user_id' => $user->id
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to auto-launch diagnostic after onboarding', [
+                'projet_id' => $projet->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
         // Si on arrive ici, c'est que step 4 a été soumis avec succès
         // Forcer la finalisation de l'onboarding
-        return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet.');
+        return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet et votre diagnostic sera généré automatiquement.');
     }
 }

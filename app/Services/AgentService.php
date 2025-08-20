@@ -9,17 +9,14 @@ use App\Agents\AgentTitreConversation;
 class AgentService
 {
     private LanguageModelService $llm;
-    private EmbeddingService $embedding;
-    private SemanticSearchService $search;
+    private VoyageVectorService $embedding;
 
     public function __construct(
         LanguageModelService $llm,
-        EmbeddingService $embedding,
-        SemanticSearchService $search
+        VoyageVectorService $embedding
     ) {
         $this->llm = $llm;
         $this->embedding = $embedding;
-        $this->search = $search;
     }
 
     /**
@@ -27,7 +24,7 @@ class AgentService
      */
     public function processMessage(string $message, string $userId, ?string $conversationId = null, ?string $vectorMemoryId = null): array
     {
-        $agent = new AgentPrincipal($this->llm, $this->embedding, $this->search);
+        $agent = new AgentPrincipal($this->llm, $this->embedding);
 
         // Injecter le contexte: 4 derniers messages + résumé de conversation
         $contextMessages = [];

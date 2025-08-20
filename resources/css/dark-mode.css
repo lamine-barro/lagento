@@ -116,9 +116,71 @@
     border-color: var(--border);
 }
 
-/* Danger colors in dark mode */
+/* Alert colors in dark mode */
 [data-theme="dark"] [style*="background: var(--danger-50)"] {
     background: rgba(220, 38, 38, 0.1) !important; /* Rouge très foncé avec transparence */
+}
+
+[data-theme="dark"] [style*="background: var(--warning-50)"] {
+    background: rgba(245, 158, 11, 0.1) !important; /* Orange/jaune très foncé avec transparence */
+}
+
+[data-theme="dark"] [style*="background: var(--success-50)"] {
+    background: rgba(34, 197, 94, 0.1) !important; /* Vert très foncé avec transparence */
+}
+
+[data-theme="dark"] [style*="background: var(--info-50)"] {
+    background: rgba(59, 130, 246, 0.1) !important; /* Bleu très foncé avec transparence */
+}
+
+/* Alert classes dark mode overrides */
+[data-theme="dark"] .alert-success {
+    background-color: rgba(34, 197, 94, 0.1) !important;
+    border-left-color: #22c55e !important;
+    color: #86efac !important;
+}
+
+[data-theme="dark"] .alert-error {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    border-left-color: #ef4444 !important;
+    color: #fca5a5 !important;
+}
+
+[data-theme="dark"] .alert-warning {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    border-left-color: #f59e0b !important;
+    color: #fcd34d !important;
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-left-color: #3b82f6 !important;
+    color: #93c5fd !important;
+}
+
+/* Alert children elements in dark mode */
+[data-theme="dark"] .alert-success *,
+[data-theme="dark"] .alert-error *,
+[data-theme="dark"] .alert-warning *,
+[data-theme="dark"] .alert-info * {
+    color: inherit !important;
+}
+
+/* Alert strong elements */
+[data-theme="dark"] .alert-success strong,
+[data-theme="dark"] .alert-error strong,
+[data-theme="dark"] .alert-warning strong,
+[data-theme="dark"] .alert-info strong {
+    font-weight: 600 !important;
+}
+
+/* Alert icons */
+[data-theme="dark"] .alert-success svg,
+[data-theme="dark"] .alert-error svg,
+[data-theme="dark"] .alert-warning svg,
+[data-theme="dark"] .alert-info svg {
+    color: inherit !important;
+    stroke: currentColor !important;
 }
 
 /* Document cards dark mode */

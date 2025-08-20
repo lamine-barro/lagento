@@ -231,6 +231,43 @@ class VoyageVectorService
     }
 
     /**
+     * Simple embed method for backward compatibility with EmbeddingService
+     */
+    public function embed(array $inputs, string $model = null): array
+    {
+        try {
+            $model = $model ?? $this->model;
+            
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.voyageai.com/v1/embeddings', [
+                'model' => $model,
+                'input' => $inputs,
+                'input_type' => 'document'
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('Voyage API error', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                return [];
+            }
+
+            $data = $response->json();
+            return array_map(fn($row) => $row['embedding'], $data['data'] ?? []);
+            
+        } catch (\Exception $e) {
+            Log::error('VoyageVectorService::embed failed', [
+                'error' => $e->getMessage(),
+                'inputs_count' => count($inputs)
+            ]);
+            return [];
+        }
+    }
+
+    /**
      * Get embedding statistics
      */
     public function getStats(): array

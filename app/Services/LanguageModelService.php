@@ -9,9 +9,9 @@ class LanguageModelService
 {
     public function chat(
         array $messages,
-        string $model = 'gpt-4.1-mini',
+        string $model = 'gpt-5-mini',
         ?float $temperature = null,
-        int $maxTokens = 800,
+        int $maxTokens = 2000,
         array $options = []
     ): string
     {

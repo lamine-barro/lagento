@@ -3,21 +3,20 @@
 namespace App\Agents;
 
 use App\Services\LanguageModelService;
-use App\Services\EmbeddingService;
-use App\Services\SemanticSearchService;
+use App\Services\VoyageVectorService;
 use Illuminate\Support\Facades\Log;
 
 abstract class BaseAgent
 {
     protected LanguageModelService $llm;
-    protected EmbeddingService $embedding;
-    protected SemanticSearchService $search;
+    protected VoyageVectorService $embedding;
+    protected ?object $search;
     protected string $agentName;
 
     public function __construct(
         LanguageModelService $llm,
-        EmbeddingService $embedding,
-        SemanticSearchService $search
+        VoyageVectorService $embedding,
+        ?object $search = null
     ) {
         $this->llm = $llm;
         $this->embedding = $embedding;
@@ -87,7 +86,10 @@ abstract class BaseAgent
 
         $analytics = $user->analytics()->latest()->first();
         
-        return [
+        // Get user project data directly (no more vectorization)
+        $projet = \App\Models\Projet::where('user_id', $userId)->latest()->first();
+        
+        $context = [
             'profile_type' => $user->profile_type,
             'company_name' => $user->company_name,
             'business_sector' => $user->business_sector,
@@ -99,6 +101,34 @@ abstract class BaseAgent
             'opportunities_matched' => $analytics->opportunities_matched ?? 0,
             'last_activity' => $analytics->updated_at ?? null,
         ];
+        
+        // Add project information if available
+        if ($projet) {
+            $context['project'] = [
+                'name' => $projet->nom_projet,
+                'company_name' => $projet->raison_sociale,
+                'description' => $projet->description,
+                'sectors' => $projet->secteurs ?? [],
+                'products_services' => $projet->produits_services ?? [],
+                'targets' => $projet->cibles ?? [],
+                'maturity' => $projet->maturite,
+                'funding_stage' => $projet->stade_financement,
+                'revenue_models' => $projet->modeles_revenus ?? [],
+                'region' => $projet->region,
+                'team_size' => $projet->taille_equipe,
+                'founders_count' => $projet->nombre_fondateurs,
+                'female_founders_count' => $projet->nombre_fondatrices,
+                'founders_age_ranges' => $projet->tranches_age_fondateurs ?? [],
+                'founders_location' => $projet->localisation_fondateurs,
+                'support_structures' => $projet->structures_accompagnement ?? [],
+                'support_types' => $projet->types_soutien ?? [],
+                'additional_needs' => $projet->details_besoins,
+                'formalized' => $projet->formalise,
+                'creation_year' => $projet->annee_creation,
+            ];
+        }
+        
+        return $context;
     }
 
     /**

@@ -35,6 +35,10 @@ class CheckOnboardingComplete
                 // Rediriger vers la première étape incomplète
                 if (!$progress['steps']['step1']) {
                     $redirectRoute = 'onboarding.step1';
+                } elseif (!$progress['steps']['step2']) {
+                    $redirectRoute = 'onboarding.step2';
+                } elseif (!$progress['steps']['step3']) {
+                    $redirectRoute = 'onboarding.step3';
                 } elseif (!$progress['steps']['step4']) {
                     $redirectRoute = 'onboarding.step4';
                 }

@@ -3,16 +3,11 @@
 namespace App\Agents;
 
 use App\Models\User;
-use App\Models\Projet;
-use App\Models\UserAnalytics;
-use App\Models\Opportunite;
+use App\Models\Document;
 use App\Models\Institution;
-use App\Models\TexteOfficiel;
 use App\Services\MemoryManagerService;
-use App\Services\VectorAccessService;
 use App\Services\LanguageModelService;
-use App\Services\EmbeddingService;
-use App\Services\SemanticSearchService;
+use App\Services\VoyageVectorService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -26,27 +21,23 @@ class AgentPrincipal extends BaseAgent
 
     public function __construct(
         ?LanguageModelService $llm = null,
-        ?EmbeddingService $embedding = null,
-        ?SemanticSearchService $search = null
+        ?VoyageVectorService $embedding = null
     ) {
         // Use service container if no dependencies provided
         $llm = $llm ?: app(LanguageModelService::class);
-        $embedding = $embedding ?: app(EmbeddingService::class);
-        $search = $search ?: app(SemanticSearchService::class);
+        $embedding = $embedding ?: app(VoyageVectorService::class);
         
-        parent::__construct($llm, $embedding, $search);
+        parent::__construct($llm, $embedding, null);
         $this->memoryManager = app(MemoryManagerService::class);
     }
 
     protected function getConfig(): array
     {
         return [
-            'model' => 'gpt-4.1-mini',
+            'model' => 'gpt-5-mini',
             'temperature' => 0.3,
-            'max_tokens' => 2500,
+            'max_tokens' => 5000,
             'tools' => [
-                'gestion_base_donnees',
-                'recherche_semantique', 
                 'recherche_vectorielle',
                 'generation_fichier',
                 'generation_image'
@@ -72,14 +63,42 @@ class AgentPrincipal extends BaseAgent
             return $result;
         }
 
+        // Check weekly message rate limit
+        $user = \App\Models\User::find($userId);
+        if (!$user || !$user->canUseFeature('messages')) {
+            $remaining = $user ? $user->getRemainingUsage('messages') : 0;
+            $result = [
+                'success' => false,
+                'error' => "Limite hebdomadaire de messages atteinte (100 par semaine). Il vous reste {$remaining} messages."
+            ];
+            $this->logExecutionEnd($sessionId, $result, $startTime);
+            return $result;
+        }
+
         $this->logDebug('Getting user context', ['user_id' => $userId]);
         
         // Get user context
         $userContext = $this->getUserAnalyticsContext($userId);
         
+        // Get user documents context
+        $userDocuments = $this->getUserDocumentsContext($userId);
+        
+        // Get user institutions context
+        $userInstitutions = $this->getUserInstitutionsContext($userId);
+        
         // Prepare system instructions
         $instructions = $this->getSystemInstructions();
         $systemPrompt = $this->prepareSystemPrompt($instructions, $userContext);
+        
+        // Add user documents to context if available
+        if (!empty($userDocuments)) {
+            $systemPrompt .= "\n\nDOCUMENTS UTILISATEUR :\n" . $userDocuments;
+        }
+        
+        // Add user institutions to context if available
+        if (!empty($userInstitutions)) {
+            $systemPrompt .= "\n\nINSTITUTIONS LOCALES :\n" . $userInstitutions;
+        }
 
         try {
             $this->logDebug('Analyzing message for tools', ['message_length' => strlen($userMessage)]);
@@ -198,6 +217,9 @@ class AgentPrincipal extends BaseAgent
                 ]
             ];
 
+            // Use message count for successful execution
+            $user->useFeature('messages');
+
             $this->logExecutionEnd($sessionId, $result, $startTime);
             return $result;
 
@@ -223,7 +245,7 @@ class AgentPrincipal extends BaseAgent
 
     protected function getSystemInstructions(): string
     {
-        return "Tu es Agent O, l'assistant IA dédié aux entrepreneurs ivoiriens. Tu es disponible 24/7 pour accompagner leur parcours entrepreneurial.
+        return "Tu es l'Agent O, l'assistant IA dédié aux entrepreneurs ivoiriens. Tu es disponible 24/7 pour accompagner leur parcours entrepreneurial.
 
 MISSION :
 - Fournir des conseils personnalisés en entrepreneuriat
@@ -243,7 +265,7 @@ STYLE DE RÉPONSE :
 - Format compact optimisé pour mobile
 - Interlignes serrés, pas d'espaces excessifs
 
-FORMAT DE SORTIE : Markdown propre et compact :
+FORMAT DE SORTIE : Markdown propre et compact en 900 mots maximum:
 
 ÉLÉMENTS DE BASE (seuls autorisés) :
 - Titres : ## (h2), ### (h3) - seulement si nécessaire, collés au contenu
@@ -267,8 +289,6 @@ LIENS ET URLs (OBLIGATOIRE si disponible) :
 - NE JAMAIS inventer d'URLs - utiliser UNIQUEMENT celles retournées par les outils
 
 INTERDICTIONS STRICTES :
-- AUCUNE carte personnalisée (opportunités, institutions, textes officiels)
-- AUCUN composant [carte-*] dans les réponses
 - AUCUN espacement excessif entre éléments
 - AUCUNE sur-structuration
 - AUCUNE URL inventée ou fictive
@@ -285,48 +305,38 @@ CONTEXTE IVOIRIEN :
 - Familiarité avec les institutions (CEPICI, CGECI, etc.)
 - Compréhension des défis spécifiques aux entrepreneurs locaux
 
+DOCUMENTS UTILISATEUR :
+- Tu as accès aux fichiers uploadés par l'utilisateur (nom, résumé, tags, type)
+- Utilise ces informations pour personnaliser tes réponses
+- Référence les documents pertinents quand approprié
+- Ne jamais inventer le contenu des documents
+
+INSTITUTIONS LOCALES :
+- Tu as accès aux institutions d'accompagnement de la région de l'utilisateur
+- Utilise les coordonnées réelles pour faciliter les contacts
+- Oriente vers les services appropriés selon le profil entrepreneurial
+
+
 OUTILS ET QUAND LES UTILISER :
-- gestion_base_donnees : Recherche dans les DONNÉES RÉELLES de la plateforme (max 8 résultats par requête) :
-  * 77 opportunités réelles importées avec secteurs/régions/URLs
-  * Projets utilisateur avec statut public/vérifié uniquement 
-  * Institutions partenaires existantes
-  → IMPORTANT: Utilise UNIQUEMENT les donnees retournees par cet outil, AUCUNE invention
-  → FORMAT OBLIGATOIRE: Pour chaque opportunité/institution avec URL, ajouter [Voir détails](url){target=\"_blank\"}
 
-- recherche_semantique : Recherche dans textes officiels juridiques pour questions OHADA/légales
+- recherche_vectorielle : Recherche dans les mémoires vectorisées (max 8 chunks pertinents) :
   
-- recherche_vectorielle : Accès aux MÉMOIRES VECTORISÉES suivantes (max 8 chunks pertinents total) :
+  **MÉMOIRES DE BASE (TOUJOURS INCLUSES) :**
+  * 'lagento_context' : Corpus principal Agent O avec conseils entrepreneuriaux, textes officiels (Ohada, code du travail, etc.), FAQ, institutions (ministères, incubateurs, accélérateurs, investisseurs, etc.) avec leurs services, la presentation du Président de la Republique Alassane Ouattara, les initiatives gouvernementale pour la jeunesse et les entrepreneurs.
+  * 'user_project' : Projets spécifiques de l'utilisateur uniquement  
+  * 'user_analytics' : Diagnostic personnalisé de l'utilisateur uniquement
   
-  **MÉMOIRES ACCESSIBLES À TOUS UTILISATEURS :**
-  * 'lagento_context' : Corpus vectorisé 173/177 chunks (3.3MB) - Contexte complet Agent O
-    → Conseils entrepreneuriaux, meilleures pratiques, exemples concrets CI
-    → REGLE : Utilise UNIQUEMENT les chunks retournes, AUCUNE extrapolation
-    
-  * 'opportunite' : Opportunités vectorisées (backup des 77 en base)
-    → Recherche sémantique dans descriptions d'opportunités
-    
-  * 'institution' : Institutions d'accompagnement CI vectorisées
-    → Incubateurs, accélérateurs, structures d'appui réelles
-    
-  * 'user_project' : Projet spécifique de CET utilisateur seulement
-    → Analyse personnalisée du projet utilisateur
-    
-  * 'user_analytics' : Diagnostic personnalisé de CET utilisateur
-    → Forces, axes progression, recommandations personnelles
-    
-  **MÉMOIRES DESCRIPTIVES (contexte général) :**
-  * 'presentation' : Documentation Agent O/Horizon-O
-  * 'faq' : Questions fréquentes utilisation
-  * 'timeline_gov' : Actions gouvernementales CI
-
-  **RÈGLES STRICTES RAG :**
-  - Retourne UNIQUEMENT le top 8 des chunks les plus pertinents
-  - AUCUNE invention d'opportunites, institutions ou donnees
-  - Si pas de resultats RAG -> dire 'aucune donnee disponible sur ce sujet'
-  - Citer uniquement les sources trouvees dans les chunks
+  **MÉMOIRES ADDITIONNELLES (selon demande) :**
+  * 'opportunite' : Recherche d'opportunités de financement/subventions (subvention, prêt, concours, hackathon, incubation, accélération, etc.) disponible de Septembre 2025 à Decembre 2025.
+  * 'conversation' : Recherche dans l'historique des conversations (si besoin)
   
-  **PRÉSENTATION DES RÉSULTATS (OBLIGATOIRE) :**
-  Pour CHAQUE opportunité dans gestion_base_donnees->opportunities :
+  **RÈGLES :**
+  - Utilise UNIQUEMENT les chunks retournés par la recherche
+  - Si aucun résultat pertinent -> dire 'aucune donnée disponible'
+  - Cite les sources trouvées dans les résultats
+  
+  **PRÉSENTATION DES OPPORTUNITÉS (OBLIGATOIRE) :**
+  Pour CHAQUE opportunité trouvée :
   1. Regarde le champ 'lien_externe' dans les données
   2. Si lien_externe existe et non vide : **{titre}** - {description}. [Voir détails](https://{lien_externe}){target=\"_blank\"}
   3. Si lien_externe vide ou null : **{titre}** - {description}
@@ -337,9 +347,17 @@ OUTILS ET QUAND LES UTILISER :
   - Données: {\"titre\":\"Programme X\",\"lien_externe\":null}
     → **Programme X** - [Description]
   
-  RÈGLE ABSOLUE : Utilise EXACTEMENT la valeur de lien_externe, ajoute juste https:// devant
-- generation_fichier (docx, csv, txt, md) : quand un document est demande (business plan, CV, rapport, plan, resume). Tu renvoies uniquement le lien de telechargement fourni par l'outil.
-- generation_image : pour logos/visuels/maquettes. Utilise exclusivement gpt-image-1. Tu renvoies uniquement le lien de telechargement fourni par l'outil.
+  **PRÉSENTATION DES INSTITUTIONS (OBLIGATOIRE) :**
+  Pour CHAQUE institution trouvée :
+  1. **{nom}** ({type}) - {description}
+  2. Si site_web existe : [Site web](https://{site_web}){target=\"_blank\"}
+  3. Si telephone existe : Tel: {telephone}
+  4. Région: {region}
+  
+  RÈGLE ABSOLUE : Utilise EXACTEMENT les valeurs des champs, ajoute juste https:// devant les URLs
+  
+- generation_fichier (docx, csv, txt, md) : L'agent décide de générer un document selon le contexte et les besoins utilisateur (ex: business plan, executive summary, rapport, etc.). Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
+- generation_image : L'agent décide de créer des visuels (logos, affiches, schémas, bannières, etc.) selon la demande utilisateur. Utilise exclusivement gpt-image-1. Tu renvoies uniquement le lien de téléchargement fourni par l'outil.
 - web search (integre au modele) : si besoin d'actualites/informations recentes (mots-cles : actualite, recent, 2024, 2025, prix, taux). Le modele l'activera automatiquement.
 
 STYLE :
@@ -351,55 +369,18 @@ STYLE :
 
     protected function analyzeMessageForTools(string $message): array
     {
-        $message = strtolower($message);
-        $tools = [];
-
-        // Recherche sémantique pour questions légales/réglementaires
-        if (preg_match('/(loi|légal|réglementation|ohada|juridique|statut|formalisation)/i', $message)) {
-            $tools[] = 'recherche_semantique';
-        }
-
-        // Recherche vectorielle pour conseils/exemples/recommandations + mots-clés spécifiques
-        if (preg_match('/(conseil|exemple|recommandation|similaire|expérience|comment|aide|inspiration|référence|cas|financement|subvention|bourse|concours|capital|investissement|accompagnement|incubateur|accélérateur|mentor|partenaire|forces|faiblesses|profil|diagnostic)/i', $message)) {
-            $tools[] = 'recherche_vectorielle';
-        }
-
-        // Recherche vectorielle pour les projets/entreprises spécifiques (noms propres, descriptions, analyses)
-        if (preg_match('/(projet|entreprise|startup|etudesk|business|mon projet|ma startup|décris|décrire|présente|analyser|mon entreprise|mon activité)/i', $message)) {
-            $tools[] = 'recherche_vectorielle';
-            // Aussi chercher dans la base de données pour les projets
-            $tools[] = 'gestion_base_donnees';
-        }
-
-        // Base de données pour opportunités/institutions - toujours chercher les opportunités
-        if (preg_match('/(opportunité|financement|subvention|incubateur|partenaire|institution|cherche|trouve|recherche|aide|besoin)/i', $message) || 
-            preg_match('/(opportunites?|chance|possibilite|option)/i', $message)) {
-            $tools[] = 'gestion_base_donnees';
-        }
-
-        // Génération de fichier pour documents/plans
-        if (preg_match('/(document|plan|rapport|cv|business plan|étude)/i', $message)) {
-            $tools[] = 'generation_fichier';
-        }
-
-        // Génération d'image pour logos/visuels
-        if (preg_match('/(logo|image|visuel|design|graphique)/i', $message)) {
-            $tools[] = 'generation_image';
-        }
-
-        return array_unique($tools);
+        // L'agent utilise tous les outils disponibles et laisse le LLM décider
+        return [
+            'recherche_vectorielle',
+            'generation_fichier', 
+            'generation_image'
+        ];
     }
 
     protected function executeTool(string $tool, string $message, string $userId): ?array
     {
         switch ($tool) {
-            case 'gestion_base_donnees':
-                return $this->executeDatabase($message, $userId);
-            
-            case 'recherche_semantique':
-                return $this->executeSemanticSearch($message);
-            
-            case 'recherche_vectorielle':
+case 'recherche_vectorielle':
                 return $this->executeVectorSearch($message, $userId);
             
             case 'generation_fichier':
@@ -413,97 +394,7 @@ STYLE :
         }
     }
 
-    protected function executeDatabase(string $message, string $userId): array
-    {
-        $results = [];
 
-        // Opportunités - recherche améliorée avec filtres multiples
-        $keyword = $this->extractKeywords($message);
-        
-        $opportunitiesQuery = Opportunite::query();
-        
-        // Détecter les requêtes générales sur les opportunités
-        $isGeneralOpportunityQuery = preg_match('/(opportunité|opportunites?|financement|aide|subvention|fond|capital)/i', $message);
-        
-        // Détecter la localisation (Abidjan, régions, etc.)
-        $location = $this->extractLocation($message);
-        if (!empty($location)) {
-            if ($location === 'Abidjan') {
-                // Chercher opportunités disponibles à Abidjan (National ou région Abidjan)
-                $opportunitiesQuery->where(function($query) {
-                    $query->whereJsonContains('regions_cibles', 'National')
-                          ->orWhereJsonContains('regions_cibles', 'Abidjan')
-                          ->orWhere('ville', 'Abidjan');
-                });
-            } else {
-                // Autres régions
-                $opportunitiesQuery->whereJsonContains('regions_cibles', $location);
-            }
-        }
-        
-        // Si c'est une recherche générale d'opportunités sans localisation spécifique, montrer toutes
-        if ($isGeneralOpportunityQuery && empty($location)) {
-            // Pas de filtre supplémentaire, montrer toutes les opportunités
-        }
-        
-        // Recherche par mots-clés spécifiques (autres que "opportunites")
-        if (!empty($keyword) && !preg_match('/(opportunité|opportunites?)/i', $keyword)) {
-            $opportunitiesQuery->where(function($query) use ($keyword) {
-                $query->where('titre', 'like', '%' . $keyword . '%')
-                      ->orWhere('description', 'like', '%' . $keyword . '%')
-                      ->orWhere('type', 'like', '%' . $keyword . '%');
-            });
-        }
-        
-        // Filtrer par secteur si détecté dans le message
-        $secteur = $this->extractSector($message);
-        if (!empty($secteur)) {
-            $opportunitiesQuery->whereJsonContains('secteurs', $secteur);
-        }
-        
-        // Filtrer les opportunités ouvertes en priorité
-        $opportunitiesQuery->orderByRaw("CASE WHEN statut = 'ouvert' THEN 1 WHEN statut = 'en_cours' THEN 2 ELSE 3 END");
-        
-        $opportunities = $opportunitiesQuery->limit(8)->get();
-
-        if ($opportunities->count() > 0) {
-            $results['opportunities'] = $opportunities->toArray();
-        }
-
-        // Institutions (filtre sur nom/description)
-        $institutions = Institution::where('nom', 'like', '%' . $keyword . '%')
-            ->orWhere('description', 'like', '%' . $keyword . '%')
-            ->limit(3)
-            ->get();
-
-        if ($institutions->count() > 0) {
-            $results['institutions'] = $institutions->toArray();
-        }
-
-        // Projets de l'utilisateur visibles (public + vérifiés)
-        $projets = Projet::where('user_id', $userId)
-            ->public()
-            ->verified()
-            ->limit(3)
-            ->get();
-
-        if ($projets->count() > 0) {
-            $results['projets'] = $projets->toArray();
-        }
-
-        return $results;
-    }
-
-    protected function executeSemanticSearch(string $message): array
-    {
-        try {
-            $results = $this->search->searchSimilar($message, 5);
-            return ['semantic_results' => $results];
-        } catch (\Exception $e) {
-            \Log::error('Semantic search error: ' . $e->getMessage());
-            return [];
-        }
-    }
 
     /**
      * Execute vector search across all memories
@@ -516,36 +407,27 @@ STYLE :
                 return ['error' => 'Utilisateur non trouvé'];
             }
 
-            // Use VectorAccessService for access-controlled search
-            $vectorAccessService = app(VectorAccessService::class);
-            
-            // Determine relevant memory types based on message content  
+            // Détermine les types de mémoires pertinents
             $relevantTypes = $this->determineRelevantMemoryTypes($message);
             
-            // Perform access-controlled semantic search
-            $results = $vectorAccessService->searchWithAccess(
-                $message,
-                $user,
-                $relevantTypes,
-                8 // Limit results
+            // Recherche vectorielle via MemoryManagerService
+            $results = $this->memoryManager->searchAcrossMemories(
+                query: $message,
+                memoryTypes: $relevantTypes,
+                limit: 8,
+                userId: $userId // Pour filtrer user_project et user_analytics
             );
-
-            $accessSummary = $vectorAccessService->getAccessSummary($user);
             
-            Log::info('Vector search executed with access control', [
+            Log::info('Vector search executed', [
                 'user_id' => $userId,
-                'access_level' => $accessSummary['access_level'],
-                'requested_types' => $relevantTypes,
-                'accessible_types' => $accessSummary['accessible_types'],
+                'searched_types' => $relevantTypes,
                 'results_count' => count($results),
                 'query_preview' => substr($message, 0, 100)
             ]);
 
             return [
                 'vector_results' => $results,
-                'searched_types' => array_intersect($relevantTypes, $accessSummary['accessible_types']),
-                'access_level' => $accessSummary['access_level'],
-                'total_accessible_chunks' => $accessSummary['total_accessible_chunks']
+                'searched_types' => $relevantTypes
             ];
             
         } catch (\Exception $e) {
@@ -559,57 +441,146 @@ STYLE :
     }
 
     /**
-     * Determine relevant memory types based on message content
+     * Détermine les types de mémoires à rechercher
      */
     private function determineRelevantMemoryTypes(string $message): array
     {
-        $message = strtolower($message);
-        $types = [];
+        // Mémoires de base TOUJOURS incluses + opportunités et conversations
+        // L'agent a accès à tout et laisse le LLM décider de la pertinence
+        return [
+            'lagento_context',  // Corpus principal Agent O
+            'user_project',     // Projets de l'utilisateur uniquement
+            'user_analytics',   // Analytics de l'utilisateur uniquement
+            'opportunite',      // Opportunités de financement
+            'conversation'      // Historique des conversations
+        ];
+    }
 
-        // LAGENTO_CONTEXT : Toujours inclure - corpus principal avec conseils entrepreneuriaux
-        $types[] = 'lagento_context';
+    /**
+     * Récupère le contexte des documents uploadés par l'utilisateur
+     */
+    protected function getUserDocumentsContext(string $userId): string
+    {
+        try {
+            $documents = Document::where('user_id', $userId)
+                ->processed()
+                ->orderBy('created_at', 'desc')
+                ->limit(10) // Limite à 10 documents récents
+                ->get();
 
-        // USER_PROJECT : projets personnels, startup, entreprise spécifique
-        if (preg_match('/(projet|entreprise|startup|business|entrepreneuriat|agrotech|décris|décrire|présente|analyser|mon projet|ma startup|mon entreprise|mon activité)/i', $message)) {
-            $types[] = 'user_project';
-        }
-        
-        // USER_ANALYTICS : profil personnel, diagnostic, forces/faiblesses
-        if (preg_match('/(mes forces|mes faiblesses|mon profil|diagnostic|développement personnel|mes compétences|mon niveau|ma maturité|axes progression)/i', $message)) {
-            $types[] = 'user_analytics';
-        }
-        
-        // Inclure user_analytics aussi pour les questions de projet (souvent liées)
-        if (in_array('user_project', $types)) {
-            $types[] = 'user_analytics';
-        }
+            if ($documents->isEmpty()) {
+                return '';
+            }
 
-        // Pour les questions spécifiques sur l'outil Agent O
-        if (preg_match('/(lagento|agent o|fonctionnalités|comment utiliser|que peux-tu faire|tes capacités|horizon-o)/i', $message)) {
-            // Lagento_context contient déjà ces infos, pas besoin de presentation séparé
-        }
+            $context = "Fichiers uploadés par l'utilisateur :\n";
+            
+            foreach ($documents as $doc) {
+                $context .= "• **{$doc->original_name}** ({$doc->file_extension})\n";
+                
+                if (!empty($doc->ai_summary)) {
+                    $context .= "  Résumé : {$doc->ai_summary}\n";
+                }
+                
+                if (!empty($doc->detected_tags)) {
+                    $context .= "  Tags : " . implode(', ', $doc->detected_tags) . "\n";
+                }
+                
+                if (!empty($doc->ai_metadata) && isset($doc->ai_metadata['document_type'])) {
+                    $context .= "  Type : {$doc->ai_metadata['document_type']}\n";
+                }
+                
+                $context .= "\n";
+            }
 
-        // OHADA/juridique : rechercher dans lagento_context pour conseils sur formalisation
-        if (preg_match('/(loi|réglementation|ohada|juridique|formalisation|procédure|statut)/i', $message)) {
-            // lagento_context déjà inclus
+            return $context;
+            
+        } catch (\Exception $e) {
+            Log::error('Error getting user documents context', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
+            return '';
         }
+    }
 
-        // Questions générales entrepreneuriales : lagento_context déjà inclus
-        
-        // Si aucun type spécifique détecté, utiliser les types disponibles
-        if (count($types) == 1) { // Seulement lagento_context
-            $types = [
-                'lagento_context',
-                'user_project', 
-                'user_analytics'
-            ];
+    /**
+     * Récupère le contexte des institutions locales pertinentes pour l'utilisateur
+     */
+    protected function getUserInstitutionsContext(string $userId): string
+    {
+        try {
+            $user = User::find($userId);
+            if (!$user) return '';
+            
+            // Récupérer la région du projet le plus récent de l'utilisateur
+            $projet = $user->projets()->latest()->first();
+            $userRegion = $projet?->region ?? 'Abidjan';
+            
+            // Rechercher les institutions dans la région ou nationales
+            $institutions = Institution::where(function($query) use ($userRegion) {
+                $query->where('region', $userRegion)
+                      ->orWhere('region', 'National')
+                      ->orWhere('region', 'Toutes régions');
+            })
+            ->orderBy('type')
+            ->limit(8)
+            ->get();
+
+            if ($institutions->isEmpty()) {
+                return '';
+            }
+
+            $context = "Institutions d'accompagnement disponibles :\n";
+            
+            foreach ($institutions as $institution) {
+                $context .= "• **{$institution->nom}** ({$institution->type})\n";
+                
+                if (!empty($institution->description)) {
+                    $context .= "  Description : {$institution->description}\n";
+                }
+                
+                if (!empty($institution->services)) {
+                    $services = is_array($institution->services) 
+                        ? implode(', ', $institution->services)
+                        : $institution->services;
+                    $context .= "  Services : {$services}\n";
+                }
+                
+                if (!empty($institution->telephone)) {
+                    $context .= "  Contact : {$institution->telephone}\n";
+                }
+                
+                if (!empty($institution->site_web)) {
+                    $context .= "  Site web : {$institution->site_web}\n";
+                }
+                
+                $context .= "  Région : {$institution->region}\n\n";
+            }
+
+            return $context;
+            
+        } catch (\Exception $e) {
+            Log::error('Error getting user institutions context', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
+            return '';
         }
-
-        return array_unique($types);
     }
 
     protected function executeFileGeneration(string $message, string $userId): array
     {
+        // Check weekly document generation rate limit
+        $user = \App\Models\User::find($userId);
+        if (!$user || !$user->canUseFeature('documents')) {
+            $remaining = $user ? $user->getRemainingUsage('documents') : 0;
+            return [
+                'file_generation' => [
+                    'status' => 'failed',
+                    'message' => "Limite hebdomadaire de génération de documents atteinte (3 par semaine). Il vous reste {$remaining} documents."
+                ]
+            ];
+        }
         $detected = $this->detectFileType($message);
         $ext = 'md';
         switch (true) {
@@ -667,6 +638,10 @@ STYLE :
             }
 
             $url = asset('storage/' . $path);
+            
+            // Use document generation count
+            $user->useFeature('documents');
+            
             return [
                 'file_generation' => [
                     'type' => $ext,
@@ -688,6 +663,17 @@ STYLE :
 
     protected function executeImageGeneration(string $message, string $userId): array
     {
+        // Check weekly image generation rate limit
+        $user = \App\Models\User::find($userId);
+        if (!$user || !$user->canUseFeature('images')) {
+            $remaining = $user ? $user->getRemainingUsage('images') : 0;
+            return [
+                'image_generation' => [
+                    'status' => 'failed',
+                    'message' => "Limite hebdomadaire de génération d'images atteinte (3 par semaine). Il vous reste {$remaining} images."
+                ]
+            ];
+        }
         $prompt = $this->extractImagePrompt($message);
         try {
             $b64 = $this->llm->generateImage($prompt, '1024x1024');
@@ -705,6 +691,10 @@ STYLE :
             $binary = base64_decode($b64);
             Storage::disk('public')->put($path, $binary);
             $url = asset('storage/' . $path);
+            
+            // Use image generation count
+            $user->useFeature('images');
+            
             return [
                 'image_generation' => [
                     'status' => 'completed',
@@ -723,71 +713,11 @@ STYLE :
         }
     }
 
-    protected function updateUserAnalytics(string $userId, array $toolsUsed): void
-    {
-        $analytics = UserAnalytics::firstOrCreate(['user_id' => $userId]);
-        
-        $analytics->increment('messages_sent');
-        
-        if (in_array('generation_fichier', $toolsUsed)) {
-            $analytics->increment('documents_generated');
-        }
-        
-        if (in_array('gestion_base_donnees', $toolsUsed)) {
-            $analytics->increment('opportunities_matched');
-        }
-
-        $analytics->save();
-    }
 
     // Helper methods
-    protected function extractSector(string $message): string
-    {
-        $sectors = config('constants.SECTEURS');
-        foreach ($sectors as $key => $value) {
-            if (stripos($message, strtolower($value)) !== false) {
-                return $key;
-            }
-        }
-        return '';
-    }
-
-    protected function extractKeywords(string $message): string
-    {
-        $stopWords = ['le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'pour', 'avec', 'sur', 'dans'];
-        $words = str_word_count(strtolower($message), 1, 'àáâãäçèéêëìíîïñòóôõöùúûüý');
-        $keywords = array_diff($words, $stopWords);
-        return implode(' ', array_slice($keywords, 0, 3));
-    }
-
-    protected function extractLocation(string $message): string
-    {
-        $message = strtolower($message);
-        
-        // Vérifier les principales villes/régions de Côte d'Ivoire
-        $locations = [
-            'abidjan' => 'Abidjan',
-            'yamoussoukro' => 'Yamoussoukro', 
-            'bouake' => 'Bouaké',
-            'daloa' => 'Daloa',
-            'korhogo' => 'Korhogo',
-            'san pedro' => 'San Pedro',
-            'man' => 'Man',
-            'bassam' => 'Grand-Bassam',
-            'national' => 'National'
-        ];
-        
-        foreach ($locations as $search => $region) {
-            if (strpos($message, $search) !== false) {
-                return $region;
-            }
-        }
-        
-        return '';
-    }
-
     protected function detectFileType(string $message): string
     {
+        // Détection simplifiée basée sur les mots-clés principaux
         if (preg_match('/business plan/i', $message)) return 'business_plan';
         if (preg_match('/cv|curriculum/i', $message)) return 'cv';
         if (preg_match('/rapport/i', $message)) return 'report';
@@ -796,7 +726,8 @@ STYLE :
 
     protected function extractImagePrompt(string $message): string
     {
-        return 'Logo professionnel pour entreprise ivoirienne moderne et minimaliste';
+        // Retourner le message utilisateur directement pour laisser plus de liberté
+        return $message;
     }
 
     protected function formatMarkdownResponse(string $response, array $toolResults = []): string

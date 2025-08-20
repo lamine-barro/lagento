@@ -3,19 +3,18 @@
 namespace App\Services;
 
 use App\Models\Document;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentAnalysisService
 {
     private PdfExtractionService $pdfService;
-    private string $openaiApiKey;
+    protected LanguageModelService $languageModel;
 
-    public function __construct(PdfExtractionService $pdfService)
+    public function __construct(PdfExtractionService $pdfService, LanguageModelService $languageModel)
     {
         $this->pdfService = $pdfService;
-        $this->openaiApiKey = config('services.openai.api_key') ?? '';
+        $this->languageModel = $languageModel;
     }
 
     /**
@@ -105,38 +104,41 @@ class DocumentAnalysisService
      */
     public function analyzeWithGPT(string $content, string $filename): array
     {
-        // Limiter le contenu à 8000 caractères pour éviter les limites de tokens
-        $truncatedContent = mb_substr($content, 0, 8000);
+        try {
+            // Limiter le contenu à 8000 caractères pour éviter les limites de tokens
+            $truncatedContent = mb_substr($content, 0, 8000);
 
-        $prompt = $this->buildAnalysisPrompt($truncatedContent, $filename);
+            $prompt = $this->buildAnalysisPrompt($truncatedContent, $filename);
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->openaiApiKey,
-            'Content-Type' => 'application/json',
-        ])->post('https://api.openai.com/v1/chat/completions', [
-            'model' => 'gpt-4o-mini', // GPT-4.1-mini
-            'messages' => [
+            $messages = [
                 [
                     'role' => 'system',
-                    'content' => 'Tu es un expert en analyse documentaire pour entrepreneurs ivoiriens. Tu dois analyser des documents officiels et business.'
+                    'content' => 'Tu es un expert en analyse documentaire pour entrepreneurs. Tu dois analyser des documents officiels et business.'
                 ],
                 [
                     'role' => 'user',
                     'content' => $prompt
                 ]
-            ],
-            'max_tokens' => 400, // Limite pour summary + métadonnées
-            'temperature' => 0.3,
-        ]);
+            ];
 
-        if (!$response->successful()) {
-            throw new \Exception('Erreur API OpenAI: ' . $response->body());
+            $analysisText = $this->languageModel->chat(
+                messages: $messages,
+                model: 'gpt-5-mini',
+                maxTokens: 500,
+                options: [
+                    'reasoning_effort' => 'low',
+                    'verbosity' => 'medium'
+                ]
+            );
+
+            return $this->parseGPTResponse($analysisText);
+        } catch (\Exception $e) {
+            Log::error('Document analysis with LLM failed', [
+                'error' => $e->getMessage(),
+                'filename' => $filename
+            ]);
+            throw new \Exception('Erreur analyse LLM: ' . $e->getMessage());
         }
-
-        $aiResponse = $response->json();
-        $analysisText = $aiResponse['choices'][0]['message']['content'];
-
-        return $this->parseGPTResponse($analysisText);
     }
 
     /**
@@ -144,10 +146,10 @@ class DocumentAnalysisService
      */
     private function buildAnalysisPrompt(string $content, string $filename): string
     {
-        return "Analyse ce document entrepreneurial ivoirien et fournis UNIQUEMENT un JSON avec:
+        return "Analyse ce document entrepreneurial et fournis UNIQUEMENT un JSON avec:
 
 1. \"summary\": Résumé en français en 300 mots max
-2. \"tags\": Array des types de documents détectés parmi: [\"RCCM\", \"DFE\", \"Statuts\", \"Pacte_actionnaires\", \"Agrément\", \"Business_plan\", \"Compte_resultat\", \"Bilan\", \"Contrat\", \"Autre\"]
+2. \"tags\": Array des types de documents détectés parmi: [\"RCCM\", \"DFE\", \"Statuts\", \"Pacte_actionnaires\", \"Agrément\", \"Business_plan\", \"Compte_resultat\", \"Bilan\", \"Contrat\", \"Facture\", \"Devis\", \"Attestation\", \"Certificat\", \"Rapport\", \"Autre\"]
 3. \"metadata\": Object avec {\"document_type\": \"type principal\", \"confidence\": score 0-1, \"key_info\": \"infos clés extraites\"}
 
 Document: {$filename}

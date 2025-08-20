@@ -42,8 +42,7 @@ class AgentSuggestionsConversation extends BaseAgent
             // Get user context for personalization
             $userContext = $this->getUserAnalyticsContext($userId);
             
-            // Get user's vectorized data for personalized suggestions
-            $vectorContext = $this->getUserVectorContext($userId);
+            // User project data is now included directly in userContext from BaseAgent
             
             $this->logDebug('Building suggestions prompt', [
                 'previous_page' => $previousPage,
@@ -56,12 +55,11 @@ class AgentSuggestionsConversation extends BaseAgent
             $systemPrompt = $this->prepareSystemPrompt($instructions, [
                 'previous_page' => $previousPage,
                 'active_page' => $activePage,
-                'user_context' => $userContext,
-                'vector_context' => $vectorContext
+                'user_context' => $userContext
             ]);
 
             // Generate suggestions prompt
-            $userMessage = $this->buildSuggestionsPrompt($previousPage, $activePage, $userContext, $vectorContext);
+            $userMessage = $this->buildSuggestionsPrompt($previousPage, $activePage, $userContext);
 
             // Generate response using nano model for speed
             $config = $this->getConfig();
@@ -136,14 +134,15 @@ Générer 5 questions BUSINESS PRATIQUES que l'entrepreneur va poser à Agent O.
 CONTRAINTES :
 - Chaque question : MAXIMUM 12 mots
 - Questions directes, business-oriented
-- Variées : canvas, cible, vente, financement, légal, growth
 - Contexte Côte d'Ivoire quand pertinent
 
 FORMAT DE SORTIE :
 5 questions exactement, une par ligne, sans numérotation.
 
 EXEMPLES OBLIGATOIRES À VARIER :
-- \"Donne-moi mon business lean canvas\"
+- \"Génère mon business plan synthétique\"
+- \"Crée un logo pour mon entreprise\"
+- \"Quelles initiatives culturelles ivoiriennes disponibles ?\" 
 - \"Qui est ma cible idéale ?\"
 - \"Comment obtenir un RDV avec un corporate ?\"
 - \"Quel montage juridique OHADA pour ma SAS ?\"
@@ -161,7 +160,7 @@ STYLE OBLIGATOIRE :
 - Mix stratégique/opérationnel/financier";
     }
 
-    protected function buildSuggestionsPrompt(string $previousPage, string $activePage, array $userContext, array $vectorContext = []): string
+    protected function buildSuggestionsPrompt(string $previousPage, string $activePage, array $userContext): string
     {
         $prompt = "Génère 5 questions business concrètes.\n\n";
         
@@ -189,11 +188,11 @@ STYLE OBLIGATOIRE :
         // Page context for relevance
         $prompt .= $this->getPageSpecificContext($activePage);
         
-        // Analytics insights if available
-        if (!empty($vectorContext['analytics'])) {
-            $analytics = $vectorContext['analytics'];
-            if (!empty($analytics['besoins'])) {
-                $topNeeds = array_slice($analytics['besoins'], 0, 2);
+        // Project insights if available
+        if (!empty($userContext['project'])) {
+            $project = $userContext['project'];
+            if (!empty($project['support_types'])) {
+                $topNeeds = array_slice($project['support_types'], 0, 2);
                 $prompt .= "Besoins identifiés: " . implode(', ', $topNeeds) . "\n";
             }
         }
@@ -332,73 +331,4 @@ STYLE OBLIGATOIRE :
         return $fallbacks;
     }
 
-    /**
-     * Get vectorized context for user (projects and analytics)
-     */
-    protected function getUserVectorContext(string $userId): array
-    {
-        try {
-            $user = User::find($userId);
-            if (!$user) {
-                return [];
-            }
-
-            $vectorAccessService = app(VectorAccessService::class);
-            
-            // Search for user's project and analytics data
-            $results = $vectorAccessService->searchWithAccess(
-                'projet entreprise diagnostic profil', // Generic query to get user data
-                $user,
-                ['user_project', 'user_analytics'],
-                10 // Get more context
-            );
-
-            $context = [
-                'projects' => [],
-                'analytics' => []
-            ];
-
-            foreach ($results as $result) {
-                if ($result['memory_type'] === 'user_project') {
-                    // Extract project name from content
-                    if (preg_match('/Nom:\s*([^\n]+)/', $result['content'], $matches)) {
-                        $context['projects'][] = [
-                            'name' => trim($matches[1]),
-                            'content' => $result['content']
-                        ];
-                    }
-                } elseif ($result['memory_type'] === 'user_analytics') {
-                    // Extract analytics insights from content
-                    $analytics = [];
-                    
-                    if (preg_match('/Niveau global:\s*([^\n]+)/', $result['content'], $matches)) {
-                        $analytics['niveau_maturite'] = trim($matches[1]);
-                    }
-                    
-                    if (preg_match('/Forces:\s*([^\n]+)/', $result['content'], $matches)) {
-                        $analytics['forces'] = array_map('trim', explode(',', $matches[1]));
-                    }
-                    
-                    if (preg_match('/Besoins\s+[^\n]*:\s*([^\n]+)/', $result['content'], $matches)) {
-                        $analytics['besoins'] = array_map('trim', explode(',', $matches[1]));
-                    }
-                    
-                    if (preg_match('/Axes progression:\s*([^\n]+)/', $result['content'], $matches)) {
-                        $analytics['axes_progression'] = array_map('trim', explode(',', $matches[1]));
-                    }
-                    
-                    $context['analytics'] = array_merge($context['analytics'], $analytics);
-                }
-            }
-
-            return $context;
-
-        } catch (\Exception $e) {
-            \Log::error('Error getting user vector context', [
-                'user_id' => $userId,
-                'error' => $e->getMessage()
-            ]);
-            return [];
-        }
-    }
 }

@@ -29,9 +29,12 @@ return new class extends Migration
             // Profile settings
             $table->boolean('is_public')->default(true);
             $table->boolean('email_notifications')->default(true);
-            // Diagnostic usage tracking
-            $table->integer('diagnostics_used_this_month')->default(0);
-            $table->date('diagnostics_month_reset')->nullable();
+            // Weekly rate limits
+            $table->integer('diagnostics_used_this_week')->default(0);
+            $table->integer('messages_used_this_week')->default(0);
+            $table->integer('images_used_this_week')->default(0);
+            $table->integer('documents_used_this_week')->default(0);
+            $table->date('rate_limits_week_start')->nullable();
             $table->timestamp('last_diagnostic_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

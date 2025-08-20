@@ -20,19 +20,8 @@ class ProjetObserver
      */
     public function saved(Projet $projet): void
     {
-        try {
-            if ($projet->id) {
-                $this->memoryManager->indexMemory('user_project', $projet);
-                Log::info('Project automatically indexed after save', ['id' => $projet->id]);
-            } else {
-                Log::warning('Cannot index project: ID not available', ['projet' => $projet->toArray()]);
-            }
-        } catch (\Exception $e) {
-            Log::error('Failed to index project after save', [
-                'id' => $projet->id,
-                'error' => $e->getMessage()
-            ]);
-        }
+        // Auto-indexation disabled - project data will be used directly in context
+        // instead of being vectorized
     }
 
 

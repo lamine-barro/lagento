@@ -43,7 +43,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(DocumentAnalysisService::class, function ($app) {
             return new DocumentAnalysisService(
-                $app->make(PdfExtractionService::class)
+                $app->make(PdfExtractionService::class),
+                $app->make(\App\Services\LanguageModelService::class)
             );
         });
     }

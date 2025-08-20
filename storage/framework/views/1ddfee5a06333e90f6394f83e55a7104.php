@@ -29,6 +29,24 @@
         <form id="step1-form" method="POST" action="<?php echo e(route('onboarding.step1.process')); ?>" enctype="multipart/form-data" class="space-y-6 mt-4">
             <?php echo csrf_field(); ?>
 
+            <!-- Alerte de validation LLM -->
+            <?php $__errorArgs = ['content_validation'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="alert alert-error">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    <div>
+                        <strong>Validation échouée</strong>
+                        <p><?php echo e($message); ?></p>
+                    </div>
+                </div>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+
             <!-- Identité & Contact -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

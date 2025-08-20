@@ -12,6 +12,17 @@
         <form id="step4-form" method="POST" action="{{ route('onboarding.step4.process') }}" class="space-y-6 mt-4">
             @csrf
 
+            <!-- Alerte de validation LLM -->
+            @error('content_validation')
+                <div class="alert alert-error">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    <div>
+                        <strong>Validation échouée</strong>
+                        <p>{{ $message }}</p>
+                    </div>
+                </div>
+            @enderror
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ founders: {{ old('founders_count', $projet->nombre_fondateurs ?? 1) }}, female: {{ old('female_founders_count', $projet->nombre_fondatrices ?? 0) }}, decFounders() { if (this.founders > 1) { this.founders--; if (this.female > this.founders) this.female = this.founders; } }, incFounders() { this.founders++; }, decFemale() { if (this.female > 0) this.female--; }, incFemale() { if (this.female < this.founders) this.female++; } }" x-init="if (female > founders) female = founders">
                 <!-- Nombre de fondateurs -->
                 <div>
