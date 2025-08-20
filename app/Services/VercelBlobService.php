@@ -66,12 +66,12 @@ class VercelBlobService
             }
         }
 
-        // Use PUT request with correct Vercel Blob API
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->token,
-            'Content-Type' => $mimeType,
-            'x-vercel-filename' => basename($filename),
-        ])->put($this->baseUrl . '/' . $filename, $content);
+        // Use PUT request with raw binary data for Vercel Blob API
+        $response = Http::withBody($content, $mimeType)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'x-vercel-filename' => basename($filename),
+            ])->put($this->baseUrl . '/' . $filename);
 
         if ($response->successful()) {
             return $response->json();
