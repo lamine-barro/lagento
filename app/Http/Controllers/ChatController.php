@@ -152,7 +152,6 @@ class ChatController extends Controller
             'role' => 'user',
             'text_content' => $userMessageContent,
             'attachments' => $attachmentData ? [$attachmentData] : null,
-            'vector_memory_id' => $vectorMemoryId
         ]);
         
         // Update conversation
@@ -169,7 +168,6 @@ class ChatController extends Controller
             'success' => true,
             'user_message_id' => $userMessage->id,
             'conversation_id' => $conversation->id,
-            'vector_memory_id' => $vectorMemoryId,
             'attachment' => $attachmentData,
             'message' => [
                 'id' => $userMessage->id,
@@ -223,13 +221,11 @@ class ChatController extends Controller
         $request->validate([
             'message' => 'nullable|string|max:5000',
             'conversation_id' => 'required|string',
-            'vector_memory_id' => 'nullable|string',
             'stream' => 'nullable|string'
         ]);
 
         $user = Auth::user();
         $conversationId = $request->get('conversation_id');
-        $vectorMemoryId = $request->get('vector_memory_id');
         $useStream = $request->get('stream') === 'true' || $request->get('stream') === true;
         
         // Get conversation

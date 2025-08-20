@@ -22,7 +22,6 @@ class UserMessage extends Model
         'markdown_content',
         'attachments',
         'executed_tools',
-        'vector_memory_id',
         'tokens_used',
         'is_retried',
         'is_copied',
@@ -52,10 +51,6 @@ class UserMessage extends Model
         return $this->belongsTo(UserConversation::class, 'conversation_id');
     }
     
-    public function vectorMemory(): BelongsTo
-    {
-        return $this->belongsTo(VectorMemory::class, 'vector_memory_id');
-    }
 
     // Accessor and Mutator for content alias
     public function getContentAttribute(): ?string
