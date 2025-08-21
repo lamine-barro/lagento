@@ -1615,12 +1615,12 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
                 'type' => 'data_enhancement',
                 'priority' => 'medium',
                 'urgency' => 'this_month',
-                'title' => 'Analyses business personnalisées',
-                'description' => 'Uploadez votre business plan pour un diagnostic approfondi et recommandations sectorielles.',
-                'action' => 'upload_business_documents',
-                'estimated_time' => '3-5 minutes',
-                'impact_score' => 90,
-                'next_step' => 'Accéder aux documents'
+                'title' => 'Consulter l\'agent IA',
+                'description' => 'Posez vos questions à l\'agent pour obtenir des conseils personnalisés et recommandations sectorielles.',
+                'action' => 'consult_ai_agent',
+                'estimated_time' => '2-3 minutes',
+                'impact_score' => 85,
+                'next_step' => 'Accéder au chat'
             ];
         }
 

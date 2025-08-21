@@ -107,14 +107,14 @@ Route::middleware(['auth'])->group(function () {
             return view('conversations.index', compact('conversations'));
         })->name('conversations.index');
         
-        // Documents
-        Route::prefix('documents')->group(function () {
-            Route::get('/', [DocumentController::class, 'index'])->name('documents.index');
-            Route::post('/upload', [DocumentController::class, 'upload'])->name('documents.upload');
-            Route::get('/view/{filename}', [DocumentController::class, 'view'])->name('documents.view')->where('filename', '.*');
-            Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download')->where('filename', '.*');
-            Route::delete('/delete/{filename}', [DocumentController::class, 'delete'])->name('documents.delete')->where('filename', '.*');
-        });
+        // Documents - DÉSACTIVÉ
+        // Route::prefix('documents')->group(function () {
+        //     Route::get('/', [DocumentController::class, 'index'])->name('documents.index');
+        //     Route::post('/upload', [DocumentController::class, 'upload'])->name('documents.upload');
+        //     Route::get('/view/{filename}', [DocumentController::class, 'view'])->name('documents.view')->where('filename', '.*');
+        //     Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download')->where('filename', '.*');
+        //     Route::delete('/delete/{filename}', [DocumentController::class, 'delete'])->name('documents.delete')->where('filename', '.*');
+        // });
         
         // Email change with OTP verification
         Route::post('/email-change/send-otp', [DiagnosticController::class, 'sendEmailChangeOtp'])->name('email-change.send-otp');

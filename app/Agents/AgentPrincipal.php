@@ -3,7 +3,6 @@
 namespace App\Agents;
 
 use App\Models\User;
-use App\Models\Document;
 use App\Services\LanguageModelService;
 use App\Services\OpenAIVectorService;
 use App\Services\SmartToolRouter;
@@ -122,7 +121,6 @@ class AgentPrincipal extends BaseAgent
         
         // Lazy load context based on route
         $userContext = [];
-        $userDocuments = '';
         
         if (in_array('user_profile', $route['context_needed'] ?? [])) {
             $this->logDebug('Loading user context', ['user_id' => $userId]);
@@ -133,19 +131,11 @@ class AgentPrincipal extends BaseAgent
             }
         }
         
-        if (in_array('full_context', $route['context_needed'] ?? []) || $route['type'] === 'user_context') {
-            $this->logDebug('Loading documents context', ['user_id' => $userId]);
-            $userDocuments = $this->getUserDocumentsContext($userId);
-        }
         
         // Prepare system instructions
         $instructions = $this->getSystemInstructions();
         $systemPrompt = $this->prepareSystemPrompt($instructions, $userContext);
         
-        // Add user documents to context if available
-        if (!empty($userDocuments)) {
-            $systemPrompt .= "\n\nDOCUMENTS UTILISATEUR :\n" . $userDocuments;
-        }
 
         try {
             // Use smart router for tool selection
@@ -372,12 +362,6 @@ CONTEXTE IVOIRIEN :
 - Maîtrise des lois OHADA et réglementations locales
 - Familiarité avec les institutions (CEPICI, CGECI, etc.)
 - Compréhension des défis spécifiques aux entrepreneurs locaux
-
-DOCUMENTS UTILISATEUR :
-- Tu as accès aux fichiers uploadés par l'utilisateur (nom, résumé, tags, type)
-- Utilise ces informations pour personnaliser tes réponses
-- Référence les documents pertinents quand approprié
-- Ne jamais inventer le contenu des documents
 
 INSTITUTIONS LOCALES :
 - Tu as accès aux institutions d'accompagnement de la région de l'utilisateur
@@ -709,52 +693,6 @@ case 'recherche_vectorielle':
         ];
     }
 
-    /**
-     * Récupère le contexte des documents uploadés par l'utilisateur
-     */
-    protected function getUserDocumentsContext(string $userId): string
-    {
-        try {
-            $documents = Document::where('user_id', $userId)
-                ->processed()
-                ->orderBy('created_at', 'desc')
-                ->limit(10) // Limite à 10 documents récents
-                ->get();
-
-            if ($documents->isEmpty()) {
-                return '';
-            }
-
-            $context = "Fichiers uploadés par l'utilisateur :\n";
-            
-            foreach ($documents as $doc) {
-                $context .= "• **{$doc->original_name}** ({$doc->file_extension})\n";
-                
-                if (!empty($doc->ai_summary)) {
-                    $context .= "  Résumé : {$doc->ai_summary}\n";
-                }
-                
-                if (!empty($doc->detected_tags)) {
-                    $context .= "  Tags : " . implode(', ', $doc->detected_tags) . "\n";
-                }
-                
-                if (!empty($doc->ai_metadata) && isset($doc->ai_metadata['document_type'])) {
-                    $context .= "  Type : {$doc->ai_metadata['document_type']}\n";
-                }
-                
-                $context .= "\n";
-            }
-
-            return $context;
-            
-        } catch (\Exception $e) {
-            Log::error('Error getting user documents context', [
-                'user_id' => $userId,
-                'error' => $e->getMessage()
-            ]);
-            return '';
-        }
-    }
 
 
     protected function executeFileGeneration(string $message, string $userId): array
