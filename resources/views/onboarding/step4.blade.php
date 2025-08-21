@@ -12,14 +12,6 @@
         <form id="step4-form" method="POST" action="{{ route('onboarding.step4.process') }}" class="space-y-6 mt-4">
             @csrf
 
-            <!-- Debug des erreurs -->
-            @if(config('app.debug'))
-                <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
-                    Debug: Errors count = {{ $errors->count() }}<br>
-                    All errors: {{ json_encode($errors->all()) }}<br>
-                    Session errors: {{ json_encode(session()->get('errors')) }}
-                </div>
-            @endif
 
             <!-- Alertes d'erreurs -->
             @if ($errors->any())
