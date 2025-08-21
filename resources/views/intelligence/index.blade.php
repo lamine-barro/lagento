@@ -141,15 +141,6 @@
         <div>
             <!-- En-tête avec contrôles -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                    <h2 class="text-lg font-semibold" style="color: var(--gray-900);">
-                        <span x-text="projets.total"></span> projets trouvés
-                    </h2>
-                    <p class="text-sm" style="color: var(--gray-600);">
-                        Projets avec onboarding terminé uniquement
-                    </p>
-                </div>
-
                 <!-- Tri -->
                 <div class="flex items-center gap-2">
                     <label class="text-sm" style="color: var(--gray-700);">Trier par :</label>
