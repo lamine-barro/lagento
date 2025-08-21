@@ -117,10 +117,25 @@
                 </div>
             </div>
 
-            <!-- Détails des besoins -->
+            <!-- Votre mot au président -->
             <div>
-                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Détails des besoins</label>
-                <textarea name="additional_info" rows="4" class="input-field w-full resize-none" placeholder="Décrivez vos besoins prioritaires..." maxlength="800">{{ old('additional_info', $projet->details_besoins ?? '') }}</textarea>
+                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">
+                    Votre mot au président 
+                    <span class="text-xs font-normal" style="color: var(--gray-500);">(100 mots max, optionnel)</span>
+                </label>
+                <div x-data="{ count: {{ strlen(old('additional_info', $projet->mot_president ?? '')) }} }">
+                    <textarea 
+                        name="additional_info" 
+                        rows="4" 
+                        class="input-field w-full resize-none" 
+                        placeholder="Un message pour le président de la République..." 
+                        maxlength="100"
+                        x-on:input="count = $event.target.value.length"
+                    >{{ old('additional_info', $projet->mot_president ?? '') }}</textarea>
+                    <div class="text-xs mt-1" style="color: var(--gray-500);">
+                        <span x-text="count + '/100 caractères'"></span>
+                    </div>
+                </div>
             </div>
 
             <!-- Bouton dans le formulaire -->

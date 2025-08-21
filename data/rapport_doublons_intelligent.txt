@@ -1,0 +1,68 @@
+
+=== RAPPORT INTELLIGENT DÉTECTION DOUBLONS ===
+Date: 2025-08-21 20:51:33
+Fichier analysé: Opportunites_Nettoyees_Finales.csv
+
+📊 RÉSUMÉ EXÉCUTIF:
+- Doublons exacts: 0
+- Doublons institutionnels: 0
+- Paires similaires (seuil 0.8): 0
+- Variations de programmes: 10
+- Variations d'institutions: 13
+- Incohérences détectées: 17
+
+🔍 DÉTAIL DES ANALYSES:
+
+1. DOUBLONS EXACTS:
+   Status: ✅ Aucun
+   Action: Aucune action requise
+
+2. DOUBLONS INSTITUTIONNELS:
+   Status: ✅ Aucun
+   Action: Aucune action requise
+
+3. SIMILARITÉ SÉMANTIQUE:
+   Status: ✅ Pas de similarité excessive
+   Action: Aucune action requise
+
+4. VARIATIONS DE PROGRAMMES:
+   Status: ℹ️ Variations détectées
+   Action: Standardisation possible
+
+5. VARIATIONS D'INSTITUTIONS:
+   Status: ℹ️ Variations détectées
+   Action: Consolidation recommandée
+
+6. INCOHÉRENCES CROISÉES:
+   Status: ⚠️ Incohérences détectées
+   Action: Correction recommandée
+
+🎯 RECOMMANDATIONS:
+
+PRIORITÉ ÉLEVÉE:
+- Aucune action critique
+- Structure satisfaisante
+
+PRIORITÉ MOYENNE:
+- Clarté satisfaisante
+- Corriger les incohérences de types et URLs
+
+PRIORITÉ FAIBLE:
+- Standardiser les noms de programmes similaires
+- Unifier les variations de noms d institutions
+
+📈 SCORE DE QUALITÉ:
+Score: 56/100
+Statut: ❌ AMÉLIORATIONS REQUISES - Nettoyage nécessaire
+
+🔧 ACTIONS AUTOMATISABLES:
+- Script de suppression des doublons exacts
+- Consolidation automatique par règles de similarité
+- Standardisation des noms par mappings
+- Validation croisée des URLs et contacts
+
+💡 VALIDATION MANUELLE RECOMMANDÉE:
+- Révision des paires à similarité élevée
+- Vérification des variations d'institutions
+- Validation de la cohérence sectorielle
+        

@@ -274,7 +274,7 @@ class OnboardingController extends Controller
             'localisation_fondateurs' => $request->founders_location ? strtolower($request->founders_location) : null,
             'structures_accompagnement' => $request->support_structures ?: [],
             'types_soutien' => $request->support_types ?: [],
-            'details_besoins' => $request->additional_info,
+            'mot_president' => $request->additional_info,
         ]);
 
         // Rafraîchir le modèle pour être sûr d'avoir les dernières données

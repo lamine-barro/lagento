@@ -17,167 +17,128 @@
         <p class="text-secondary">Découvrez les projets entrepreneuriaux avec profils complets</p>
     </div>
 
-    <!-- Layout principal -->
-    <div class="grid lg:grid-cols-4 gap-6">
-        <!-- Bloc de filtres (gauche) -->
-        <div class="lg:col-span-1">
-            <div class="card sticky top-4">
-                <div class="card-header">
-                    <h3 class="card-title flex items-center gap-2">
-                        <i data-lucide="filter" class="w-5 h-5 text-orange"></i>
-                        Filtres
-                    </h3>
+    <!-- Bloc de filtres optimisé -->
+    <div class="mb-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title flex items-center gap-2">
+                    <i data-lucide="filter" class="w-5 h-5 text-orange"></i>
+                    Filtres
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Recherche -->
+                <div class="mb-4">
+                    <input 
+                        type="text" 
+                        x-model="filters.recherche"
+                        @input.debounce.500ms="applyFilters()"
+                        placeholder="Rechercher un projet..."
+                        class="w-full px-3 py-2 border rounded-md text-sm"
+                        style="border-color: var(--gray-300); background: var(--white);"
+                    >
                 </div>
-                <div class="card-body space-y-6">
-                    <!-- Recherche -->
+
+                <!-- Dropdowns alignés -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <!-- Formalisation -->
                     <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Recherche</label>
-                        <input 
-                            type="text" 
-                            x-model="filters.recherche"
-                            @input.debounce.500ms="applyFilters()"
-                            placeholder="Nom du projet, description..."
+                        <select 
+                            x-model="filters.formalise"
+                            @change="applyFilters()"
                             class="w-full px-3 py-2 border rounded-md text-sm"
                             style="border-color: var(--gray-300); background: var(--white);"
                         >
-                    </div>
-
-                    <!-- Formalisation -->
-                    <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Formalisation</label>
-                        <div class="space-y-2">
+                            <option value="">Formalisation</option>
                             @foreach(['oui' => 'Formalisé', 'non' => 'Non formalisé'] as $key => $label)
-                            <label class="flex items-center gap-2 cursor-pointer text-sm">
-                                <input 
-                                    type="radio" 
-                                    name="formalise" 
-                                    value="{{ $key }}"
-                                    x-model="filters.formalise"
-                                    @change="applyFilters()"
-                                    class="text-orange"
-                                >
-                                <span>{{ $label }}</span>
-                                <span class="ml-auto px-2 py-0.5 text-xs rounded" 
-                                      style="background: var(--gray-100); color: var(--gray-600);">
-                                    {{ $filters['formalise'][$key] ?? 0 }}
-                                </span>
-                            </label>
+                            <option value="{{ $key }}">{{ $label }} ({{ $filters['formalise'][$key] ?? 0 }})</option>
                             @endforeach
-                        </div>
+                        </select>
                     </div>
 
-                    <!-- Régions -->
+                    <!-- Région -->
                     <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Région</label>
-                        <div class="max-h-48 overflow-y-auto space-y-1">
+                        <select 
+                            x-model="filters.region"
+                            @change="applyFilters()"
+                            class="w-full px-3 py-2 border rounded-md text-sm"
+                            style="border-color: var(--gray-300); background: var(--white);"
+                        >
+                            <option value="">Région</option>
                             @foreach(App\Constants\BusinessConstants::REGIONS as $regionKey => $coords)
-                            <label class="flex items-center gap-2 cursor-pointer text-sm">
-                                <input 
-                                    type="radio" 
-                                    name="region" 
-                                    value="{{ $regionKey }}"
-                                    x-model="filters.region"
-                                    @change="applyFilters()"
-                                    class="text-orange"
-                                >
-                                <span class="flex-1">{{ $regionKey }}</span>
-                                <span class="px-2 py-0.5 text-xs rounded" 
-                                      style="background: var(--gray-100); color: var(--gray-600);">
-                                    {{ $filters['regions'][$regionKey] ?? 0 }}
-                                </span>
-                            </label>
+                            <option value="{{ $regionKey }}">{{ $regionKey }} ({{ $filters['regions'][$regionKey] ?? 0 }})</option>
                             @endforeach
-                        </div>
+                        </select>
                     </div>
 
-                    <!-- Secteurs -->
+                    <!-- Secteur -->
                     <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Secteur</label>
-                        <div class="max-h-48 overflow-y-auto space-y-1">
+                        <select 
+                            x-model="filters.secteur"
+                            @change="applyFilters()"
+                            class="w-full px-3 py-2 border rounded-md text-sm"
+                            style="border-color: var(--gray-300); background: var(--white);"
+                        >
+                            <option value="">Secteur</option>
                             @foreach(App\Constants\BusinessConstants::SECTEURS as $secteurKey => $secteurLabel)
-                            <label class="flex items-center gap-2 cursor-pointer text-sm">
-                                <input 
-                                    type="radio" 
-                                    name="secteur" 
-                                    value="{{ $secteurKey }}"
-                                    x-model="filters.secteur"
-                                    @change="applyFilters()"
-                                    class="text-orange"
-                                >
-                                <span class="flex-1">{{ $secteurLabel }}</span>
-                                <span class="px-2 py-0.5 text-xs rounded" 
-                                      style="background: var(--gray-100); color: var(--gray-600);">
-                                    {{ $filters['secteurs'][$secteurKey] ?? 0 }}
-                                </span>
-                            </label>
+                            <option value="{{ $secteurKey }}">{{ $secteurLabel }} ({{ $filters['secteurs'][$secteurKey] ?? 0 }})</option>
                             @endforeach
-                        </div>
+                        </select>
                     </div>
+                </div>
 
+                <!-- Filtres additionnels -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Maturité -->
                     <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Maturité</label>
-                        <div class="space-y-2">
+                        <select 
+                            x-model="filters.maturite"
+                            @change="applyFilters()"
+                            class="w-full px-3 py-2 border rounded-md text-sm"
+                            style="border-color: var(--gray-300); background: var(--white);"
+                        >
+                            <option value="">Maturité</option>
                             @foreach(App\Constants\BusinessConstants::STADES_MATURITE as $maturiteKey => $maturiteLabel)
-                            <label class="flex items-center gap-2 cursor-pointer text-sm">
-                                <input 
-                                    type="radio" 
-                                    name="maturite" 
-                                    value="{{ $maturiteKey }}"
-                                    x-model="filters.maturite"
-                                    @change="applyFilters()"
-                                    class="text-orange"
-                                >
-                                <span class="flex-1">{{ $maturiteLabel }}</span>
-                                <span class="px-2 py-0.5 text-xs rounded" 
-                                      style="background: var(--gray-100); color: var(--gray-600);">
-                                    {{ $filters['maturite'][$maturiteKey] ?? 0 }}
-                                </span>
-                            </label>
+                            <option value="{{ $maturiteKey }}">{{ $maturiteLabel }} ({{ $filters['maturite'][$maturiteKey] ?? 0 }})</option>
                             @endforeach
-                        </div>
+                        </select>
                     </div>
 
                     <!-- Localisation des fondateurs -->
                     <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--gray-700);">Localisation des fondateurs</label>
-                        <div class="space-y-2">
-                            @foreach(App\Constants\BusinessConstants::LOCALISATION_FONDATEURS as $locKey => $locLabel)
-                            <label class="flex items-center gap-2 cursor-pointer text-sm">
-                                <input 
-                                    type="radio" 
-                                    name="localisation_fondateurs" 
-                                    value="{{ $locKey }}"
-                                    x-model="filters.localisation_fondateurs"
-                                    @change="applyFilters()"
-                                    class="text-orange"
-                                >
-                                <span class="flex-1">{{ $locLabel }}</span>
-                                <span class="px-2 py-0.5 text-xs rounded" 
-                                      style="background: var(--gray-100); color: var(--gray-600);">
-                                    {{ $filters['localisation_fondateurs'][$locKey] ?? 0 }}
-                                </span>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Reset filtres -->
-                    <div class="pt-4 border-t" style="border-color: var(--gray-200);">
-                        <button 
-                            @click="resetFilters()" 
-                            class="w-full btn btn-ghost text-sm"
+                        <select 
+                            x-model="filters.localisation_fondateurs"
+                            @change="applyFilters()"
+                            class="w-full px-3 py-2 border rounded-md text-sm"
+                            style="border-color: var(--gray-300); background: var(--white);"
                         >
-                            <i data-lucide="x" class="w-4 h-4 mr-2"></i>
-                            Réinitialiser
-                        </button>
+                            <option value="">Localisation fondateurs</option>
+                            @foreach(App\Constants\BusinessConstants::LOCALISATION_FONDATEURS as $locKey => $locLabel)
+                            <option value="{{ $locKey }}">{{ $locLabel }} ({{ $filters['localisation_fondateurs'][$locKey] ?? 0 }})</option>
+                            @endforeach
+                        </select>
                     </div>
+                </div>
+
+                <!-- Reset filtres -->
+                <div class="mt-4 text-center">
+                    <button 
+                        @click="resetFilters()" 
+                        class="btn btn-ghost text-sm"
+                    >
+                        <i data-lucide="x" class="w-4 h-4 mr-2"></i>
+                        Réinitialiser
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Zone principale (droite) -->
-        <div class="lg:col-span-3">
+    <!-- Layout principal -->
+    <div class="grid lg:grid-cols-1 gap-6">
+
+        <!-- Zone principale -->
+        <div>
             <!-- En-tête avec contrôles -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
@@ -268,6 +229,52 @@
                                 </span>
                                 @endif
                             </div>
+
+                            <!-- Présentation du projet -->
+                            @if($projet->description)
+                            <div class="mb-3" x-data="{ expanded: false }">
+                                <h4 class="text-sm font-medium mb-1" style="color: var(--gray-900);">Présentation du projet</h4>
+                                <div class="text-sm" style="color: var(--gray-600);">
+                                    <div x-show="!expanded">
+                                        {{ Str::limit($projet->description, 100) }}
+                                        @if(strlen($projet->description) > 100)
+                                        <button @click="expanded = true" class="text-orange hover:underline ml-1">
+                                            voir plus
+                                        </button>
+                                        @endif
+                                    </div>
+                                    <div x-show="expanded" x-transition>
+                                        {{ $projet->description }}
+                                        <button @click="expanded = false" class="text-orange hover:underline ml-1">
+                                            voir moins
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
+                            <!-- Votre mot au président -->
+                            @if($projet->mot_president)
+                            <div class="mb-3" x-data="{ expanded: false }">
+                                <h4 class="text-sm font-medium mb-1" style="color: var(--gray-900);">Votre mot au président</h4>
+                                <div class="text-sm" style="color: var(--gray-600);">
+                                    <div x-show="!expanded">
+                                        {{ Str::limit($projet->mot_president, 100) }}
+                                        @if(strlen($projet->mot_president) > 100)
+                                        <button @click="expanded = true" class="text-orange hover:underline ml-1">
+                                            voir plus
+                                        </button>
+                                        @endif
+                                    </div>
+                                    <div x-show="expanded" x-transition>
+                                        {{ $projet->mot_president }}
+                                        <button @click="expanded = false" class="text-orange hover:underline ml-1">
+                                            voir moins
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
 
                             <!-- Contact -->
                             @if($projet->nom_representant)

@@ -1,0 +1,77 @@
+
+=== RAPPORT FUSION ÉTENDUE - INCUBATEURS ===
+Date: 2025-08-21 20:41:11
+
+📊 DONNÉES TRAITÉES:
+- Opportunites_Classees.csv: Base de référence
+- Opportunites_Incubateurs.csv: 24 nouvelles opportunités
+- Doublons détectés et ignorés: 0
+- Nouvelles entrées ajoutées: 24
+- TOTAL FINAL: 172 opportunités
+
+🔧 NORMALISATION APPLIQUÉE SUR INCUBATEURS:
+- Types institutions: ['INCUBATEUR_ACCELERATEUR', 'STUDIO', 'INVESTISSEUR'] → standardisés
+- Types opportunités: ['ACCELERATION', 'INCUBATION', 'INVESTISSEMENT'] → normalisés
+- Statuts: ['Ouvert', 'À vérifier'] → uniformisés
+- Secteurs: format virgule → point-virgule
+- Contacts: nettoyage format 'via'
+- URLs: suppression guillemets
+
+🏢 DISTRIBUTION FINALE PAR TYPE D'INSTITUTION:
+- MINISTERE_AGENCE: 59 (34.3%)
+- INCUBATEUR_ACCELERATEUR: 33 (19.2%)
+- CENTRE_FORMATION: 21 (12.2%)
+- FONDS_INVESTISSEMENT: 16 (9.3%)
+- ASSOCIATION_ENTREPRENEURIALE: 14 (8.1%)
+- ORGANISATION_INTERNATIONALE: 6 (3.5%)
+- HUB_INNOVATION: 6 (3.5%)
+- MICROFINANCE: 5 (2.9%)
+- BANQUE_DEVELOPPEMENT: 3 (1.7%)
+- ESPACE_COWORKING: 1 (0.6%)
+- GUICHET_UNIQUE: 1 (0.6%)
+- AGENCE_PROMOTION: 1 (0.6%)
+- COOPERATION_DIASPORA: 1 (0.6%)
+- FEDERATION_PUBLIQUE: 1 (0.6%)
+-  20/09/2025: 1 (0.6%)
+
+🎯 DISTRIBUTION FINALE PAR TYPE D'OPPORTUNITÉ:
+- FORMATION: 50 (29.1%)
+- FINANCEMENT: 46 (26.7%)
+- INCUBATION: 31 (18.0%)
+- ACCELERATION: 13 (7.6%)
+- CONCOURS: 12 (7.0%)
+- EVENEMENT: 6 (3.5%)
+- ASSISTANCE_TECHNIQUE: 2 (1.2%)
+- SUBVENTION/FINANCEMENT: 2 (1.2%)
+- FORMATION/ACCELERATION: 1 (0.6%)
+- FINANCEMENT/ACCELERATION: 1 (0.6%)
+- FINANCEMENT/RECHERCHE: 1 (0.6%)
+- INCUBATION/FORMATION: 1 (0.6%)
+- INFRASTRUCTURE/FINANCEMENT: 1 (0.6%)
+- STAGE: 1 (0.6%)
+
+✅ QUALITÉ ET COHÉRENCE:
+- Format uniforme sur toutes les colonnes
+- Classification respectant la hiérarchie établie
+- Doublons éliminés automatiquement
+- Secteurs normalisés (séparateur ;)
+- Contacts et URLs nettoyés
+
+🎯 SPÉCIFICITÉS INCUBATEURS INTÉGRÉES:
+- Studios de développement → Incubateurs/Accélérateurs
+- Fonds d'investissement → Fonds d'investissement
+- Programmes d'accélération → Accélération
+- Statuts 'À vérifier' → 'À venir'
+
+📈 IMPACT SUR L'ÉCOSYSTÈME LAGENTO:
+- Couverture complète incubateurs/accélérateurs CI
+- Recommandations plus précises pour startups
+- Mapping complet des opportunités de financement
+- Base de données exhaustive pour l'IA
+
+🚀 PROCHAINES ÉTAPES:
+- Intégration vectorielle complète
+- Tests recommandations avec nouveaux incubateurs
+- Validation terrain avec entrepreneurs
+- Mise à jour trimestrielle coordonnée
+        

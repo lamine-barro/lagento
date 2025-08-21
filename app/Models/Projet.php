@@ -62,7 +62,7 @@ class Projet extends Model
         // Besoins
         'structures_accompagnement',
         'types_soutien',
-        'details_besoins',
+        'mot_president',
         'abonne_newsletter',
         
         // Meta
