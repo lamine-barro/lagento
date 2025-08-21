@@ -109,7 +109,7 @@ class OpenAIVectorService
     /**
      * Intelligent chunking with overlap
      */
-    public function chunkText(string $text, int $maxChunkSize = 1000, float $overlapPercentage = 0.1): array
+    public function chunkText(string $text, int $maxChunkSize = 1000, float $overlapPercentage = 0.2): array
     {
         if (strlen($text) <= $maxChunkSize) {
             return [$text];

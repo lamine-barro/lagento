@@ -62,7 +62,7 @@
 @section('content')
 <div class="intelligence-page min-h-screen">
     <!-- Header harmonisé -->
-    <div class="intelligence-header sticky top-0 z-40 shadow-sm">
+    <div class="intelligence-header sticky top-16 z-40 shadow-sm">
         <div class="container max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between h-16 md:h-20">
                 <div class="flex items-center space-x-3">
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Navigation Pills Mobile -->
-    <div class="container max-w-7xl mx-auto px-4 pt-4 md:pt-8" x-data="{ activeTab: 'insights' }">
+    <div class="container max-w-7xl mx-auto px-4 pt-6 md:pt-8" x-data="{ activeTab: 'insights' }">
         <div class="intelligence-card rounded-xl shadow-sm p-2 mb-6">
             <nav class="flex space-x-1">
                 <button @click="activeTab = 'insights'" :class="activeTab === 'insights' ? 'intelligence-nav-active' : 'intelligence-nav-inactive'" class="flex-1 flex items-center justify-center px-3 py-3 rounded-lg font-medium transition-all duration-200 text-sm">
@@ -180,7 +180,12 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Configuration Mapbox corrigée
+    console.log('Mapbox token check:', '{{ config('services.mapbox.token') }}');
     mapboxgl.accessToken = '{{ config('services.mapbox.token') }}';
+    
+    if (!mapboxgl.accessToken) {
+        console.error('Mapbox token is missing! Check your .env configuration.');
+    }
     
     // State management
     window.intelligenceApp = {
@@ -282,34 +287,66 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         
         initializeMapWithData(regions) {
-            const map = new mapboxgl.Map({
-                container: 'map-container',
-                style: 'mapbox://styles/mapbox/light-v11',
-                center: [-5.547, 7.540], // Centre exact de la Côte d'Ivoire
-                zoom: 6.5
-            });
+            if (!mapboxgl.accessToken) {
+                this.initializeMapFallback();
+                return;
+            }
             
-            map.on('load', () => {
-                regions.forEach(region => {
-                    if (region.latitude && region.longitude) {
-                        const marker = new mapboxgl.Marker({
-                            color: this.getRegionColor(region.projects_count),
-                            scale: Math.max(0.8, Math.min(1.5, region.projects_count / 20))
-                        })
-                        .setLngLat([region.longitude, region.latitude])
-                        .setPopup(new mapboxgl.Popup().setHTML(
-                            `<div class="p-3">
-                                <h4 class="font-semibold text-gray-900 mb-1">${region.name}</h4>
-                                <p class="text-sm text-gray-600">${region.projects_count} projet${region.projects_count > 1 ? 's' : ''}</p>
-                            </div>`
-                        ))
-                        .addTo(map);
-                    }
+            try {
+                const map = new mapboxgl.Map({
+                    container: 'map-container',
+                    style: 'mapbox://styles/mapbox/light-v11',
+                    center: [-5.547, 7.540], // Centre exact de la Côte d'Ivoire
+                    zoom: 6.5
                 });
-            });
+            
+                map.on('load', () => {
+                    regions.forEach(region => {
+                        if (region.latitude && region.longitude) {
+                            const marker = new mapboxgl.Marker({
+                                color: this.getRegionColor(region.projects_count),
+                                scale: Math.max(0.8, Math.min(1.5, region.projects_count / 20))
+                            })
+                            .setLngLat([region.longitude, region.latitude])
+                            .setPopup(new mapboxgl.Popup().setHTML(
+                                `<div class="p-3">
+                                    <h4 class="font-semibold text-gray-900 mb-1">${region.name}</h4>
+                                    <p class="text-sm text-gray-600">${region.projects_count} projet${region.projects_count > 1 ? 's' : ''}</p>
+                                </div>`
+                            ))
+                            .addTo(map);
+                        }
+                    });
+                });
+                
+                map.on('error', (e) => {
+                    console.error('Mapbox error:', e);
+                    this.initializeMapFallback();
+                });
+            } catch (error) {
+                console.error('Map initialization error:', error);
+                this.initializeMapFallback();
+            }
         },
         
         initializeMapFallback() {
+            console.log('Initializing map fallback with token:', mapboxgl.accessToken);
+            
+            if (!mapboxgl.accessToken) {
+                document.getElementById('map-container').innerHTML = `
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p class="text-red-600 font-medium">Erreur de configuration Mapbox</p>
+                            <p class="text-sm text-gray-500">Token d'accès manquant</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
             // Fallback avec données par défaut des régions CI
             const defaultRegions = [
                 { name: 'Abidjan', coords: [-4.0083, 5.3097], projects: 0 },
@@ -320,29 +357,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 { name: 'Daloa', coords: [-6.8770, 6.8770], projects: 0 }
             ];
             
-            const map = new mapboxgl.Map({
-                container: 'map-container',
-                style: 'mapbox://styles/mapbox/light-v11',
-                center: [-5.547, 7.540],
-                zoom: 6.5
-            });
-            
-            map.on('load', () => {
-                defaultRegions.forEach(region => {
-                    const marker = new mapboxgl.Marker({
-                        color: '#6B7280', // Couleur grise par défaut
-                        scale: 0.8
-                    })
-                    .setLngLat(region.coords)
-                    .setPopup(new mapboxgl.Popup().setHTML(
-                        `<div class="p-3">
-                            <h4 class="font-semibold text-gray-900 mb-1">${region.name}</h4>
-                            <p class="text-sm text-gray-600">Données en cours de chargement...</p>
-                        </div>`
-                    ))
-                    .addTo(map);
+            try {
+                const map = new mapboxgl.Map({
+                    container: 'map-container',
+                    style: 'mapbox://styles/mapbox/light-v11',
+                    center: [-5.547, 7.540],
+                    zoom: 6.5
                 });
-            });
+            
+                map.on('load', () => {
+                    defaultRegions.forEach(region => {
+                        const marker = new mapboxgl.Marker({
+                            color: '#6B7280', // Couleur grise par défaut
+                            scale: 0.8
+                        })
+                        .setLngLat(region.coords)
+                        .setPopup(new mapboxgl.Popup().setHTML(
+                            `<div class="p-3">
+                                <h4 class="font-semibold text-gray-900 mb-1">${region.name}</h4>
+                                <p class="text-sm text-gray-600">Données en cours de chargement...</p>
+                            </div>`
+                        ))
+                        .addTo(map);
+                    });
+                });
+                
+                map.on('error', (e) => {
+                    console.error('Mapbox error:', e);
+                    document.getElementById('map-container').innerHTML = `
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <p class="text-red-600 font-medium">Erreur de chargement de la carte</p>
+                                <p class="text-sm text-gray-500">Vérifiez votre connexion internet</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Map initialization error:', error);
+                document.getElementById('map-container').innerHTML = `
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p class="text-red-600 font-medium">Impossible d'initialiser la carte</p>
+                            <p class="text-sm text-gray-500">Erreur technique</p>
+                        </div>
+                    </div>
+                `;
+            }
         },
         
         getRegionColor(projectCount) {
