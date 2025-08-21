@@ -1,0 +1,65 @@
+
+=== RAPPORT DE CLASSIFICATION DES OPPORTUNITÉS ===
+Date: 2025-08-21 19:48:25
+
+📊 RÉSUMÉ:
+- Total d'opportunités classées: 148
+- Critère de tri principal: Type d'institution
+- Critère de tri secondaire: Type d'opportunité
+- Critère de tri tertiaire: Institution puis titre
+
+🏢 HIÉRARCHIE DES INSTITUTIONS (ordre de priorité):
+ 1. MINISTERE_AGENCE: 59 opportunités
+ 2. BANQUE_DEVELOPPEMENT: 3 opportunités
+ 3. FONDS_INVESTISSEMENT: 11 opportunités
+ 4. INCUBATEUR_ACCELERATEUR: 14 opportunités
+ 5. CENTRE_FORMATION: 21 opportunités
+ 6. ORGANISATION_INTERNATIONALE: 6 opportunités
+ 7. ASSOCIATION_ENTREPRENEURIALE: 14 opportunités
+ 8. HUB_INNOVATION: 6 opportunités
+ 9. MICROFINANCE: 5 opportunités
+10. ESPACE_COWORKING: 1 opportunités
+11. GUICHET_UNIQUE: 1 opportunités
+12. AGENCE_PROMOTION: 1 opportunités
+13. COOPERATION_DIASPORA: 1 opportunités
+14. FEDERATION_PUBLIQUE: 1 opportunités
+
+🎯 HIÉRARCHIE DES OPPORTUNITÉS (ordre de priorité):
+ 1. FINANCEMENT: 41 opportunités
+ 2. INCUBATION: 18 opportunités
+ 3. ACCELERATION: 7 opportunités
+ 4. FORMATION: 50 opportunités
+ 5. CONCOURS: 12 opportunités
+ 6. STAGE: 1 opportunités
+ 7. EVENEMENT: 6 opportunités
+ 8. ASSISTANCE_TECHNIQUE: 2 opportunités
+ 9. SUBVENTION/FINANCEMENT: 2 opportunités
+10. FINANCEMENT/RECHERCHE: 1 opportunités
+11. FINANCEMENT/ACCELERATION: 1 opportunités
+12. INFRASTRUCTURE/FINANCEMENT: 1 opportunités
+13. INCUBATION/FORMATION: 1 opportunités
+14. FORMATION/ACCELERATION: 1 opportunités
+
+📋 LOGIQUE DE CLASSIFICATION:
+1. Priorité aux institutions gouvernementales et financières
+2. Ensuite les incubateurs et centres de formation
+3. Puis les organisations internationales et associations
+4. Enfin les structures spécialisées
+
+5. Au sein de chaque type d'institution:
+   - Financement en priorité
+   - Puis incubation/accélération
+   - Ensuite formation
+   - Enfin événements et concours
+
+🎯 AVANTAGES DE CETTE CLASSIFICATION:
+- Facilite la recherche par type d'acteur
+- Groupe les opportunités similaires
+- Optimise les recommandations de l'agent Lagento
+- Améliore l'expérience utilisateur
+
+📈 PROCHAINES ÉTAPES:
+- Intégration dans la base vectorielle
+- Configuration des filtres de recherche
+- Tests des recommandations personnalisées
+        

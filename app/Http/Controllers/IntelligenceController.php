@@ -2,63 +2,137 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Projet;
+use App\Constants\BusinessConstants;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 class IntelligenceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('intelligence.index');
+        // Construction de la requête de base pour les projets avec onboarding complet
+        $query = Projet::whereNotNull('nom_projet')
+            ->whereNotNull('formalise')
+            ->whereNotNull('region')
+            ->whereNotNull('nombre_fondateurs')
+            ->whereNotNull('nombre_fondatrices')
+            ->where('is_public', true)
+            ->with('user'); // Pour récupérer la date d'inscription
+
+        // Application des filtres
+        if ($request->filled('recherche')) {
+            $recherche = $request->input('recherche');
+            $query->where(function ($q) use ($recherche) {
+                $q->where('nom_projet', 'LIKE', "%{$recherche}%")
+                  ->orWhere('description', 'LIKE', "%{$recherche}%");
+            });
+        }
+
+        if ($request->filled('formalise')) {
+            $query->where('formalise', $request->input('formalise'));
+        }
+
+        if ($request->filled('region')) {
+            $query->where('region', $request->input('region'));
+        }
+
+        if ($request->filled('secteur')) {
+            $query->whereJsonContains('secteurs', $request->input('secteur'));
+        }
+
+        if ($request->filled('maturite')) {
+            $query->where('maturite', $request->input('maturite'));
+        }
+
+        if ($request->filled('localisation_fondateurs')) {
+            $query->where('localisation_fondateurs', $request->input('localisation_fondateurs'));
+        }
+
+        // Tri
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+        
+        $allowedSorts = ['nom_projet', 'region', 'maturite', 'created_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+
+        // Pagination
+        $projets = $query->paginate(20)->withQueryString();
+
+        // Calcul des compteurs pour les filtres (mis en cache)
+        $filters = $this->getFilters();
+
+        return view('intelligence.index', compact('projets', 'filters'));
     }
 
-    public function projects(Request $request)
+    public function getFilters()
     {
-        try {
-            $page = $request->get('page', 1);
-            $filter = $request->get('filter', 'tous');
-            $search = $request->get('search', '');
+        return Cache::remember('intelligence_filters', 300, function () {
+            // Requête de base pour les projets éligibles
+            $baseQuery = Projet::whereNotNull('nom_projet')
+                ->whereNotNull('formalise')
+                ->whereNotNull('region')
+                ->whereNotNull('nombre_fondateurs')
+                ->whereNotNull('nombre_fondatrices')
+                ->where('is_public', true);
 
-            $query = Projet::with('user')
-                ->whereHas('user', function ($query) {
-                    $query->where('onboarding_completed', true);
-                });
+            return [
+                'formalise' => $baseQuery->clone()
+                    ->select('formalise', DB::raw('count(*) as count'))
+                    ->groupBy('formalise')
+                    ->pluck('count', 'formalise')
+                    ->toArray(),
 
-            // Appliquer les filtres
-            switch ($filter) {
-                case 'formalise':
-                    $query->where('formalise', 'oui');
-                    break;
-                case 'non_formalise':
-                    $query->where('formalise', 'non');
-                    break;
-                case 'recent':
-                    $query->where('created_at', '>=', now()->subDays(30));
-                    break;
+                'regions' => $baseQuery->clone()
+                    ->select('region', DB::raw('count(*) as count'))
+                    ->groupBy('region')
+                    ->pluck('count', 'region')
+                    ->toArray(),
+
+                'secteurs' => $this->getSecteursCounts($baseQuery),
+
+                'maturite' => $baseQuery->clone()
+                    ->select('maturite', DB::raw('count(*) as count'))
+                    ->groupBy('maturite')
+                    ->whereNotNull('maturite')
+                    ->pluck('count', 'maturite')
+                    ->toArray(),
+
+                'localisation_fondateurs' => $baseQuery->clone()
+                    ->select('localisation_fondateurs', DB::raw('count(*) as count'))
+                    ->groupBy('localisation_fondateurs')
+                    ->whereNotNull('localisation_fondateurs')
+                    ->pluck('count', 'localisation_fondateurs')
+                    ->toArray(),
+            ];
+        });
+    }
+
+    private function getSecteursCounts($baseQuery)
+    {
+        // Récupération de tous les projets avec leurs secteurs
+        $projets = $baseQuery->clone()
+            ->select('secteurs')
+            ->whereNotNull('secteurs')
+            ->get();
+
+        $secteursCounts = [];
+
+        foreach ($projets as $projet) {
+            $secteurs = $projet->secteurs ?? [];
+            foreach ($secteurs as $secteur) {
+                $secteursCounts[$secteur] = ($secteursCounts[$secteur] ?? 0) + 1;
             }
-
-            // Appliquer la recherche
-            if (!empty($search)) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nom', 'like', '%' . $search . '%')
-                      ->orWhere('description', 'like', '%' . $search . '%')
-                      ->orWhere('secteurs', 'like', '%' . $search . '%')
-                      ->orWhereHas('user', function ($userQuery) use ($search) {
-                          $userQuery->where('name', 'like', '%' . $search . '%');
-                      });
-                });
-            }
-
-            $projets = $query->orderBy('created_at', 'desc')
-                           ->paginate(20, ['*'], 'page', $page);
-
-            return view('intelligence.projects', compact('projets'))->render();
-        } catch (\Exception $e) {
-            \Log::error('Intelligence projects error: ' . $e->getMessage());
-            return '<div class="bg-red-50 border border-red-200 rounded-lg p-4"><p class="text-red-600">Erreur lors du chargement des projets</p></div>';
         }
+
+        return $secteursCounts;
+    }
+
+    public function apiFilters()
+    {
+        return response()->json($this->getFilters());
     }
 }

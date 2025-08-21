@@ -1,0 +1,72 @@
+
+=== RAPPORT DE VALIDATION - DONNÉES FUSIONNÉES ===
+Date: 2025-08-21 19:29:59
+
+📊 STATISTIQUES GÉNÉRALES:
+- Total opportunités: 148
+- Colonnes: 18
+- Doublons détectés: 2
+
+🏢 RÉPARTITION PAR TYPE D'INSTITUTION:
+- MINISTERE_AGENCE: 59 (39.9%)
+- CENTRE_FORMATION: 21 (14.2%)
+- INCUBATEUR_ACCELERATEUR: 14 (9.5%)
+- ASSOCIATION_ENTREPRENEURIALE: 14 (9.5%)
+- FONDS_INVESTISSEMENT: 11 (7.4%)
+- ORGANISATION_INTERNATIONALE: 6 (4.1%)
+- HUB_INNOVATION: 6 (4.1%)
+- MICROFINANCE: 5 (3.4%)
+- BANQUE_DEVELOPPEMENT: 3 (2.0%)
+- ESPACE_COWORKING: 1 (0.7%)
+- COOPERATION_DIASPORA: 1 (0.7%)
+- AGENCE_PROMOTION: 1 (0.7%)
+- GUICHET_UNIQUE: 1 (0.7%)
+-  20/09/2025: 1 (0.7%)
+- FEDERATION_PUBLIQUE: 1 (0.7%)
+
+🎯 RÉPARTITION PAR TYPE D'OPPORTUNITÉ:
+- FORMATION: 50 (33.8%)
+- FINANCEMENT: 41 (27.7%)
+- INCUBATION: 18 (12.2%)
+- CONCOURS: 12 (8.1%)
+- ACCELERATION: 7 (4.7%)
+- EVENEMENT: 6 (4.1%)
+- ASSISTANCE_TECHNIQUE: 2 (1.4%)
+- SUBVENTION/FINANCEMENT: 2 (1.4%)
+- STAGE: 1 (0.7%)
+- INCUBATION/FORMATION: 1 (0.7%)
+- FORMATION/ACCELERATION: 1 (0.7%)
+- INFRASTRUCTURE/FINANCEMENT: 1 (0.7%)
+- FINANCEMENT/RECHERCHE: 1 (0.7%)
+- FINANCEMENT/ACCELERATION: 1 (0.7%)
+
+🌍 RÉPARTITION PAR ORIGINE:
+- PUBLIC: 79 (53.4%)
+- PRIVE: 45 (30.4%)
+- INTERNATIONAL: 20 (13.5%)
+
+📈 TOP 5 SECTEURS:
+- TOUS_SECTEURS: 39 opportunités
+- NUMERIQUE: 27 opportunités
+- Agriculture: 9 opportunités
+- ENVIRONNEMENT: 6 opportunités
+- FINANCE: 6 opportunités
+
+✅ QUALITÉ DES DONNÉES:
+- Taux de validité des emails: 100.0%
+- Intégrité structurelle: ✅ Conforme
+- Cohérence des formats: ✅ Normalisé
+
+🎯 RECOMMANDATIONS:
+1. Vérifier et nettoyer les 2 doublons détectés
+2. Compléter les champs avec faible taux de remplissage
+3. Valider les contacts et liens externes
+4. Effectuer une revue éditoriale des descriptions
+5. Programmer des mises à jour régulières des statuts
+
+📋 PROCHAINES ÉTAPES:
+- Mise en production du dataset fusionné
+- Configuration de l'indexation vectorielle
+- Tests d'intégration avec l'agent Lagento
+- Planification des mises à jour trimestrielles
+        

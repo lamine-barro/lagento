@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DiagnosticController;
-use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\IntelligenceController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProjetController;
@@ -70,9 +69,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/step4', [OnboardingController::class, 'processStep4'])->name('onboarding.step4.process');
     });
     
-    // Route intelligence spéciale (pas de restriction d'onboarding)
-    Route::get('/intelligence', [IntelligenceController::class, 'index'])->name('intelligence');
-    Route::get('/intelligence/projects', [IntelligenceController::class, 'projects'])->name('intelligence.projects');
 
     // Routes protégées qui nécessitent un onboarding complet
     Route::middleware(['onboarding.complete'])->group(function () {
@@ -82,6 +78,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/profile', [DiagnosticController::class, 'updateProfile'])->name('profile.update');
         Route::post('/profile/project', [DiagnosticController::class, 'updateProject'])->name('profile.project.update');
         Route::delete('/profile', [DiagnosticController::class, 'deleteProfile'])->name('profile.delete');
+        
+        // Intelligence (tableau de bord)
+        Route::get('/intelligence', [IntelligenceController::class, 'index'])->name('intelligence');
+        Route::get('/api/intelligence/filters', [IntelligenceController::class, 'apiFilters'])->name('intelligence.filters');
         
         // Chat
         Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
@@ -107,14 +107,6 @@ Route::middleware(['auth'])->group(function () {
             return view('conversations.index', compact('conversations'));
         })->name('conversations.index');
         
-        // Documents - DÉSACTIVÉ
-        // Route::prefix('documents')->group(function () {
-        //     Route::get('/', [DocumentController::class, 'index'])->name('documents.index');
-        //     Route::post('/upload', [DocumentController::class, 'upload'])->name('documents.upload');
-        //     Route::get('/view/{filename}', [DocumentController::class, 'view'])->name('documents.view')->where('filename', '.*');
-        //     Route::get('/download/{filename}', [DocumentController::class, 'download'])->name('documents.download')->where('filename', '.*');
-        //     Route::delete('/delete/{filename}', [DocumentController::class, 'delete'])->name('documents.delete')->where('filename', '.*');
-        // });
         
         // Email change with OTP verification
         Route::post('/email-change/send-otp', [DiagnosticController::class, 'sendEmailChangeOtp'])->name('email-change.send-otp');

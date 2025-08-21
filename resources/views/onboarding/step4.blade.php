@@ -103,19 +103,6 @@
                 </div>
             </div>
 
-            <!-- Structures d'accompagnement -->
-            <div>
-                <label class="block text-sm font-medium mb-2 mt-4" style="color: var(--gray-700);">Structures d'accompagnement (max 5)</label>
-                <p class="text-sm mb-4" style="color: var(--gray-600);">Avez-vous déjà bénéficié de l'accompagnement d'une structure d'appui ?</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" x-data="checkboxLimit(5, 'support_structures[]')" x-init="updateDisabled()" @change="updateDisabled()">
-                    @foreach(config('constants.STRUCTURES_ACCOMPAGNEMENT') as $s)
-                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all hover:bg-orange-50 has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500" style="border-color: var(--gray-300);">
-                            <input type="checkbox" name="support_structures[]" value="{{ $s }}" class="w-4 h-4 rounded" style="accent-color: var(--orange);" {{ in_array($s, old('support_structures', $projet->structures_accompagnement ?? [])) ? 'checked' : '' }}>
-                            <span class="text-sm font-medium">{{ $s }}</span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
 
             <!-- Types de soutien (max 5) -->
             <div>
