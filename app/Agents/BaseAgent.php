@@ -217,7 +217,10 @@ abstract class BaseAgent
     protected function logExecutionEnd(string $sessionId, array $result, float $startTime): void
     {
         $duration = (microtime(true) - $startTime) * 1000; // in ms
+        $endMemory = memory_get_usage(true);
+        $peakMemory = memory_get_peak_usage(true);
         
+        // Standard log
         Log::info("✅ [{$this->agentName}] EXECUTION END", [
             'session_id' => $sessionId,
             'agent' => $this->agentName,
@@ -227,6 +230,20 @@ abstract class BaseAgent
             'output_size' => strlen(json_encode($result)),
             'tools_used' => $result['tools_used'] ?? [],
             'metadata' => $result['metadata'] ?? [],
+            'timestamp' => now()->toISOString()
+        ]);
+        
+        // Performance log
+        Log::channel('agent_performance')->info('Agent execution completed', [
+            'session_id' => $sessionId,
+            'agent' => $this->agentName,
+            'duration_ms' => round($duration, 2),
+            'end_memory' => $endMemory,
+            'peak_memory' => $peakMemory,
+            'memory_used_mb' => round(($peakMemory - $endMemory) / 1024 / 1024, 2),
+            'success' => $result['success'] ?? false,
+            'tools_used' => $result['tools_used'] ?? [],
+            'response_length' => $this->calculateResponseLength($result),
             'timestamp' => now()->toISOString()
         ]);
         

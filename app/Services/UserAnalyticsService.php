@@ -13,11 +13,16 @@ class UserAnalyticsService
 {
     protected OpenAIVectorService $vectorService;
     protected AutoVectorizationService $autoVectorService;
+    protected DiagnosticCacheService $cacheService;
 
-    public function __construct(OpenAIVectorService $vectorService, AutoVectorizationService $autoVectorService)
-    {
+    public function __construct(
+        OpenAIVectorService $vectorService, 
+        AutoVectorizationService $autoVectorService,
+        DiagnosticCacheService $cacheService
+    ) {
         $this->vectorService = $vectorService;
         $this->autoVectorService = $autoVectorService;
+        $this->cacheService = $cacheService;
     }
 
     /**
@@ -28,9 +33,16 @@ class UserAnalyticsService
         try {
             $analytics = $this->getOrCreateUserAnalytics($user);
             
-            // Enrich with lightweight LLM pass (gpt-5-mini) to extract salient tags and summary
-            // Enhanced with vector memory context
-            $lmSummary = $this->summarizeBusinessData($onboardingData, $user);
+            // Vérifier le cache pour le résumé business
+            $lmSummary = $this->cacheService->getCachedProfileSummary($user, $onboardingData);
+            
+            if (!$lmSummary) {
+                // Cache miss - générer avec LLM et mettre en cache
+                $lmSummary = $this->summarizeBusinessData($onboardingData, $user);
+                if (!empty($lmSummary)) {
+                    $this->cacheService->cacheProfileSummary($user, $onboardingData, $lmSummary);
+                }
+            }
 
             $profile = [
                 'niveau_global' => $lmSummary['level'] ?? null,
@@ -142,10 +154,8 @@ Réponds UNIQUEMENT ce JSON.";
             ];
 
             $lm = app(\App\Services\LanguageModelService::class);
-            $raw = $lm->chat($messages, 'gpt-5-mini', null, 30000, [
-                'response_format' => ['type' => 'json_object'],
-                'reasoning_effort' => 'low',
-                'verbosity' => 'medium'
+            $raw = $lm->chat($messages, 'gpt-4.1-mini', null, 8000, [
+                'response_format' => ['type' => 'json_object']
             ]);
             
             Log::info('UserAnalyticsService: Enhanced LLM response received', [
@@ -288,6 +298,15 @@ Réponds UNIQUEMENT ce JSON.";
     {
         try {
             $analytics = $this->getOrCreateUserAnalytics($user);
+            
+            // Vérifier le cache pour le dashboard
+            $cachedDashboard = $this->cacheService->getCachedDashboard($user);
+            if ($cachedDashboard) {
+                // Mettre à jour avec les données en cache
+                $this->mapDashboardStructureToAnalytics($analytics, $cachedDashboard);
+                return;
+            }
+            
             $profile = $analytics->entrepreneur_profile ?? [];
             
             // Récupérer le projet de l'utilisateur pour l'analyse
@@ -348,6 +367,9 @@ Réponds UNIQUEMENT ce JSON.";
             ];
             
             $dashboardStructure = $this->generateDashboardStructureWithLLM($llmInput);
+            
+            // Mettre en cache le dashboard généré
+            $this->cacheService->cacheDashboard($user, $dashboardStructure);
             
             // Mappage vers la nouvelle structure ACID
             $this->mapDashboardStructureToAnalytics($analytics, $dashboardStructure);
@@ -1067,7 +1089,7 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             
             Log::info('UserAnalyticsService: Starting dashboard analytics generation', ['prompt_size' => strlen($prompt)]);
             
-            $raw = $lm->chat($messages, 'gpt-5-mini', null, 20000, [
+            $raw = $lm->chat($messages, 'gpt-4.1-mini', null, 6000, [
                 'response_format' => ['type' => 'json_object'],
                 'reasoning_effort' => 'low',
                 'verbosity' => 'medium'
@@ -1420,6 +1442,12 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
     public function generateUserInsights(User $user): array
     {
         try {
+            // Vérifier le cache pour les insights
+            $cachedInsights = $this->cacheService->getCachedInsights($user);
+            if ($cachedInsights) {
+                return $cachedInsights;
+            }
+            
             $analytics = $this->getOrCreateUserAnalytics($user);
             
             $insights = [
@@ -1440,6 +1468,9 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
                 'recommendations' => $this->generateRecommendations($user, $analytics),
                 'generated_at' => now()->toISOString()
             ];
+
+            // Mettre en cache les insights générés
+            $this->cacheService->cacheInsights($user, $insights);
 
             // Update analytics with insights
             $analytics->update([
@@ -2110,6 +2141,22 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
             // Build search query based on user data
             $searchQuery = $this->buildOpportunitySearchQuery($data);
             
+            // Extraire user pour le cache
+            $user = null;
+            if (isset($data['user_info']['id'])) {
+                $user = \App\Models\User::find($data['user_info']['id']);
+            } elseif (isset($data['user_info']) && $data['user_info'] instanceof \App\Models\User) {
+                $user = $data['user_info'];
+            }
+            
+            // Vérifier le cache pour la recherche vectorielle
+            if ($user) {
+                $cachedResults = $this->cacheService->getCachedVectorSearch($user, $searchQuery);
+                if ($cachedResults) {
+                    return $cachedResults;
+                }
+            }
+
             // Search in 'opportunites' namespace
             $searchResults = $this->vectorService->searchSimilar(
                 query: $searchQuery,
@@ -2137,6 +2184,11 @@ OUTPUT: JSON uniquement, structure optimisée pour affichage interface, lisibili
                 'results_count' => count($opportunities),
                 'namespace' => 'opportunites'
             ]);
+
+            // Mettre en cache les résultats de recherche vectorielle
+            if ($user) {
+                $this->cacheService->cacheVectorSearch($user, $searchQuery, $opportunities);
+            }
 
             return $opportunities;
             

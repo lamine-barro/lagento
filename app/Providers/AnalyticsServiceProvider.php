@@ -20,7 +20,8 @@ class AnalyticsServiceProvider extends ServiceProvider
         $this->app->singleton(UserAnalyticsService::class, function ($app) {
             return new UserAnalyticsService(
                 $app->make(OpenAIVectorService::class),
-                $app->make(AutoVectorizationService::class)
+                $app->make(AutoVectorizationService::class),
+                $app->make(\App\Services\DiagnosticCacheService::class)
             );
         });
     }

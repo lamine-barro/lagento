@@ -145,7 +145,7 @@ class DocumentAnalysisService
 
             $extractedText = $this->languageModel->chat(
                 messages: $messages,
-                model: 'gpt-5-mini',
+                model: 'gpt-4.1-mini',
                 temperature: 0.1,
                 maxTokens: 1500
             );
@@ -185,7 +185,7 @@ class DocumentAnalysisService
 
             $analysisText = $this->languageModel->chat(
                 messages: $messages,
-                model: 'gpt-5-mini',
+                model: 'gpt-4.1-mini',
                 temperature: 0.2,
                 maxTokens: 1000,
                 options: [

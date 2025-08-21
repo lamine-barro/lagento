@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Document;
 use App\Services\LanguageModelService;
 use App\Services\OpenAIVectorService;
+use App\Services\SmartToolRouter;
+use App\Services\AgentCacheService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -15,14 +17,20 @@ use PhpOffice\PhpWord\IOFactory;
 
 class AgentPrincipal extends BaseAgent
 {
+    private SmartToolRouter $router;
+    private AgentCacheService $cache;
 
     public function __construct(
         ?LanguageModelService $llm = null,
-        ?OpenAIVectorService $embedding = null
+        ?OpenAIVectorService $embedding = null,
+        ?SmartToolRouter $router = null,
+        ?AgentCacheService $cache = null
     ) {
         // Use service container if no dependencies provided
         $llm = $llm ?: app(LanguageModelService::class);
         $embedding = $embedding ?: app(OpenAIVectorService::class);
+        $this->router = $router ?: app(SmartToolRouter::class);
+        $this->cache = $cache ?: app(AgentCacheService::class);
         
         parent::__construct($llm, $embedding, null);
     }
@@ -30,7 +38,7 @@ class AgentPrincipal extends BaseAgent
     protected function getConfig(): array
     {
         return [
-            'model' => 'gpt-5-mini',
+            'model' => 'gpt-4.1-mini',
             'temperature' => 0.3,
             'max_tokens' => 5000,
             'tools' => [
@@ -45,6 +53,18 @@ class AgentPrincipal extends BaseAgent
     {
         $startTime = microtime(true);
         $sessionId = $this->logExecutionStart($inputs);
+        
+        // Log performance metrics
+        $performanceLog = [
+            'session_id' => $sessionId,
+            'start_time' => $startTime,
+            'start_memory' => memory_get_usage(true),
+            'conversation_id' => $inputs['conversation_id'] ?? null,
+            'user_id' => $inputs['user_id'] ?? null,
+            'message_length' => strlen($inputs['user_message'] ?? ''),
+        ];
+        
+        Log::channel('agent_performance')->info('Agent execution started', $performanceLog);
         
         $userMessage = $inputs['user_message'] ?? '';
         $userId = $inputs['user_id'] ?? null;
@@ -71,13 +91,52 @@ class AgentPrincipal extends BaseAgent
             return $result;
         }
 
-        $this->logDebug('Getting user context', ['user_id' => $userId]);
+        // Check cache first for simple questions
+        $route = $this->router->route($userMessage);
         
-        // Get user context
-        $userContext = $this->getUserAnalyticsContext($userId);
+        if ($route['cacheable'] ?? false) {
+            $cachedResponse = $this->cache->getCachedResponse(
+                $userMessage, 
+                $userId, 
+                $route['type']
+            );
+            
+            if ($cachedResponse !== null) {
+                $this->logDebug('Returning cached response', [
+                    'cache_key' => $route['cache_key'],
+                    'type' => $route['type']
+                ]);
+                
+                $cachedResponse['metadata']['from_cache'] = true;
+                $this->logExecutionEnd($sessionId, $cachedResponse, $startTime);
+                return $cachedResponse;
+            }
+        }
         
-        // Get user documents context
-        $userDocuments = $this->getUserDocumentsContext($userId);
+        $this->logDebug('Route analysis', [
+            'type' => $route['type'],
+            'depth' => $route['depth'],
+            'needs_search' => $route['needs_search'],
+            'tools' => $route['tools']
+        ]);
+        
+        // Lazy load context based on route
+        $userContext = [];
+        $userDocuments = '';
+        
+        if (in_array('user_profile', $route['context_needed'] ?? [])) {
+            $this->logDebug('Loading user context', ['user_id' => $userId]);
+            $userContext = $this->cache->getUserContext($userId) ?: $this->getUserAnalyticsContext($userId);
+            
+            if (!$this->cache->getUserContext($userId)) {
+                $this->cache->setUserContext($userId, $userContext);
+            }
+        }
+        
+        if (in_array('full_context', $route['context_needed'] ?? []) || $route['type'] === 'user_context') {
+            $this->logDebug('Loading documents context', ['user_id' => $userId]);
+            $userDocuments = $this->getUserDocumentsContext($userId);
+        }
         
         // Prepare system instructions
         $instructions = $this->getSystemInstructions();
@@ -89,12 +148,18 @@ class AgentPrincipal extends BaseAgent
         }
 
         try {
-            $this->logDebug('Analyzing message for tools', ['message_length' => strlen($userMessage)]);
+            // Use smart router for tool selection
+            $toolsNeeded = [];
             
-            // Analyze user message to determine if tools are needed
-            $toolsNeeded = $this->analyzeMessageForTools($userMessage);
-            
-            $this->logDebug('Tools analysis completed', ['tools_needed' => $toolsNeeded]);
+            if ($route['needs_search'] && !in_array('direct_llm_response', $route['optimization_hints'] ?? [])) {
+                $toolsNeeded = $route['tools'] ?? [];
+                $this->logDebug('Tools from router', ['tools_needed' => $toolsNeeded]);
+            } else {
+                $this->logDebug('No tools needed - direct LLM response', [
+                    'type' => $route['type'],
+                    'hints' => $route['optimization_hints'] ?? []
+                ]);
+            }
             
             $toolResults = [];
             $toolUsageLogs = [];
@@ -201,9 +266,27 @@ class AgentPrincipal extends BaseAgent
                     'tokens_estimated' => strlen($response) / 4, // Rough estimation
                     'tools_executed' => count($toolUsageLogs),
                     'web_search_used' => $webSearchNeeded,
-                    'context_added' => !empty($recent) || !empty($summary)
+                    'context_added' => !empty($recent) || !empty($summary),
+                    'route_type' => $route['type'],
+                    'route_depth' => $route['depth']
                 ]
             ];
+            
+            // Cache the response if appropriate
+            if ($route['cacheable'] ?? false) {
+                $this->cache->cacheResponse(
+                    $userMessage,
+                    $userId,
+                    $result,
+                    $route['type'],
+                    $route['cache_duration'] ?? null
+                );
+                
+                $this->logDebug('Response cached', [
+                    'type' => $route['type'],
+                    'ttl' => $route['cache_duration'] ?? 'default'
+                ]);
+            }
 
             // Use message count for successful execution
             $user->useFeature('messages');
@@ -521,25 +604,42 @@ case 'recherche_vectorielle':
     protected function executeVectorSearch(string $message, string $userId): array
     {
         try {
+            // Check cache first
+            $cachedResults = $this->cache->getSearchResults($message, 'user_' . $userId);
+            if ($cachedResults !== null) {
+                $this->logDebug('Vector search cache HIT', [
+                    'query' => substr($message, 0, 50)
+                ]);
+                return $cachedResults;
+            }
+            
             $user = User::find($userId);
             if (!$user) {
                 return ['error' => 'Utilisateur non trouvé'];
             }
 
+            // Get route hints for optimization
+            $route = $this->router->route($message);
+            $searchFilters = $route['search_filters'] ?? [];
+            $maxResults = $route['max_search_results'] ?? 5;
+            
             // Détermine les types de mémoires pertinents
             $relevantTypes = $this->determineRelevantMemoryTypes($message);
             
             // Recherche vectorielle via OpenAIVectorService et Pinecone
             $allResults = [];
             
-            // Recherche dans le contexte LagentO (TOUJOURS inclus)
-            $contextResults = $this->embedding->searchSimilar(
-                query: $message,
-                topK: 4,
-                filter: [],
-                namespace: 'lagento_context'
-            );
-            $allResults = array_merge($allResults, $contextResults);
+            // Skip general context for simple questions
+            if ($route['type'] !== 'simple_facts') {
+                // Recherche dans le contexte LagentO (TOUJOURS inclus)
+                $contextResults = $this->embedding->searchSimilar(
+                    query: $message,
+                    topK: min(4, $maxResults),
+                    filter: $searchFilters,
+                    namespace: 'lagento_context'
+                );
+                $allResults = array_merge($allResults, $contextResults);
+            }
             
             // Recherche dans les diagnostics utilisateur
             $diagnosticResults = $this->embedding->searchSimilar(
@@ -568,10 +668,20 @@ case 'recherche_vectorielle':
                 'query_preview' => substr($message, 0, 100)
             ]);
 
-            return [
+            $searchResult = [
                 'vector_results' => $results,
                 'searched_types' => $relevantTypes
             ];
+            
+            // Cache the results
+            $this->cache->cacheSearchResults(
+                $message,
+                $searchResult,
+                'user_' . $userId,
+                1800 // 30 minutes
+            );
+            
+            return $searchResult;
             
         } catch (\Exception $e) {
             Log::error('Vector search error', [

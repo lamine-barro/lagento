@@ -15,6 +15,9 @@ use App\Services\OpenAIVectorService;
 use App\Services\AutoVectorizationService;
 use App\Services\PdfExtractionService;
 use App\Services\DocumentAnalysisService;
+use App\Services\SmartToolRouter;
+use App\Services\AgentCacheService;
+use App\Services\OptimizedVectorService;
 use Illuminate\Support\Facades\Auth;
 use App\Auth\UuidEloquentUserProvider;
 
@@ -45,6 +48,26 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(PdfExtractionService::class),
                 $app->make(\App\Services\LanguageModelService::class)
             );
+        });
+
+        // Register optimized services
+        $this->app->singleton(SmartToolRouter::class, function ($app) {
+            return new SmartToolRouter();
+        });
+
+        $this->app->singleton(AgentCacheService::class, function ($app) {
+            return new AgentCacheService();
+        });
+
+        $this->app->singleton(OptimizedVectorService::class, function ($app) {
+            return new OptimizedVectorService(
+                $app->make(OpenAIVectorService::class),
+                $app->make(AgentCacheService::class)
+            );
+        });
+
+        $this->app->singleton(\App\Services\DiagnosticCacheService::class, function ($app) {
+            return new \App\Services\DiagnosticCacheService();
         });
     }
 

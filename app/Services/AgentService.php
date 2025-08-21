@@ -209,7 +209,7 @@ class AgentService
                 ['role' => 'system', 'content' => 'Tu es un assistant qui produit des résumés concis et factuels en français.'],
                 ['role' => 'user', 'content' => $prompt],
             ];
-            $raw = $this->llm->chat($messages, 'gpt-5-mini', 0.2, 1200);
+            $raw = $this->llm->chat($messages, 'gpt-4.1-nano', 0.2, 1200);
             return trim($raw);
         } catch (\Throwable $e) {
             \Log::error('Conversation summary generation failed', ['id' => $conversation->id, 'error' => $e->getMessage()]);
