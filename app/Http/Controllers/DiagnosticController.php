@@ -173,7 +173,7 @@ class DiagnosticController extends Controller
         if (!$user->canRunDiagnostic()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vous avez atteint la limite hebdomadaire de 3 diagnostics.'
+                'message' => 'Vous avez atteint la limite hebdomadaire de 5 diagnostics.'
             ], 429);
         }
 

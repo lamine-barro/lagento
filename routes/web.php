@@ -72,8 +72,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Route intelligence spéciale (pas de restriction d'onboarding)
     Route::get('/intelligence', [IntelligenceController::class, 'index'])->name('intelligence');
-    Route::get('/intelligence/insights', [IntelligenceController::class, 'insights'])->name('intelligence.insights');
-    Route::get('/intelligence/directory', [IntelligenceController::class, 'directory'])->name('intelligence.directory');
+    Route::get('/intelligence/projects', [IntelligenceController::class, 'projects'])->name('intelligence.projects');
 
     // Routes protégées qui nécessitent un onboarding complet
     Route::middleware(['onboarding.complete'])->group(function () {

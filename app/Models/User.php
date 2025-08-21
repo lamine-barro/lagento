@@ -88,7 +88,7 @@ class User extends Authenticatable
 
     // Weekly rate limits constants
     const WEEKLY_LIMITS = [
-        'diagnostics' => 3,
+        'diagnostics' => 5,
         'messages' => 100,
         'images' => 3,
         'documents' => 3,

@@ -258,7 +258,7 @@ FORMAT DE SORTIE : Markdown propre et compact en 900 mots maximum:
 ÉLÉMENTS DE BASE (seuls autorisés) :
 - Titres : ## (h2), ### (h3) - seulement si nécessaire, collés au contenu
 - Formatage : **gras** pour les points clés, *italique* pour l'emphase légère
-- Listes : ordonnées (1.) et non-ordonnées (-) - format serré, pas d'espaces
+- Listes : UNIQUEMENT non-ordonnées (-) - éviter absolument les listes ordonnées (1. 2. 3.) qui cassent l'affichage
 - Paragraphes courts et lisibles avec interlignes compacts
 
 LIENS ET URLs (OBLIGATOIRE) :
@@ -273,6 +273,7 @@ INTERDICTIONS STRICTES :
 - AUCUN espacement excessif entre éléments
 - AUCUNE sur-structuration
 - AUCUNE URL inventée ou fictive
+- AUCUNE liste ordonnée (1. 2. 3.) - utiliser UNIQUEMENT les listes à puces (-)
 - NE JAMAIS mentionner les sources RAG ou la recherche vectorielle
 - NE JAMAIS dire \"selon les données\" ou \"d'après les informations trouvées\"
 - NE JAMAIS mentionner les montants, sommes d'argent, ou valeurs financières des opportunités
