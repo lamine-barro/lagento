@@ -149,20 +149,70 @@ class DiagnosticController extends Controller
     {
         $user = Auth::user();
         
-        // Supprimer toutes les données associées à l'utilisateur
-        $user->conversations()->delete();
-        $user->projets()->delete();
-        $user->userAnalytics()->delete();
-        
-        // Supprimer l'utilisateur
-        $user->delete();
-        
-        // Déconnecter et rediriger
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        
-        return response()->json(['success' => true, 'redirect' => route('landing')]);
+        try {
+            \DB::beginTransaction();
+            
+            // Supprimer toutes les données associées à l'utilisateur
+            // Messages des conversations (suppression en cascade)
+            foreach ($user->conversations as $conversation) {
+                $conversation->messages()->delete();
+            }
+            
+            // Conversations de l'utilisateur
+            $user->conversations()->delete();
+            
+            // Analytics de l'utilisateur
+            $user->analytics()->delete();
+            
+            // Projets de l'utilisateur  
+            $user->projets()->delete();
+            
+            // Mémoires vectorielles si elles existent
+            if (class_exists(\App\Models\VectorMemory::class)) {
+                \App\Models\VectorMemory::where('user_id', $user->id)->delete();
+            }
+            
+            // Supprimer les données Pinecone si configuré
+            try {
+                $pineconeService = app(\App\Services\PineconeService::class);
+                // Supprimer les vecteurs de l'utilisateur dans tous les namespaces
+                $namespaces = ['diagnostics', 'conversations', 'opportunites'];
+                foreach ($namespaces as $namespace) {
+                    $pineconeService->deleteByMetadata([
+                        'user_id' => $user->id
+                    ], $namespace);
+                }
+            } catch (\Exception $e) {
+                Log::warning("Could not delete Pinecone vectors for user {$user->id}: " . $e->getMessage());
+            }
+            
+            // Supprimer l'utilisateur
+            $user->delete();
+            
+            \DB::commit();
+            
+            // Déconnecter et nettoyer la session
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            Log::info("User account deleted successfully", ['user_id' => $user->id]);
+            
+            return response()->json([
+                'success' => true, 
+                'redirect' => route('landing'),
+                'message' => 'Votre compte a été supprimé avec succès.'
+            ]);
+            
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            Log::error("Failed to delete user account for user {$user->id}: " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la suppression de votre compte. Veuillez réessayer.'
+            ], 500);
+        }
     }
 
     public function runDiagnostic(Request $request)
