@@ -167,9 +167,14 @@ class DiagnosticController extends Controller
             // Projets de l'utilisateur  
             $user->projets()->delete();
             
-            // Mémoires vectorielles si elles existent
-            if (class_exists(\App\Models\VectorMemory::class)) {
-                \App\Models\VectorMemory::where('user_id', $user->id)->delete();
+            // Mémoires vectorielles si la table existe
+            try {
+                if (\Schema::hasTable('vector_memories')) {
+                    \DB::table('vector_memories')->where('user_id', $user->id)->delete();
+                }
+            } catch (\Exception $e) {
+                // Table n'existe pas, on continue
+                Log::debug("Vector memories table does not exist, skipping");
             }
             
             // Supprimer les données Pinecone si configuré
@@ -186,6 +191,9 @@ class DiagnosticController extends Controller
                 Log::warning("Could not delete Pinecone vectors for user {$user->id}: " . $e->getMessage());
             }
             
+            // Capturer l'ID avant suppression pour les logs
+            $userId = $user->id;
+            
             // Supprimer l'utilisateur
             $user->delete();
             
@@ -196,7 +204,7 @@ class DiagnosticController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             
-            Log::info("User account deleted successfully", ['user_id' => $user->id]);
+            Log::info("User account deleted successfully", ['user_id' => $userId]);
             
             return response()->json([
                 'success' => true, 

@@ -69,6 +69,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\DiagnosticCacheService::class, function ($app) {
             return new \App\Services\DiagnosticCacheService();
         });
+
+        // Register file storage services
+        $this->app->singleton(\App\Services\VercelBlobService::class, function ($app) {
+            return new \App\Services\VercelBlobService();
+        });
+
+        $this->app->singleton(\App\Services\FileStorageService::class, function ($app) {
+            return new \App\Services\FileStorageService(
+                $app->make(\App\Services\VercelBlobService::class)
+            );
+        });
     }
 
     /**
