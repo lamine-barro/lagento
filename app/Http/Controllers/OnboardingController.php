@@ -62,13 +62,24 @@ class OnboardingController extends Controller
         }
 
         $user = Auth::user();
-        // Récupérer ou créer le projet de l'utilisateur
-        $projet = Projet::firstOrCreate(
+        
+        // Utiliser updateOrCreate pour éviter les problèmes de persistance
+        $projet = Projet::updateOrCreate(
             ['user_id' => $user->id],
-            ['nom_projet' => $request->nom_projet]
+            [
+                'nom_projet' => $request->nom_projet,
+                'raison_sociale' => $request->raison_sociale,
+                'description' => $request->description,
+                'annee_creation' => $request->annee_creation,
+                'formalise' => $request->formalise,
+                'region' => $request->region,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'is_public' => true,
+            ]
         );
 
-        $logoUrl = $projet->logo_url;
+        // Gérer le logo si présent
         if ($request->hasFile('logo')) {
             $image = Image::read($request->file('logo'));
             $image->scaleDown(1024, 1024); // limite dimensions
@@ -77,21 +88,9 @@ class OnboardingController extends Controller
             // Use centralized file storage service
             $fileStorage = app(\App\Services\FileStorageService::class);
             $result = $fileStorage->storeLogo($encoded, $request->user()->id);
-            $logoUrl = $result['url'];
+            $projet->logo_url = $result['url'];
+            $projet->save();
         }
-
-        $projet->update([
-            'nom_projet' => $request->nom_projet,
-            'raison_sociale' => $request->raison_sociale,
-            'description' => $request->description,
-            'annee_creation' => $request->annee_creation,
-            'formalise' => $request->formalise,
-            'logo_url' => $logoUrl,
-            'region' => $request->region,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'is_public' => true,
-        ]);
 
         \Log::info('Step 1 completed successfully, redirecting to step 2', [
             'projet_id' => $projet->id,
@@ -264,8 +263,20 @@ class OnboardingController extends Controller
         $user = Auth::user();
         $projet = Projet::where('user_id', $user->id)->latest()->first();
         if (!$projet) {
-            return redirect()->route('onboarding.step1');
+            // Si aucun projet n'existe, vérifier les champs obligatoires de l'étape 1
+            \Log::warning('No project found for user at step 4', ['user_id' => $user->id]);
+            return redirect()->route('onboarding.step1')
+                ->with('warning', 'Veuillez compléter les étapes précédentes avant de continuer.');
         }
+
+        // Vérifier que les étapes précédentes sont complétées
+        $progress = $projet->getOnboardingProgress();
+        if (!$progress['steps']['step1']) {
+            \Log::warning('Step 1 not completed, redirecting', ['user_id' => $user->id]);
+            return redirect()->route('onboarding.step1')
+                ->with('warning', 'Veuillez d\'abord compléter l\'étape 1.');
+        }
+
         $projet->update([
             'taille_equipe' => $request->team_size,
             'nombre_fondateurs' => (int)$request->founders_count,
@@ -280,16 +291,35 @@ class OnboardingController extends Controller
         // Rafraîchir le modèle pour être sûr d'avoir les dernières données
         $projet->refresh();
 
-        // Marquer l'onboarding comme terminé
-        $user->update(['onboarding_completed' => true]);
+        // Vérifier que l'onboarding est vraiment complet avant de marquer comme terminé
+        if ($projet->isOnboardingComplete()) {
+            // Marquer l'onboarding comme terminé
+            $user->update(['onboarding_completed' => true]);
 
-        \Log::info('Step 4 completed successfully', [
-            'projet_id' => $projet->id,
-            'user_onboarding_completed' => true,
-            'redirecting_to' => 'diagnostic'
-        ]);
+            \Log::info('Step 4 completed successfully', [
+                'projet_id' => $projet->id,
+                'user_onboarding_completed' => true,
+                'redirecting_to' => 'diagnostic'
+            ]);
 
-        // Redirection vers la page diagnostic
-        return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet. Vous pouvez maintenant lancer votre diagnostic.');
+            // Redirection vers la page diagnostic
+            return redirect()->route('diagnostic')->with('success', 'Félicitations ! Votre profil est maintenant complet. Vous pouvez maintenant lancer votre diagnostic.');
+        } else {
+            \Log::warning('Onboarding not complete after step 4', [
+                'user_id' => $user->id,
+                'progress' => $projet->getOnboardingProgress()
+            ]);
+            
+            // Rediriger vers la première étape incomplète
+            if (!$progress['steps']['step1']) {
+                return redirect()->route('onboarding.step1');
+            } elseif (!$progress['steps']['step2']) {
+                return redirect()->route('onboarding.step2');
+            } elseif (!$progress['steps']['step3']) {
+                return redirect()->route('onboarding.step3');
+            } else {
+                return redirect()->route('onboarding.step4');
+            }
+        }
     }
 }
