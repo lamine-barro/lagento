@@ -136,7 +136,7 @@
                         <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
                     </svg>
                 </div>
-                <span class="text-sm shimmer-text font-medium text-gray-900 dark:text-gray-100">LagentO réfléchit...</span>
+                <span class="text-sm shimmer-text font-medium thinking-text">LagentO réfléchit...</span>
             </div>
         </div>
     </div>
@@ -915,6 +915,18 @@ function chatInterface() {
 
 @push('scripts')
 {{-- Streaming enhancements are now included at the top for proper loading order --}}
+@endpush
+
+@push('styles')
+<style>
+.thinking-text {
+    color: #111827 !important; /* gray-900 for light mode */
+}
+
+[data-theme="dark"] .thinking-text {
+    color: #f9fafb !important; /* gray-50 for dark mode */
+}
+</style>
 @endpush
 
 @endsection
