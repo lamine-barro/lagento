@@ -38,7 +38,7 @@
     }
     
     [data-theme="dark"] .page-title {
-        color: var(--gray-100);
+        color: white;
     }
     
     .page-subtitle {
