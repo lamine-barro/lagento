@@ -133,6 +133,16 @@
         display: none;
     }
     
+    /* Prévenir le débordement horizontal sur tous les appareils */
+    body {
+        overflow-x: hidden !important;
+    }
+    
+    .two-column-layout {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+    }
+    
     @media (max-width: 1024px) {
         .two-column-layout {
             flex-direction: column;
@@ -140,6 +150,7 @@
         .left-column, .right-column {
             width: 100%;
             padding: 2rem;
+            overflow-x: hidden !important;
         }
         .main-title {
             font-size: 2.5rem !important;
@@ -168,6 +179,13 @@
             line-height: 1.3 !important;
         }
         
+        /* Ajuster le span dans le titre pour mobile */
+        .main-title span {
+            display: block !important;
+            padding: 0.5rem 1rem !important;
+            margin: 0.5rem 0 !important;
+        }
+        
         .description {
             font-size: 1rem !important;
             line-height: 1.6 !important;
@@ -177,12 +195,20 @@
         .description span {
             font-size: 1.125rem !important;
         }
+        
+        /* Masquer les éléments décoratifs sur mobile */
+        .decoration-1, .decoration-2 {
+            display: none !important;
+        }
     }
     
     /* Espacements encore plus compacts sur très petits écrans */
     @media (max-width: 640px) {
         .left-column {
             padding: 1.5rem !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
         }
         
         .logo-container {
@@ -202,8 +228,29 @@
             margin-bottom: 1rem !important;
         }
         
+        /* Réduire encore plus le padding du span sur petits écrans */
+        .main-title span {
+            padding: 0.375rem 0.75rem !important;
+            font-size: 1.75rem !important;
+        }
+        
         .description {
             margin-bottom: 1.5rem !important;
+        }
+        
+        /* Adapter le formulaire pour mobile */
+        form {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        /* Stack le formulaire en colonne sur mobile */
+        form > div {
+            flex-direction: column !important;
+        }
+        
+        .email-input, .submit-button {
+            width: 100% !important;
         }
     }
 </style>
