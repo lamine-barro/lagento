@@ -286,7 +286,7 @@
         
         <!-- Description -->
         <p class="description" style="font-size: 1.25rem; line-height: 1.8; color: var(--gray-700); margin-bottom: 3rem;">
-            LagentO a cartographié <span style="color: var(--orange); font-weight: bold; font-size: 1.5rem;">1,000+ milliards de FCFA</span> 
+            LagentO a cartographié <a href="{{ route('opportunites.index') }}" style="color: var(--orange); font-weight: bold; font-size: 1.5rem; text-decoration: none; border-bottom: 2px solid var(--orange); transition: all 0.3s ease;" onmouseover="this.style.borderBottomColor='var(--orange-dark)'; this.style.color='var(--orange-dark)'" onmouseout="this.style.borderBottomColor='var(--orange)'; this.style.color='var(--orange)'">1,000+ milliards de FCFA</a> 
             d'opportunités pour les jeunes entrepreneurs en Côte d'Ivoire à travers les initiatives 
             gouvernementales et les écosystèmes. Il est disponible 24h/7 pour vous accompagner à les saisir.
         </p>

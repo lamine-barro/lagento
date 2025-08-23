@@ -6,6 +6,7 @@ use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\GuestChatController;
 use App\Http\Controllers\IntelligenceController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\OpportunitesController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,9 @@ Route::get('/opportunites-entrepreneur-cote-ivoire', function () {
 Route::get('/reseau-entrepreneurs-ivoiriens', function () {
     return view('seo.reseau-entrepreneurs');
 })->name('seo.reseau');
+
+// Page des opportunités publique
+Route::get('/opportunites', [OpportunitesController::class, 'index'])->name('opportunites.index');
 
 // Authentication routes
 Route::prefix('auth')->group(function () {

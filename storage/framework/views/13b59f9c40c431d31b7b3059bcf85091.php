@@ -314,9 +314,6 @@ unset($__errorArgs, $__bag); ?>
     </div>
 </div>
 
-<!-- Chat Widget en bas à droite -->
-<?php echo $__env->make('components.guest-chat', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-
 <script>
     // Theme detection and switching
     document.addEventListener('DOMContentLoaded', function() {
