@@ -290,9 +290,6 @@
     </div>
 </div>
 
-<!-- Chat Widget en bas à droite -->
-@include('components.guest-chat')
-
 <script>
     // Theme detection and switching
     document.addEventListener('DOMContentLoaded', function() {
