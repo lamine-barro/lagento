@@ -85,7 +85,7 @@
                     © 2025 Agento - <a href="{{ route('legal') }}" class="hover:underline" style="color: var(--gray-600);">Mentions légales</a>
                 </p>
                 <p class="text-xs" style="color: var(--gray-500);">
-                    Développé avec ❤️ pour l'écosystème entrepreneurial ivoirien
+                    Développé par <a href="https://horizon-o.ci" class="hover:underline" style="color: var(--gray-600);">Horizon O</a> avec ❤️ pour l'écosystème entrepreneurial ivoirien
                 </p>
             </div>
         </footer>

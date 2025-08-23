@@ -1,15 +1,13 @@
-@extends('layouts.guest')
+<?php $__env->startSection('seo_title', 'Agento - Assistant IA entrepreneurial n°1 en Côte d\'Ivoire'); ?>
+<?php $__env->startSection('meta_description', 'Découvrez Agento, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens.'); ?>
+<?php $__env->startSection('meta_keywords', 'assistant IA côte ivoire, entrepreneur abidjan, startup CI, financement pme'); ?>
+<?php $__env->startSection('title', 'Agento - Assistant IA entrepreneurial'); ?>
 
-@section('seo_title', 'Agento - Assistant IA entrepreneurial n°1 en Côte d\'Ivoire')
-@section('meta_description', 'Découvrez Agento, le premier assistant IA spécialement conçu pour accompagner les entrepreneurs ivoiriens.')
-@section('meta_keywords', 'assistant IA côte ivoire, entrepreneur abidjan, startup CI, financement pme')
-@section('title', 'Agento - Assistant IA entrepreneurial')
+<?php $__env->startSection('vite'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+<?php $__env->stopSection(); ?>
 
-@section('vite')
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-@endsection
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <style>
     .two-column-layout {
         display: flex;
@@ -213,14 +211,33 @@
     <div class="left-column">
         <!-- Logo -->
         <div class="logo-container" style="margin-bottom: 3rem;">
-            <x-logo size="xl" />
+            <?php if (isset($component)) { $__componentOriginal987d96ec78ed1cf75b349e2e5981978f = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.logo','data' => ['size' => 'xl']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('logo'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['size' => 'xl']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal987d96ec78ed1cf75b349e2e5981978f)): ?>
+<?php $attributes = $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f; ?>
+<?php unset($__attributesOriginal987d96ec78ed1cf75b349e2e5981978f); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal987d96ec78ed1cf75b349e2e5981978f)): ?>
+<?php $component = $__componentOriginal987d96ec78ed1cf75b349e2e5981978f; ?>
+<?php unset($__componentOriginal987d96ec78ed1cf75b349e2e5981978f); ?>
+<?php endif; ?>
         </div>
         
         <!-- Illustration Mobile uniquement -->
         <div class="mobile-illustration" style="margin-bottom: 3rem;">
             <div style="width: 100%; max-width: 400px; margin: 0 auto;">
                 <img 
-                    src="{{ asset('lagento_illustration.png') }}" 
+                    src="<?php echo e(asset('lagento_illustration.png')); ?>" 
                     alt="LagentO - Assistant IA pour entrepreneurs" 
                     style="width: 100%; height: auto; border-radius: 1.5rem; box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.2);"
                     loading="eager"
@@ -245,14 +262,14 @@
         </p>
         
         <!-- Formulaire Email -->
-        <form method="POST" action="{{ route('auth.email') }}" style="max-width: 500px;">
-            @csrf
+        <form method="POST" action="<?php echo e(route('auth.email')); ?>" style="max-width: 500px;">
+            <?php echo csrf_field(); ?>
             <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                 <input 
                     type="email" 
                     name="email" 
                     placeholder="Votre adresse email"
-                    value="{{ old('email') }}"
+                    value="<?php echo e(old('email')); ?>"
                     class="email-input"
                     style="flex: 1; padding: 1rem 1.5rem; font-size: 1.125rem; border: 2px solid var(--gray-200); border-radius: var(--radius-lg); background: var(--white); color: var(--gray-900); transition: var(--transition);"
                     required
@@ -266,9 +283,16 @@
                     Évaluer mon projet
                 </button>
             </div>
-            @error('email')
-                <p style="color: var(--orange); font-size: 0.875rem;">{{ $message }}</p>
-            @enderror
+            <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <p style="color: var(--orange); font-size: 0.875rem;"><?php echo e($message); ?></p>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
         </form>
     </div>
     
@@ -281,7 +305,7 @@
             
             <!-- Main illustration -->
             <img 
-                src="{{ asset('lagento_illustration.png') }}" 
+                src="<?php echo e(asset('lagento_illustration.png')); ?>" 
                 alt="LagentO - Assistant IA pour entrepreneurs" 
                 class="illustration-image"
                 loading="eager"
@@ -291,7 +315,7 @@
 </div>
 
 <!-- Chat Widget en bas à droite -->
-@include('components.guest-chat')
+<?php echo $__env->make('components.guest-chat', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
     // Theme detection and switching
@@ -322,4 +346,5 @@
         });
     });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.guest', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/landing.blade.php ENDPATH**/ ?>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DiagnosticController;
+use App\Http\Controllers\GuestChatController;
 use App\Http\Controllers\IntelligenceController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProjetController;
@@ -12,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::get('/', [AuthController::class, 'showEmailForm'])->name('landing');
 Route::get('/login', [AuthController::class, 'showEmailForm'])->name('login');
+
+// Guest chat API route
+Route::post('/api/guest-chat', [GuestChatController::class, 'sendMessage'])->name('guest.chat');
 
 Route::get('/legal', function () {
     return view('legal');
