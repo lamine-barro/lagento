@@ -32,7 +32,7 @@
     .page-title {
         font-size: 3rem;
         font-weight: bold;
-        color: var(--gray-900);
+        color: var(--orange);
         margin-bottom: 1rem;
         line-height: 1.2;
     }
@@ -82,7 +82,7 @@
         flex: 1;
         padding: 0.875rem 1.25rem;
         border: 2px solid var(--gray-200);
-        border-radius: var(--radius-lg);
+        border-radius: 0.5rem;
         font-size: 1rem;
         background: var(--white);
         color: var(--gray-900);
@@ -105,7 +105,7 @@
         background: var(--orange);
         color: white;
         border: none;
-        border-radius: var(--radius-lg);
+        border-radius: 0.5rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -133,17 +133,17 @@
     .tag-pill {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
+        gap: 0.375rem;
+        padding: 0.5rem 1rem;
         background: var(--white);
         border: 2px solid var(--gray-200);
-        border-radius: 2rem;
+        border-radius: 0.5rem;
         color: var(--gray-700);
         text-decoration: none;
         transition: all 0.3s ease;
         white-space: nowrap;
         font-weight: 500;
-        font-size: 0.95rem;
+        font-size: 0.875rem;
     }
     
     [data-theme="dark"] .tag-pill {
@@ -167,10 +167,10 @@
     
     .tag-count {
         background: rgba(0, 0, 0, 0.1);
-        padding: 0.25rem 0.6rem;
-        border-radius: 1rem;
-        font-size: 0.85rem;
-        min-width: 28px;
+        padding: 0.125rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        min-width: 24px;
         text-align: center;
         font-weight: 600;
     }
@@ -538,13 +538,8 @@
             </div>
             
             <h1 class="page-title">
-                Opportunités d'Entrepreneuriat
+            {{ number_format($totalOpportunities) }} opportunités pour la jeunesse entrepreneuriale ivorienne
             </h1>
-            <div class="stats-highlight">{{ number_format($totalOpportunities) }} opportunités ouvertes</div>
-            <p class="page-subtitle">
-                Ah mon champion ! Voici toutes les opportunités que j'ai cartographiées pour toi. 
-                Des ministères aux fonds privés, tout y est pour propulser ton projet entrepreneurial !
-            </p>
         </div>
 
         <!-- Barre de recherche -->
@@ -572,6 +567,7 @@
             <div class="tags-container">
                 <a href="{{ request()->fullUrlWithQuery(['type' => null, 'page' => null]) }}" 
                    class="tag-pill {{ $selectedType === 'tous' ? 'active' : '' }}">
+                    <i data-lucide="grid-3x3" style="width: 16px; height: 16px;"></i>
                     <span>Tous</span>
                     <span class="tag-count">{{ array_sum($typeStats) }}</span>
                 </a>
@@ -579,6 +575,25 @@
                 @foreach($typeStats as $type => $count)
                     <a href="{{ request()->fullUrlWithQuery(['type' => $type, 'page' => null]) }}" 
                        class="tag-pill {{ $selectedType === $type ? 'active' : '' }}">
+                        @switch($type)
+                            @case('FINANCEMENT')
+                                <i data-lucide="coins" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('INCUBATION')
+                                <i data-lucide="egg" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('FORMATION')
+                                <i data-lucide="graduation-cap" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('CONCOURS')
+                                <i data-lucide="trophy" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('ACCELERATION')
+                                <i data-lucide="rocket" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @default
+                                <i data-lucide="circle" style="width: 16px; height: 16px;"></i>
+                        @endswitch
                         <span>{{ $type }}</span>
                         <span class="tag-count">{{ $count }}</span>
                     </a>
@@ -592,6 +607,7 @@
             <div class="tags-container">
                 <a href="{{ request()->fullUrlWithQuery(['institution_type' => null, 'page' => null]) }}" 
                    class="tag-pill {{ $selectedInstitutionType === 'tous' ? 'active' : '' }}">
+                    <i data-lucide="building-2" style="width: 16px; height: 16px;"></i>
                     <span>Toutes institutions</span>
                     <span class="tag-count">{{ array_sum($institutionTypeStats) }}</span>
                 </a>
@@ -599,6 +615,31 @@
                 @foreach($institutionTypeStats as $instType => $count)
                     <a href="{{ request()->fullUrlWithQuery(['institution_type' => $instType, 'page' => null]) }}" 
                        class="tag-pill {{ $selectedInstitutionType === $instType ? 'active' : '' }}">
+                        @switch($instType)
+                            @case('MINISTERE_AGENCE')
+                                <i data-lucide="landmark" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('BANQUE_DEVELOPPEMENT')
+                                <i data-lucide="university" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('FONDS_INVESTISSEMENT')
+                                <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('INCUBATEUR_ACCELERATEUR')
+                                <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('ASSOCIATION_ENTREPRENEURIALE')
+                                <i data-lucide="users" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('MICROFINANCE')
+                                <i data-lucide="piggy-bank" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @case('ORGANISATION_INTERNATIONALE')
+                                <i data-lucide="globe" style="width: 16px; height: 16px;"></i>
+                                @break
+                            @default
+                                <i data-lucide="building" style="width: 16px; height: 16px;"></i>
+                        @endswitch
                         <span>{{ str_replace('_', ' ', $instType) }}</span>
                         <span class="tag-count">{{ $count }}</span>
                     </a>
@@ -805,6 +846,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('theme-changed', function(e) {
         document.documentElement.setAttribute('data-theme', e.detail.theme);
     });
+    
+    // Initialiser les icônes Lucide
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 </script>
 @endsection
