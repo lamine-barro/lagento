@@ -85,9 +85,11 @@ class VercelBlobService
      */
     public function delete(string $url): bool
     {
+        // Vercel Blob API expects a POST request to /delete endpoint with JSON body
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
-        ])->delete($this->baseUrl . '/delete', [
+            'Content-Type' => 'application/json',
+        ])->post('https://blob.vercel-storage.com/delete', [
             'urls' => [$url]
         ]);
 
