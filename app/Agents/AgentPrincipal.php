@@ -41,9 +41,7 @@ class AgentPrincipal extends BaseAgent
             'temperature' => 0.3,
             'max_tokens' => 5000,
             'tools' => [
-                'recherche_vectorielle',
-                'generation_fichier',
-                'generation_image'
+                'recherche_vectorielle'
             ]
         ];
     }
@@ -425,8 +423,8 @@ OUTILS ET QUAND LES UTILISER :
 
 RÈGLE OPTIMISATION : N'utilise QUE les outils STRICTEMENT nécessaires pour la demande. Évite d'exécuter tous les outils par défaut.
 
-- generation_fichier : UNIQUEMENT si l'utilisateur demande explicitement un document (business plan, CV, rapport, contrat, etc.). 
-- generation_image : UNIQUEMENT si l'utilisateur demande explicitement un visuel (logo, affiche, bannière, illustration, etc.). 
+- generation_fichier : DÉSACTIVÉE - Je n'ai pas encore cette capacité
+- generation_image : DÉSACTIVÉE - Je n'ai pas encore cette capacité 
 - web search (intégré) : UNIQUEMENT si besoin d'actualités/infos récentes (2024, 2025, taux actuels, etc.).
 
 **STRATÉGIE DE DÉCOUPAGE :**
@@ -584,14 +582,15 @@ VALEURS À TRANSMETTRE :
     protected function executeTool(string $tool, string $message, string $userId): ?array
     {
         switch ($tool) {
-case 'recherche_vectorielle':
+            case 'recherche_vectorielle':
                 return $this->executeVectorSearch($message, $userId);
             
             case 'generation_fichier':
-                return $this->executeFileGeneration($message, $userId);
-            
             case 'generation_image':
-                return $this->executeImageGeneration($message, $userId);
+                // Ces outils sont désactivés pour le moment
+                return [
+                    'error' => 'Cette fonctionnalité n\'est pas encore disponible. Je peux vous aider avec des conseils et informations pour l\'instant.'
+                ];
             
             default:
                 return null;

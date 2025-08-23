@@ -168,8 +168,8 @@
                          onfocusin="this.style.borderColor='var(--orange)'; this.style.boxShadow='0 0 0 3px rgba(255, 107, 53, 0.1)'" 
                          onfocusout="this.style.borderColor='var(--gray-200)'; this.style.boxShadow='none'">
                         
-                        <!-- Aperçu fichier -->
-                        <div x-show="attachedFile" class="absolute bottom-full mb-2 p-3 rounded-lg shadow-lg max-w-sm" style="background: var(--white); border: 1px solid var(--gray-200);">
+                        <!-- Aperçu fichier - temporarily hidden -->
+                        <div x-show="false" class="absolute bottom-full mb-2 p-3 rounded-lg shadow-lg max-w-sm" style="background: var(--white); border: 1px solid var(--gray-200); display: none;">
                             <div class="flex items-center gap-3">
                                 <div class="flex-1 min-w-0">
                                     <div class="text-sm font-medium truncate" style="color: var(--gray-900);" x-text="attachedFile?.name"></div>
@@ -195,19 +195,22 @@
                         <div class="flex items-center justify-between px-4 py-2">
                             <!-- Left icons -->
                             <div class="flex items-center gap-3">
+                                <!-- File attachment temporarily hidden -->
                                 <input 
                                     type="file" 
                                     x-ref="fileInput" 
                                     @change="handleFileUpload"
                                     accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp"
                                     class="hidden"
+                                    style="display: none;"
                                 />
                                 <button type="button" @click="$refs.fileInput.click()" 
-                                        class="p-1.5 rounded-lg transition-all relative" 
+                                        class="p-1.5 rounded-lg transition-all relative hidden" 
                                         :style="attachedFile ? 'color: var(--orange-primary); background: var(--orange-50);' : 'color: var(--gray-600);'"
                                         onmouseover="this.style.color='var(--gray-900)'; this.style.background='var(--gray-100)';" 
                                         onmouseout="if (!this.classList.contains('attached')) { this.style.color='var(--gray-600)'; this.style.background='transparent'; }"
-                                        title="Joindre un fichier (PDF, DOC, images)">
+                                        title="Joindre un fichier (PDF, DOC, images)"
+                                        style="display: none;">
                                     <i data-lucide="paperclip" class="w-4 h-4"></i>
                                 </button>
                                 <button type="button" 

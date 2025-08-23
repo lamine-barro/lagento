@@ -116,7 +116,7 @@
 /* Effet shimmer pour les textes de loading - Version avec couleur de texte visible */
 .shimmer-text {
   position: relative;
-  color: var(--gray-700);
+  color: var(--gray-900);
   animation: shimmerGlow 1.8s infinite;
 }
 
@@ -158,7 +158,7 @@
 
 /* Shimmer adapté avec data-theme pour plus de contrôle */
 [data-theme="dark"] .shimmer-text {
-  color: var(--gray-600);
+  color: var(--gray-100);
   animation: shimmerGlowDataDark 1.8s infinite;
 }
 
