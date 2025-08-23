@@ -44,7 +44,19 @@ class OpportunitesController extends Controller
             $typeStats = Opportunite::getTypeStats();
             $institutionTypeStats = Opportunite::getInstitutionTypeStats();
 
-            // Préparer les données pour la vue
+            // Si c'est une requête AJAX, retourner seulement les cartes HTML
+            if ($request->ajax()) {
+                $html = view('opportunites.partials.cards', ['opportunities' => $opportunities])->render();
+                
+                return response()->json([
+                    'html' => $html,
+                    'count' => $opportunities->total(), // Total cumulé jusqu'à cette page
+                    'total' => Opportunite::where('statut', 'Ouvert')->count(),
+                    'hasMore' => $opportunities->hasMorePages()
+                ]);
+            }
+
+            // Préparer les données pour la vue complète
             return view('opportunites.index', [
                 'opportunities' => $opportunities,
                 'typeStats' => $typeStats,
@@ -63,6 +75,17 @@ class OpportunitesController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+
+            // Si c'est une requête AJAX, retourner JSON
+            if ($request->ajax()) {
+                return response()->json([
+                    'html' => '',
+                    'count' => 0,
+                    'total' => 0,
+                    'hasMore' => false,
+                    'error' => 'Erreur lors du chargement des opportunités'
+                ]);
+            }
 
             return view('opportunites.index', [
                 'opportunities' => collect([]),

@@ -1,11 +1,9 @@
-@extends('layouts.guest')
+<?php $__env->startSection('seo_title', 'Opportunités d\'Entrepreneuriat - <?php echo e($totalOpportunities); ?>+ opportunités | AgentO'); ?>
+<?php $__env->startSection('meta_description', 'Découvrez <?php echo e($totalOpportunities); ?>+ opportunités officielles de financement, incubation, accélération et formation pour entrepreneurs ivoiriens. Ministères, banques, fonds d\'investissement.'); ?>
+<?php $__env->startSection('meta_keywords', 'opportunités financement côte ivoire, startup incubation, ministère agriculture, aej, fafci, banque mondiale'); ?>
+<?php $__env->startSection('title', 'Opportunités d\'Entrepreneuriat - AgentO'); ?>
 
-@section('seo_title', 'Opportunités d\'Entrepreneuriat - {{ $totalOpportunities }}+ opportunités | AgentO')
-@section('meta_description', 'Découvrez {{ $totalOpportunities }}+ opportunités officielles de financement, incubation, accélération et formation pour entrepreneurs ivoiriens. Ministères, banques, fonds d\'investissement.')
-@section('meta_keywords', 'opportunités financement côte ivoire, startup incubation, ministère agriculture, aej, fafci, banque mondiale')
-@section('title', 'Opportunités d\'Entrepreneuriat - AgentO')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <style>
     .opportunities-page {
         min-height: 100vh;
@@ -572,11 +570,30 @@
         <div class="page-header">
             <!-- Logo -->
             <div style="margin-bottom: 2rem;">
-                <x-logo size="lg" />
+                <?php if (isset($component)) { $__componentOriginal987d96ec78ed1cf75b349e2e5981978f = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.logo','data' => ['size' => 'lg']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('logo'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['size' => 'lg']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal987d96ec78ed1cf75b349e2e5981978f)): ?>
+<?php $attributes = $__attributesOriginal987d96ec78ed1cf75b349e2e5981978f; ?>
+<?php unset($__attributesOriginal987d96ec78ed1cf75b349e2e5981978f); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal987d96ec78ed1cf75b349e2e5981978f)): ?>
+<?php $component = $__componentOriginal987d96ec78ed1cf75b349e2e5981978f; ?>
+<?php unset($__componentOriginal987d96ec78ed1cf75b349e2e5981978f); ?>
+<?php endif; ?>
             </div>
             
             <h1 class="page-title">
-            {{ number_format($totalOpportunities) }} opportunités pour la jeunesse entrepreneuriale ivorienne
+            <?php echo e(number_format($totalOpportunities)); ?> opportunités pour la jeunesse entrepreneuriale ivorienne
             </h1>
         </div>
 
@@ -585,145 +602,148 @@
             <form method="GET" class="search-form">
                 <input type="text" 
                        name="search" 
-                       value="{{ $search }}" 
+                       value="<?php echo e($search); ?>" 
                        placeholder="Rechercher par titre, institution, secteur..." 
                        class="search-input">
                 <button type="submit" class="search-btn">Rechercher</button>
                 
                 <!-- Maintenir les filtres existants -->
-                @if($selectedType !== 'tous')
-                    <input type="hidden" name="type" value="{{ $selectedType }}">
-                @endif
-                @if($selectedInstitutionType !== 'tous')
-                    <input type="hidden" name="institution_type" value="{{ $selectedInstitutionType }}">
-                @endif
+                <?php if($selectedType !== 'tous'): ?>
+                    <input type="hidden" name="type" value="<?php echo e($selectedType); ?>">
+                <?php endif; ?>
+                <?php if($selectedInstitutionType !== 'tous'): ?>
+                    <input type="hidden" name="institution_type" value="<?php echo e($selectedInstitutionType); ?>">
+                <?php endif; ?>
             </form>
         </div>
 
         <!-- Tags de Filtres par Type -->
         <div class="filter-tags">
             <div class="tags-container">
-                <a href="{{ request()->fullUrlWithQuery(['type' => null, 'page' => null]) }}" 
-                   class="tag-pill {{ $selectedType === 'tous' ? 'active' : '' }}">
+                <a href="<?php echo e(request()->fullUrlWithQuery(['type' => null, 'page' => null])); ?>" 
+                   class="tag-pill <?php echo e($selectedType === 'tous' ? 'active' : ''); ?>">
                     <i data-lucide="grid-3x3" style="width: 16px; height: 16px;"></i>
                     <span>Tous</span>
-                    <span class="tag-count">{{ array_sum($typeStats) }}</span>
+                    <span class="tag-count"><?php echo e(array_sum($typeStats)); ?></span>
                 </a>
                 
-                @foreach($typeStats as $type => $count)
-                    <a href="{{ request()->fullUrlWithQuery(['type' => $type, 'page' => null]) }}" 
-                       class="tag-pill {{ $selectedType === $type ? 'active' : '' }}">
-                        @switch($type)
-                            @case('FINANCEMENT')
+                <?php $__currentLoopData = $typeStats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type => $count): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <a href="<?php echo e(request()->fullUrlWithQuery(['type' => $type, 'page' => null])); ?>" 
+                       class="tag-pill <?php echo e($selectedType === $type ? 'active' : ''); ?>">
+                        <?php switch($type):
+                            case ('FINANCEMENT'): ?>
                                 <i data-lucide="coins" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('INCUBATION')
+                                <?php break; ?>
+                            <?php case ('INCUBATION'): ?>
                                 <i data-lucide="egg" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('FORMATION')
+                                <?php break; ?>
+                            <?php case ('FORMATION'): ?>
                                 <i data-lucide="graduation-cap" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('CONCOURS')
+                                <?php break; ?>
+                            <?php case ('CONCOURS'): ?>
                                 <i data-lucide="trophy" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('ACCELERATION')
+                                <?php break; ?>
+                            <?php case ('ACCELERATION'): ?>
                                 <i data-lucide="rocket" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @default
+                                <?php break; ?>
+                            <?php default: ?>
                                 <i data-lucide="circle" style="width: 16px; height: 16px;"></i>
-                        @endswitch
-                        <span>{{ $type }}</span>
-                        <span class="tag-count">{{ $count }}</span>
+                        <?php endswitch; ?>
+                        <span><?php echo e($type); ?></span>
+                        <span class="tag-count"><?php echo e($count); ?></span>
                     </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
 
         <!-- Tags de Filtres par Type d'Institution -->
-        @if(!empty($institutionTypeStats))
+        <?php if(!empty($institutionTypeStats)): ?>
         <div class="filter-tags">
             <div class="tags-container">
-                <a href="{{ request()->fullUrlWithQuery(['institution_type' => null, 'page' => null]) }}" 
-                   class="tag-pill {{ $selectedInstitutionType === 'tous' ? 'active' : '' }}">
+                <a href="<?php echo e(request()->fullUrlWithQuery(['institution_type' => null, 'page' => null])); ?>" 
+                   class="tag-pill <?php echo e($selectedInstitutionType === 'tous' ? 'active' : ''); ?>">
                     <i data-lucide="building-2" style="width: 16px; height: 16px;"></i>
                     <span>Toutes institutions</span>
-                    <span class="tag-count">{{ array_sum($institutionTypeStats) }}</span>
+                    <span class="tag-count"><?php echo e(array_sum($institutionTypeStats)); ?></span>
                 </a>
                 
-                @foreach($institutionTypeStats as $instType => $count)
-                    <a href="{{ request()->fullUrlWithQuery(['institution_type' => $instType, 'page' => null]) }}" 
-                       class="tag-pill {{ $selectedInstitutionType === $instType ? 'active' : '' }}">
-                        @switch($instType)
-                            @case('MINISTERE_AGENCE')
+                <?php $__currentLoopData = $institutionTypeStats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $instType => $count): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <a href="<?php echo e(request()->fullUrlWithQuery(['institution_type' => $instType, 'page' => null])); ?>" 
+                       class="tag-pill <?php echo e($selectedInstitutionType === $instType ? 'active' : ''); ?>">
+                        <?php switch($instType):
+                            case ('MINISTERE_AGENCE'): ?>
                                 <i data-lucide="landmark" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('BANQUE_DEVELOPPEMENT')
+                                <?php break; ?>
+                            <?php case ('BANQUE_DEVELOPPEMENT'): ?>
                                 <i data-lucide="university" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('FONDS_INVESTISSEMENT')
+                                <?php break; ?>
+                            <?php case ('FONDS_INVESTISSEMENT'): ?>
                                 <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('INCUBATEUR_ACCELERATEUR')
+                                <?php break; ?>
+                            <?php case ('INCUBATEUR_ACCELERATEUR'): ?>
                                 <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('ASSOCIATION_ENTREPRENEURIALE')
+                                <?php break; ?>
+                            <?php case ('ASSOCIATION_ENTREPRENEURIALE'): ?>
                                 <i data-lucide="users" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('MICROFINANCE')
+                                <?php break; ?>
+                            <?php case ('MICROFINANCE'): ?>
                                 <i data-lucide="piggy-bank" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @case('ORGANISATION_INTERNATIONALE')
+                                <?php break; ?>
+                            <?php case ('ORGANISATION_INTERNATIONALE'): ?>
                                 <i data-lucide="globe" style="width: 16px; height: 16px;"></i>
-                                @break
-                            @default
+                                <?php break; ?>
+                            <?php default: ?>
                                 <i data-lucide="building" style="width: 16px; height: 16px;"></i>
-                        @endswitch
-                        <span>{{ str_replace('_', ' ', $instType) }}</span>
-                        <span class="tag-count">{{ $count }}</span>
+                        <?php endswitch; ?>
+                        <span><?php echo e(str_replace('_', ' ', $instType)); ?></span>
+                        <span class="tag-count"><?php echo e($count); ?></span>
                     </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
 
         <!-- Grille des Opportunités -->
-        @if($opportunities->isNotEmpty())
+        <?php if($opportunities->isNotEmpty()): ?>
             <div class="opportunities-grid" id="opportunitiesGrid">
-                @foreach($opportunities as $opportunity)
-                    <div class="opportunity-card" onclick="toggleCard(this)" data-id="{{ $opportunity->id }}">
+                <?php $__currentLoopData = $opportunities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opportunity): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <div class="opportunity-card" onclick="toggleCard(this)" data-id="<?php echo e($opportunity->id); ?>">
                         <!-- En-tête de la carte -->
                         <div class="card-header">
-                            <h3 class="card-title">{{ $opportunity->titre }}</h3>
+                            <h3 class="card-title"><?php echo e($opportunity->titre); ?></h3>
                             <div class="card-badges">
-                                <span class="badge badge-{{ strtolower($opportunity->type) }}">
-                                    {{ $opportunity->type }}
+                                <span class="badge badge-<?php echo e(strtolower($opportunity->type)); ?>">
+                                    <?php echo e($opportunity->type); ?>
+
                                 </span>
-                                <span class="badge badge-default">{{ $opportunity->statut }}</span>
+                                <span class="badge badge-default"><?php echo e($opportunity->statut); ?></span>
                             </div>
                             <div class="institution-info">
-                                <strong>{{ $opportunity->institution }}</strong> • {{ str_replace('_', ' ', $opportunity->institution_type) }}
+                                <strong><?php echo e($opportunity->institution); ?></strong> • <?php echo e(str_replace('_', ' ', $opportunity->institution_type)); ?>
+
                             </div>
                         </div>
                         
                         <!-- Aperçu -->
                         <div class="card-preview">
                             <p class="card-description">
-                                {{ $opportunity->description }}
+                                <?php echo e($opportunity->description); ?>
+
                             </p>
                         </div>
                         
                         <!-- Meta informations -->
                         <div class="card-meta">
                             <div class="meta-info">
-                                @if($opportunity->regions_ciblees && $opportunity->regions_ciblees !== 'National')
-                                    <span>📍 {{ $opportunity->regions_ciblees }}</span>
-                                @else
+                                <?php if($opportunity->regions_ciblees && $opportunity->regions_ciblees !== 'National'): ?>
+                                    <span>📍 <?php echo e($opportunity->regions_ciblees); ?></span>
+                                <?php else: ?>
                                     <span>📍 National</span>
-                                @endif
+                                <?php endif; ?>
                                 
-                                @if($opportunity->date_limite_candidature)
-                                    <span>📅 {{ $opportunity->date_limite_candidature }}</span>
-                                @endif
+                                <?php if($opportunity->date_limite_candidature): ?>
+                                    <span>📅 <?php echo e($opportunity->date_limite_candidature); ?></span>
+                                <?php endif; ?>
                             </div>
                             <span class="expand-icon">▼</span>
                         </div>
@@ -732,84 +752,84 @@
                         <div class="card-expanded">
                             <div class="expanded-content">
                                 <div class="info-grid">
-                                    @if($opportunity->remuneration)
+                                    <?php if($opportunity->remuneration): ?>
                                         <div class="info-item">
                                             <span class="info-label">💰 Rémunération / Budget</span>
-                                            <span class="info-value">{{ $opportunity->remuneration }}</span>
+                                            <span class="info-value"><?php echo e($opportunity->remuneration); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                     
-                                    @if($opportunity->duree)
+                                    <?php if($opportunity->duree): ?>
                                         <div class="info-item">
                                             <span class="info-label">⏱️ Durée</span>
-                                            <span class="info-value">{{ $opportunity->duree }}</span>
+                                            <span class="info-value"><?php echo e($opportunity->duree); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                     
-                                    @if($opportunity->nombre_places)
+                                    <?php if($opportunity->nombre_places): ?>
                                         <div class="info-item">
                                             <span class="info-label">👥 Nombre de places</span>
-                                            <span class="info-value">{{ $opportunity->nombre_places }}</span>
+                                            <span class="info-value"><?php echo e($opportunity->nombre_places); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                     
-                                    @if($opportunity->date_debut)
+                                    <?php if($opportunity->date_debut): ?>
                                         <div class="info-item">
                                             <span class="info-label">📅 Date de début</span>
-                                            <span class="info-value">{{ $opportunity->date_debut }}</span>
+                                            <span class="info-value"><?php echo e($opportunity->date_debut); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                     
-                                    @if($opportunity->contact_email_enrichi)
+                                    <?php if($opportunity->contact_email_enrichi): ?>
                                         <div class="info-item">
                                             <span class="info-label">📧 Contact</span>
-                                            <span class="info-value">{{ $opportunity->contact_email_enrichi }}</span>
+                                            <span class="info-value"><?php echo e($opportunity->contact_email_enrichi); ?></span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                                 
-                                @if($opportunity->secteurs)
+                                <?php if($opportunity->secteurs): ?>
                                     <div class="info-item">
                                         <span class="info-label">🏢 Secteurs d'activité</span>
                                         <div class="secteurs-list">
-                                            @foreach($opportunity->secteurs_array as $secteur)
-                                                <span class="secteur-tag">{{ str_replace('_', ' ', $secteur) }}</span>
-                                            @endforeach
+                                            <?php $__currentLoopData = $opportunity->secteurs_array; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $secteur): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <span class="secteur-tag"><?php echo e(str_replace('_', ' ', $secteur)); ?></span>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                                 
-                                @if($opportunity->criteres_eligibilite)
+                                <?php if($opportunity->criteres_eligibilite): ?>
                                     <div class="info-item">
                                         <span class="info-label">✅ Critères d'éligibilité</span>
-                                        <span class="info-value">{{ $opportunity->criteres_eligibilite }}</span>
+                                        <span class="info-value"><?php echo e($opportunity->criteres_eligibilite); ?></span>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             
-                            @if($opportunity->lien_externe)
-                                <a href="{{ $opportunity->lien_externe }}" 
+                            <?php if($opportunity->lien_externe): ?>
+                                <a href="<?php echo e($opportunity->lien_externe); ?>" 
                                    target="_blank" 
                                    class="external-link"
                                    onclick="event.stopPropagation()">
                                     Voir les détails officiels
                                     <span>↗</span>
                                 </a>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <!-- Load More Section -->
             <div class="load-more-section">
                 <div class="pagination-info">
-                    Affichage de {{ $opportunities->count() }} sur {{ $opportunities->total() }} opportunités
+                    Affichage de <?php echo e($opportunities->count()); ?> sur <?php echo e($opportunities->total()); ?> opportunités
                 </div>
                 
-                @if($opportunities->hasMorePages())
+                <?php if($opportunities->hasMorePages()): ?>
                     <div class="load-more-container">
-                        <button id="loadMoreBtn" class="load-more-btn" data-next-page="{{ $opportunities->currentPage() + 1 }}">
+                        <button id="loadMoreBtn" class="load-more-btn" data-next-page="<?php echo e($opportunities->currentPage() + 1); ?>">
                             <span class="btn-text">Voir plus d'opportunités</span>
                             <span class="btn-loading" style="display: none;">
                                 <i data-lucide="loader-2" style="width: 20px; height: 20px; animation: spin 1s linear infinite;"></i>
@@ -817,20 +837,20 @@
                             </span>
                         </button>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
-        @else
+        <?php else: ?>
             <div class="no-results">
                 <div class="no-results-icon">🔍</div>
                 <h3>Aucune opportunité trouvée</h3>
                 <p>Essayez de modifier vos critères de recherche ou supprimez les filtres pour voir plus d'opportunités.</p>
-                @if($search || $selectedType !== 'tous' || $selectedInstitutionType !== 'tous')
-                    <a href="{{ route('opportunites.index') }}" class="external-link" style="margin-top: 1rem;">
+                <?php if($search || $selectedType !== 'tous' || $selectedInstitutionType !== 'tous'): ?>
+                    <a href="<?php echo e(route('opportunites.index')); ?>" class="external-link" style="margin-top: 1rem;">
                         Voir toutes les opportunités
                     </a>
-                @endif
+                <?php endif; ?>
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
 
@@ -977,4 +997,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.guest', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/laminebarro/agent-O/resources/views/opportunites/index.blade.php ENDPATH**/ ?>
