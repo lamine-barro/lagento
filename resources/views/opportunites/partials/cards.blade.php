@@ -21,6 +21,15 @@
                         @case('CONCOURS')
                             <i data-lucide="trophy" class="w-3 h-3"></i>
                             @break
+                        @case('ASSISTANCE_TECHNIQUE')
+                            <i data-lucide="headphones" class="w-3 h-3"></i>
+                            @break
+                        @case('PROMOTION')
+                            <i data-lucide="megaphone" class="w-3 h-3"></i>
+                            @break
+                        @case('STUDIO')
+                            <i data-lucide="video" class="w-3 h-3"></i>
+                            @break
                         @default
                             <i data-lucide="circle" class="w-3 h-3"></i>
                     @endswitch
