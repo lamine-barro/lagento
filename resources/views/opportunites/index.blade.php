@@ -9,12 +9,13 @@
 <style>
     .opportunities-page {
         min-height: 100vh;
-        background: var(--gray-50);
+        background: white;
         padding: 2rem 0;
+        transition: background-color 0.3s ease;
     }
     
     [data-theme="dark"] .opportunities-page {
-        background: var(--gray-900);
+        background: #0a0a0a;
     }
     
     .container {
@@ -97,7 +98,6 @@
     .search-input:focus {
         border-color: var(--orange);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
     }
     
     .search-btn {
@@ -199,9 +199,9 @@
     }
     
     [data-theme="dark"] .opportunity-card {
-        background: var(--gray-800);
-        border-color: var(--gray-700);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        background: #1a1a1a;
+        border-color: #333;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     .opportunity-card:hover {
@@ -216,7 +216,7 @@
     }
     
     [data-theme="dark"] .card-header {
-        border-color: var(--gray-700);
+        border-color: #333;
     }
     
     .card-title {
@@ -232,7 +232,7 @@
     }
     
     [data-theme="dark"] .card-title {
-        color: var(--gray-100);
+        color: #f5f5f5;
     }
     
     .card-badges {
@@ -272,7 +272,7 @@
     }
     
     [data-theme="dark"] .institution-info {
-        color: var(--gray-400);
+        color: #a0a0a0;
     }
     
     .card-preview {
@@ -290,7 +290,7 @@
     }
     
     [data-theme="dark"] .card-description {
-        color: var(--gray-400);
+        color: #cccccc;
     }
     
     .card-meta {
@@ -298,14 +298,14 @@
         align-items: center;
         justify-content: space-between;
         padding: 1rem 1.5rem;
-        background: var(--gray-25);
+        background: #f8f9fa;
         font-size: 0.875rem;
         color: var(--gray-500);
     }
     
     [data-theme="dark"] .card-meta {
-        background: var(--gray-750);
-        color: var(--gray-400);
+        background: #2a2a2a;
+        color: #808080;
     }
     
     .meta-info {
@@ -331,12 +331,12 @@
         display: none;
         padding: 1.5rem;
         border-top: 1px solid var(--gray-100);
-        background: var(--gray-25);
+        background: #f8f9fa;
     }
     
     [data-theme="dark"] .card-expanded {
-        border-color: var(--gray-700);
-        background: var(--gray-850);
+        border-color: #333;
+        background: #111;
     }
     
     .opportunity-card.expanded .card-expanded {
@@ -369,7 +369,7 @@
     }
     
     [data-theme="dark"] .info-label {
-        color: var(--gray-300);
+        color: #f5f5f5;
     }
     
     .info-value {
@@ -379,7 +379,7 @@
     }
     
     [data-theme="dark"] .info-value {
-        color: var(--gray-400);
+        color: #cccccc;
     }
     
     .secteurs-list {
@@ -532,13 +532,18 @@
     <div class="container">
         <!-- En-tête -->
         <div class="page-header">
+            <!-- Logo -->
+            <div style="margin-bottom: 2rem;">
+                <x-logo size="lg" />
+            </div>
+            
             <h1 class="page-title">
-                Opportunités Officielles d'Entrepreneuriat
+                Opportunités d'Entrepreneuriat
             </h1>
             <div class="stats-highlight">{{ number_format($totalOpportunities) }} opportunités ouvertes</div>
             <p class="page-subtitle">
-                Base de données complète des opportunités de financement, incubation, formation et accompagnement 
-                disponibles auprès des institutions officielles ivoiriennes et partenaires internationaux.
+                Ah mon champion ! Voici toutes les opportunités que j'ai cartographiées pour toi. 
+                Des ministères aux fonds privés, tout y est pour propulser ton projet entrepreneurial !
             </p>
         </div>
 
@@ -701,11 +706,6 @@
                                         <span class="info-value">{{ $opportunity->criteres_eligibilite }}</span>
                                     </div>
                                 @endif
-                                
-                                <div class="info-item">
-                                    <span class="info-label">🏛️ Origine de l'initiative</span>
-                                    <span class="info-value">{{ strtoupper($opportunity->origine_initiative) }}</span>
-                                </div>
                             </div>
                             
                             @if($opportunity->lien_externe)
