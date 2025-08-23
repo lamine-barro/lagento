@@ -168,6 +168,15 @@ document.addEventListener('alpine:init', () => {
                 <i data-lucide="edit" class="w-4 h-4"></i>
             </a>
             
+            <a 
+                href="{{ route('opportunites.index') }}"
+                class="p-3 rounded-md border transition-colors flex items-center justify-center text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
+                style="border-color: var(--gray-300); color: var(--gray-700);"
+                title="Voir toutes les opportunités"
+            >
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </a>
+            
         </div>
     </div>
     

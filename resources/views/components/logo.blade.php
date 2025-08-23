@@ -1,6 +1,7 @@
 @php
     $size = $size ?? 'md';
     $classes = $class ?? '';
+    $clickable = $clickable ?? true;
     
     $sizeClasses = [
         'sm' => 'h-6 w-auto',
@@ -14,6 +15,10 @@
 @endphp
 
 <div class="flex items-center justify-center {{ $classes }}">
+    @if($clickable)
+        <a href="{{ route('landing') }}" class="transition-opacity hover:opacity-80">
+    @endif
+    
     <!-- Logo light (visible en mode light) -->
     <img src="/logo-light.png" 
          alt="Agento" 
@@ -25,6 +30,10 @@
          alt="Agento" 
          class="{{ $logoClass }} hidden dark:block"
          style="display: var(--logo-dark-display, none);">
+    
+    @if($clickable)
+        </a>
+    @endif
 </div>
 
 <style>
