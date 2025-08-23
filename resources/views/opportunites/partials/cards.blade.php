@@ -22,7 +22,7 @@
                             <i data-lucide="trophy" class="w-3 h-3"></i>
                             @break
                         @case('ASSISTANCE_TECHNIQUE')
-                            <i data-lucide="headphones" class="w-3 h-3"></i>
+                            <i data-lucide="wrench" class="w-3 h-3"></i>
                             @break
                         @case('PROMOTION')
                             <i data-lucide="megaphone" class="w-3 h-3"></i>

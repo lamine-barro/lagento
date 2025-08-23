@@ -631,7 +631,7 @@
                                 <i data-lucide="rocket" style="width: 16px; height: 16px;"></i>
                                 @break
                             @case('ASSISTANCE_TECHNIQUE')
-                                <i data-lucide="headphones" style="width: 16px; height: 16px;"></i>
+                                <i data-lucide="wrench" style="width: 16px; height: 16px;"></i>
                                 @break
                             @case('PROMOTION')
                                 <i data-lucide="megaphone" style="width: 16px; height: 16px;"></i>
