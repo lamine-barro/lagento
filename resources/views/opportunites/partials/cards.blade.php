@@ -1,149 +1,142 @@
 @forelse($opportunities as $opportunity)
-    <div class="opportunity-card bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-500 hover:shadow-md transition-all duration-200 cursor-pointer" data-id="{{ $opportunity->id }}">
-        <div class="p-6">
-            <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="building-2" class="w-4 h-4 text-orange-500"></i>
-                    <span class="text-sm text-gray-600 dark:text-gray-300 font-medium">{{ $opportunity->institution }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-800">
-                        <i data-lucide="circle-check" class="w-3 h-3"></i>
-                        {{ $opportunity->statut }}
-                    </span>
-                </div>
+    <div class="opportunity-card" onclick="toggleCard(this)" data-id="{{ $opportunity->id }}">
+        <!-- En-tête de la carte -->
+        <div class="card-header">
+            <h3 class="card-title">{{ $opportunity->titre }}</h3>
+            <div class="card-badges">
+                <span class="badge badge-{{ strtolower($opportunity->type) }}">
+                    @switch($opportunity->type)
+                        @case('FINANCEMENT')
+                            <i data-lucide="coins" class="w-3 h-3"></i>
+                            @break
+                        @case('FORMATION')
+                            <i data-lucide="graduation-cap" class="w-3 h-3"></i>
+                            @break
+                        @case('INCUBATION')
+                            <i data-lucide="egg" class="w-3 h-3"></i>
+                            @break
+                        @case('ACCELERATION')
+                            <i data-lucide="rocket" class="w-3 h-3"></i>
+                            @break
+                        @case('CONCOURS')
+                            <i data-lucide="trophy" class="w-3 h-3"></i>
+                            @break
+                        @default
+                            <i data-lucide="circle" class="w-3 h-3"></i>
+                    @endswitch
+                    {{ $opportunity->type }}
+                </span>
+                <span class="badge badge-status badge-{{ strtolower($opportunity->statut) }}">{{ $opportunity->statut }}</span>
             </div>
-
-            <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-3 line-clamp-2">
-                {{ $opportunity->titre }}
-            </h3>
-
-            <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                {{ Str::limit($opportunity->description, 150) }}
-            </p>
-
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        <span>{{ $opportunity->pays }}</span>
-                    </div>
+            
+            <div class="card-meta">
+                <span class="meta-item">
+                    <i data-lucide="building-2" class="w-4 h-4"></i>
+                    {{ $opportunity->institution }}
+                </span>
+                <span class="meta-item">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    {{ $opportunity->pays }}
+                </span>
+            </div>
+        </div>
+        
+        <!-- Contenu condensé visible par défaut -->
+        <div class="card-content">
+            <div class="description-preview">
+                {{ Str::limit($opportunity->description, 120) }}
+            </div>
+            
+            <div class="card-footer">
+                <div class="info-badges">
+                    @if($opportunity->remuneration && $opportunity->remuneration !== 'Non spécifié')
+                        <span class="info-badge">
+                            <i data-lucide="banknote" class="w-3 h-3"></i>
+                            {{ Str::limit($opportunity->remuneration, 25) }}
+                        </span>
+                    @endif
                     @if($opportunity->date_limite_candidature && $opportunity->date_limite_candidature !== 'Continu')
-                        <div class="flex items-center gap-1">
-                            <i data-lucide="calendar" class="w-4 h-4"></i>
-                            <span>{{ $opportunity->date_limite_candidature }}</span>
-                        </div>
+                        <span class="info-badge urgency">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                            {{ $opportunity->date_limite_candidature }}
+                        </span>
                     @endif
                 </div>
-                <div class="flex items-center gap-2">
-                    @php
-                        $typeIcon = match($opportunity->type) {
-                            'Financement' => 'banknote',
-                            'Formation' => 'graduation-cap',
-                            'Stage' => 'briefcase',
-                            'Programme' => 'layers',
-                            'Concours' => 'award',
-                            'Emploi' => 'user-check',
-                            'Bourse' => 'scholar',
-                            default => 'star'
-                        };
-                    @endphp
-                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                        <i data-lucide="{{ $typeIcon }}" class="w-3 h-3"></i>
-                        {{ $opportunity->type }}
-                    </span>
-                </div>
+                <button class="expand-btn">
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    <span>Voir détails</span>
+                </button>
             </div>
         </div>
 
-        <!-- Contenu étendu (caché par défaut) -->
-        <div class="expanded-content hidden border-t border-gray-200 dark:border-gray-700">
-            <div class="p-6 space-y-4">
-                <div>
-                    <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Description complète</h4>
-                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">{{ $opportunity->description }}</p>
-                </div>
-
-                @if($opportunity->criteres_eligibilite)
-                    <div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white mb-2 mt-4">Critères d'éligibilité</h4>
-                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">{{ $opportunity->criteres_eligibilite }}</p>
-                    </div>
-                @endif
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @if($opportunity->duree)
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="clock" class="w-4 h-4 text-gray-500"></i>
-                            <span class="text-sm"><strong>Durée:</strong> {{ $opportunity->duree }}</span>
-                        </div>
-                    @endif
-
+        <!-- Contenu étendu -->
+        <div class="card-expanded">
+            <div class="expanded-content">
+                <div class="info-grid">
                     @if($opportunity->remuneration)
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="dollar-sign" class="w-4 h-4 text-gray-500"></i>
-                            <span class="text-sm"><strong>Rémunération:</strong> {{ $opportunity->remuneration }}</span>
+                        <div class="info-item">
+                            <span class="info-label">💰 Rémunération / Budget</span>
+                            <span class="info-value">{{ $opportunity->remuneration }}</span>
                         </div>
                     @endif
-
+                    
+                    @if($opportunity->duree)
+                        <div class="info-item">
+                            <span class="info-label">⏱️ Durée</span>
+                            <span class="info-value">{{ $opportunity->duree }}</span>
+                        </div>
+                    @endif
+                    
                     @if($opportunity->nombre_places)
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="users" class="w-4 h-4 text-gray-500"></i>
-                            <span class="text-sm"><strong>Places:</strong> {{ $opportunity->nombre_places }}</span>
+                        <div class="info-item">
+                            <span class="info-label">👥 Nombre de places</span>
+                            <span class="info-value">{{ $opportunity->nombre_places }}</span>
                         </div>
                     @endif
-
-                    @if($opportunity->date_debut && $opportunity->date_debut !== 'Continu')
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="calendar-plus" class="w-4 h-4 text-gray-500"></i>
-                            <span class="text-sm"><strong>Début:</strong> {{ $opportunity->date_debut }}</span>
+                    
+                    @if($opportunity->date_debut)
+                        <div class="info-item">
+                            <span class="info-label">📅 Date de début</span>
+                            <span class="info-value">{{ $opportunity->date_debut }}</span>
+                        </div>
+                    @endif
+                    
+                    @if($opportunity->contact_email_enrichi)
+                        <div class="info-item">
+                            <span class="info-label">📧 Contact</span>
+                            <span class="info-value">{{ $opportunity->contact_email_enrichi }}</span>
                         </div>
                     @endif
                 </div>
-
-                @if($opportunity->secteurs_array && count($opportunity->secteurs_array) > 0)
-                    <div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Secteurs</h4>
-                        <div class="flex flex-wrap gap-2">
+                
+                @if($opportunity->secteurs)
+                    <div class="info-item">
+                        <span class="info-label">🏢 Secteurs d'activité</span>
+                        <div class="secteurs-list">
                             @foreach($opportunity->secteurs_array as $secteur)
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                    {{ trim($secteur) }}
-                                </span>
+                                <span class="secteur-tag">{{ str_replace('_', ' ', $secteur) }}</span>
                             @endforeach
                         </div>
                     </div>
                 @endif
-
-                @if($opportunity->regions_ciblees_array && count($opportunity->regions_ciblees_array) > 0)
-                    <div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Régions ciblées</h4>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($opportunity->regions_ciblees_array as $region)
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                    {{ trim($region) }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                @if($opportunity->contact_email_enrichi)
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="mail" class="w-4 h-4 text-gray-500"></i>
-                        <span class="text-sm"><strong>Contact:</strong> {{ $opportunity->contact_email_enrichi }}</span>
-                    </div>
-                @endif
-
-                @if($opportunity->lien_externe)
-                    <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <a href="{{ $opportunity->lien_externe }}" target="_blank" rel="noopener noreferrer" 
-                           class="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors duration-200">
-                            <i data-lucide="external-link" class="w-4 h-4"></i>
-                            Voir l'opportunité
-                        </a>
+                
+                @if($opportunity->criteres_eligibilite)
+                    <div class="info-item">
+                        <span class="info-label">✅ Critères d'éligibilité</span>
+                        <span class="info-value">{{ $opportunity->criteres_eligibilite }}</span>
                     </div>
                 @endif
             </div>
+            
+            @if($opportunity->lien_externe)
+                <a href="{{ $opportunity->lien_externe }}" 
+                   target="_blank" 
+                   class="external-link"
+                   onclick="event.stopPropagation()">
+                    Voir les détails officiels
+                    <span>↗</span>
+                </a>
+            @endif
         </div>
     </div>
 @empty
