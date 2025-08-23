@@ -174,7 +174,7 @@ document.addEventListener('alpine:init', () => {
                 style="border-color: var(--gray-300); color: var(--gray-700);"
                 title="Voir toutes les opportunités"
             >
-                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <i data-lucide="briefcase" class="w-4 h-4"></i>
             </a>
             
         </div>
