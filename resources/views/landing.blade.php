@@ -280,7 +280,7 @@
             Le Président Inspire,<br>
             <span style="display: inline-block; background: var(--orange); color: white; padding: 0.5rem 2rem; border-radius: var(--radius-lg); margin: 0.5rem 0; box-shadow: var(--shadow-lg);">
                 LagentO Soutient,
-            </span><br>
+            </span>
             La Jeunesse Construit
         </h1>
         
