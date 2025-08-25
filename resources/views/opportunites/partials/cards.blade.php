@@ -5,79 +5,38 @@
             <h3 class="card-title">{{ $opportunity->titre }}</h3>
             <div class="card-badges">
                 <span class="badge badge-{{ strtolower($opportunity->type) }}">
-                    @switch($opportunity->type)
-                        @case('FINANCEMENT')
-                            <i data-lucide="coins" class="w-3 h-3"></i>
-                            @break
-                        @case('FORMATION')
-                            <i data-lucide="graduation-cap" class="w-3 h-3"></i>
-                            @break
-                        @case('INCUBATION')
-                            <i data-lucide="egg" class="w-3 h-3"></i>
-                            @break
-                        @case('ACCELERATION')
-                            <i data-lucide="rocket" class="w-3 h-3"></i>
-                            @break
-                        @case('CONCOURS')
-                            <i data-lucide="trophy" class="w-3 h-3"></i>
-                            @break
-                        @case('ASSISTANCE_TECHNIQUE')
-                            <i data-lucide="wrench" class="w-3 h-3"></i>
-                            @break
-                        @case('PROMOTION')
-                            <i data-lucide="megaphone" class="w-3 h-3"></i>
-                            @break
-                        @case('STUDIO')
-                            <i data-lucide="video" class="w-3 h-3"></i>
-                            @break
-                        @default
-                            <i data-lucide="circle" class="w-3 h-3"></i>
-                    @endswitch
                     {{ $opportunity->type }}
                 </span>
-                <span class="badge badge-status badge-{{ strtolower($opportunity->statut) }}">{{ $opportunity->statut }}</span>
+                <span class="badge badge-default">{{ $opportunity->statut }}</span>
             </div>
-            
-            <div class="card-meta">
-                <span class="meta-item">
-                    <i data-lucide="building-2" class="w-4 h-4"></i>
-                    {{ $opportunity->institution }}
-                </span>
-                <span class="meta-item">
-                    <i data-lucide="map-pin" class="w-4 h-4"></i>
-                    {{ $opportunity->pays }}
-                </span>
+            <div class="institution-info">
+                <strong>{{ $opportunity->institution }}</strong> • {{ str_replace('_', ' ', $opportunity->institution_type) }}
             </div>
         </div>
         
-        <!-- Contenu condensé visible par défaut -->
-        <div class="card-content">
-            <div class="description-preview">
-                {{ Str::limit($opportunity->description, 120) }}
-            </div>
-            
-            <div class="card-footer">
-                <div class="info-badges">
-                    @if($opportunity->remuneration && $opportunity->remuneration !== 'Non spécifié')
-                        <span class="info-badge">
-                            <i data-lucide="banknote" class="w-3 h-3"></i>
-                            {{ Str::limit($opportunity->remuneration, 25) }}
-                        </span>
-                    @endif
-                    @if($opportunity->date_limite_candidature && $opportunity->date_limite_candidature !== 'Continu')
-                        <span class="info-badge urgency">
-                            <i data-lucide="clock" class="w-3 h-3"></i>
-                            {{ $opportunity->date_limite_candidature }}
-                        </span>
-                    @endif
-                </div>
-                <button class="expand-btn">
-                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                    <span>Voir détails</span>
-                </button>
-            </div>
+        <!-- Aperçu -->
+        <div class="card-preview">
+            <p class="card-description">
+                {{ $opportunity->description }}
+            </p>
         </div>
-
+        
+        <!-- Meta informations -->
+        <div class="card-meta">
+            <div class="meta-info">
+                @if($opportunity->regions_ciblees && $opportunity->regions_ciblees !== 'National')
+                    <span>📍 {{ $opportunity->regions_ciblees }}</span>
+                @else
+                    <span>📍 National</span>
+                @endif
+                
+                @if($opportunity->date_limite_candidature)
+                    <span>📅 {{ $opportunity->date_limite_candidature }}</span>
+                @endif
+            </div>
+            <span class="expand-icon">▼</span>
+        </div>
+        
         <!-- Contenu étendu -->
         <div class="card-expanded">
             <div class="expanded-content">
@@ -149,11 +108,9 @@
         </div>
     </div>
 @empty
-    <div class="col-span-full text-center py-12">
-        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-            <i data-lucide="search-x" class="w-8 h-8 text-gray-400"></i>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Aucune opportunité trouvée</h3>
-        <p class="text-gray-500 dark:text-gray-400">Essayez de modifier vos filtres ou votre recherche.</p>
+    <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <h3>Aucune opportunité trouvée</h3>
+        <p>Essayez de modifier vos critères de recherche ou supprimez les filtres pour voir plus d'opportunités.</p>
     </div>
 @endforelse

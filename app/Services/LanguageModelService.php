@@ -102,10 +102,16 @@ class LanguageModelService
 
             $response = OpenAI::chat()->create($chatParams);
 
-            return $response->choices[0]->message->content ?? '';
+            $content = $response->choices[0]->message->content ?? '';
+            
+            if (empty($content)) {
+                throw new \Exception('Empty response from OpenAI API');
+            }
+            
+            return $content;
         } catch (\Throwable $e) {
-            Log::error('LLM chat failed', ['error' => $e->getMessage()]);
-            return '';
+            Log::error('LLM chat failed', ['error' => $e->getMessage(), 'model' => $model]);
+            throw $e;
         }
     }
 

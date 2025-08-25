@@ -229,11 +229,10 @@ Réponds par un JSON:
 
             $content = $this->languageModel->chat(
                 messages: $messages,
-                model: 'gpt-5-nano',
+                model: 'gpt-4.1-mini',
                 maxTokens: 150,
                 options: [
-                    'reasoning_effort' => 'minimal',
-                    'verbosity' => 'low'
+                    'response_format' => ['type' => 'json_object']
                 ]
             );
             
@@ -252,7 +251,12 @@ Réponds par un JSON:
             ];
         } catch (\Exception $e) {
             Log::error('Erreur validation LLM: ' . $e->getMessage());
-            throw $e;
+            // En cas d'erreur de l'API, on laisse passer pour ne pas bloquer l'utilisateur
+            return [
+                'valid' => true,
+                'confidence' => 0.0,
+                'reason' => 'Validation impossible (erreur API) - autorisé par défaut'
+            ];
         }
     }
 }

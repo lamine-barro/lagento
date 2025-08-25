@@ -187,8 +187,8 @@ document.addEventListener('alpine:init', () => {
                 <div class="flex items-center justify-center py-8">
                     <div class="text-center">
                         <div class="smooth-spin w-8 h-8 border-2 rounded-full mx-auto mb-4" style="border-color: var(--orange-primary); border-top-color: transparent;"></div>
-                        <h3 class="text-lg font-medium mb-2 shimmer-text" style="color: var(--gray-900);">Régénération du diagnostic en cours</h3>
-                        <p class="shimmer-text" style="color: var(--gray-600);">L'IA analyse vos nouvelles données entrepreneuriales...</p>
+                        <h3 class="text-lg font-medium mb-2 shimmer-text" style="color: var(--gray-900);">Génération du diagnostic en cours...</h3>
+                        <p class="shimmer-text" style="color: var(--gray-600);">Veuillez patienter, l'IA analyse vos nouvelles données entrepreneuriales.</p>
                         
                         <!-- Progress indicator avec étapes -->
                         <div class="mt-6 space-y-3">

@@ -154,30 +154,89 @@ Réponds UNIQUEMENT ce JSON.";
             ];
 
             $lm = app(\App\Services\LanguageModelService::class);
-            $raw = $lm->chat($messages, 'gpt-4.1-mini', null, 8000, [
-                'response_format' => ['type' => 'json_object']
-            ]);
             
-            Log::info('UserAnalyticsService: Enhanced LLM response received', [
-                'raw_length' => strlen($raw), 
-                'raw_preview' => substr($raw, 0, 200),
-                'vector_context_length' => strlen($contextualInfo)
-            ]);
-            
-            $parsed = json_decode($raw, true);
-            if (is_array($parsed)) {
-                Log::info('UserAnalyticsService: Enhanced JSON parsing successful', ['keys' => array_keys($parsed)]);
-                return $parsed;
+            try {
+                $raw = $lm->chat($messages, 'gpt-4.1-mini', null, 8000, [
+                    'response_format' => ['type' => 'json_object']
+                ]);
+                
+                if (empty($raw)) {
+                    throw new \Exception('Empty response from LLM service');
+                }
+                
+                Log::info('UserAnalyticsService: Enhanced LLM response received', [
+                    'raw_length' => strlen($raw), 
+                    'raw_preview' => substr($raw, 0, 200),
+                    'vector_context_length' => strlen($contextualInfo)
+                ]);
+                
+                $parsed = json_decode($raw, true);
+                
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception('Invalid JSON response: ' . json_last_error_msg());
+                }
+                
+                if (is_array($parsed)) {
+                    Log::info('UserAnalyticsService: Enhanced JSON parsing successful', ['keys' => array_keys($parsed)]);
+                    return $parsed;
+                }
+                
+                throw new \Exception('Parsed response is not an array');
+                
+            } catch (\Exception $llmError) {
+                Log::error('UserAnalyticsService: LLM call failed', ['error' => $llmError->getMessage()]);
+                // Fallback to basic analysis without LLM
+                return $this->createBasicBusinessSummary($data, $user);
             }
-            
-            Log::error('UserAnalyticsService: JSON parsing failed', ['raw' => $raw]);
-            return [];
         } catch (\Throwable $e) {
             Log::error('UserAnalyticsService: summarizeBusinessData exception', ['error' => $e->getMessage()]);
         }
         return [];
     }
 
+    /**
+     * Create a basic business summary without LLM when OpenAI fails
+     */
+    private function createBasicBusinessSummary(array $data, User $user): array
+    {
+        // Fallback analysis basée sur des règles simples
+        $businessName = $data['business_name'] ?? 'Entreprise';
+        $description = $data['description'] ?? '';
+        $sector = $data['business_sector'] ?? 'Non spécifié';
+        $stage = $data['business_stage'] ?? 'débutant';
+        
+        // Score de base selon les données disponibles
+        $score = 30; // Score de base
+        if (!empty($description) && strlen($description) > 50) $score += 15;
+        if (!empty($data['target_market'])) $score += 10;
+        if (!empty($data['revenue_model'])) $score += 15;
+        if ($data['formalized'] ?? false) $score += 10;
+        if (!empty($data['team_size'])) $score += 10;
+        
+        $level = match(true) {
+            $score >= 70 => 'confirmé',
+            $score >= 50 => 'intermédiaire',
+            default => 'débutant'
+        };
+        
+        return [
+            'summary' => "Entreprise {$businessName} dans le secteur {$sector}, au stade {$stage}. Analyse de base générée sans IA.",
+            'keywords' => [$sector, $stage, 'entreprenariat', 'côte d\'ivoire', 'business'],
+            'risks' => ['Données limitées pour l\'analyse'],
+            'level' => $level,
+            'potential_score' => $score,
+            'strengths' => [
+                ['domaine' => 'Motivation', 'description' => 'Initiative entrepreneuriale engagée']
+            ],
+            'improvements' => [
+                ['domaine' => 'Profil', 'action_suggeree' => 'Compléter les informations de profil', 'impact' => 'élevé', 'resources' => ['Documentation', 'Formation']]
+            ],
+            'training_needs' => ['Développement entrepreneurial'],
+            'profile_type' => 'entrepreneur',
+            'opportunities_match' => 5,
+            'ecosystem_position' => 'émergent'
+        ];
+    }
 
     /**
      * Track user interaction with chat/agents
