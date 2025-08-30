@@ -79,7 +79,7 @@ class AutoVectorizationService
     /**
      * Vectorize conversation summary automatically (every 10 messages)
      */
-    public function vectorizeConversationSummary(Conversation $conversation): bool
+    public function vectorizeConversationSummary($conversation): bool
     {
         try {
             $messages = $conversation->messages()

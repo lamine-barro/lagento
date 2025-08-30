@@ -630,6 +630,9 @@ Réponds UNIQUEMENT ce JSON.";
                     'partiellement_formalise' => 'en_cours',
                     'non_complet' => 'en_cours',
                     'incomplet' => 'en_cours',
+                    'non_conforme' => 'non_formalise',
+                    'non_formalise' => 'non_formalise',
+                    'conforme' => 'formalise_complet',
                     'non disponible' => null,
                     'a completer' => null,
                     '' => null

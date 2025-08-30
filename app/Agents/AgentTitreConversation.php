@@ -155,6 +155,9 @@ La conversation a évolué avec plus de contexte. Génère un titre plus précis
 
     protected function buildInitialPrompt(string $userFirstMessage, string $activePage): string
     {
+        // Clean UTF-8 characters to prevent encoding issues
+        $userFirstMessage = mb_convert_encoding($userFirstMessage, 'UTF-8', 'UTF-8');
+        
         $prompt = "Génère un titre pour cette conversation basé sur le premier message :\n\n";
         $prompt .= "Message : {$userFirstMessage}\n";
         
@@ -175,7 +178,9 @@ La conversation a évolué avec plus de contexte. Génère un titre plus précis
         $lastMessages = array_slice($recentMessages, -5);
         foreach ($lastMessages as $i => $message) {
             $role = $message['role'] === 'user' ? 'Utilisateur' : 'Agent';
-            $content = substr($message['content'], 0, 100) . (strlen($message['content']) > 100 ? '...' : '');
+            // Clean UTF-8 characters to prevent encoding issues
+            $content = mb_convert_encoding($message['content'], 'UTF-8', 'UTF-8');
+            $content = substr($content, 0, 100) . (strlen($content) > 100 ? '...' : '');
             $prompt .= "{$role} : {$content}\n";
         }
 
