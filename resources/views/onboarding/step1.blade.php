@@ -88,7 +88,7 @@
                                     </div>
                                     <p class="text-sm text-gray-500 text-center">
                                         Glissez-déposez votre logo ici ou cliquez pour parcourir<br>
-                                        <span class="text-xs">PNG, JPG jusqu'à 10 Mo</span>
+                                        <span class="text-xs">PNG, JPG jusqu'à 1 Mo</span>
                                     </p>
                                 </div>
                             </template>
@@ -202,8 +202,8 @@ function logoUpload() {
                 return;
             }
             
-            if (file.size > 10 * 1024 * 1024) { // 10MB
-                alert('Le fichier ne doit pas dépasser 10 Mo');
+            if (file.size > 1 * 1024 * 1024) { // 1MB
+                alert('Le fichier ne doit pas dépasser 1 Mo');
                 return;
             }
             

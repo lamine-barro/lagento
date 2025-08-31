@@ -37,7 +37,7 @@ class OnboardingController extends Controller
             'description' => 'nullable|string|max:1000',
             'annee_creation' => 'nullable|integer|min:2010|max:' . date('Y'),
             'formalise' => 'required|in:oui,non',
-            'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:10240',
+            'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:1024',
             'region' => 'required|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
@@ -81,15 +81,41 @@ class OnboardingController extends Controller
 
         // Gérer le logo si présent
         if ($request->hasFile('logo')) {
-            $image = Image::read($request->file('logo'));
-            $image->scaleDown(1024, 1024); // limite dimensions
-            $encoded = $image->toJpeg(quality: 80);
-            
-            // Use centralized file storage service
-            $fileStorage = app(\App\Services\FileStorageService::class);
-            $result = $fileStorage->storeLogo($encoded, $request->user()->id);
-            $projet->logo_url = $result['url'];
-            $projet->save();
+            try {
+                \Log::info('Starting logo upload process', [
+                    'file_name' => $request->file('logo')->getClientOriginalName(),
+                    'file_size' => $request->file('logo')->getSize(),
+                    'user_id' => $request->user()->id
+                ]);
+                
+                $image = Image::read($request->file('logo'));
+                $image->scaleDown(1024, 1024); // limite dimensions
+                $encoded = $image->toJpeg(quality: 80);
+                
+                // Use centralized file storage service
+                $fileStorage = app(\App\Services\FileStorageService::class);
+                $result = $fileStorage->storeLogo($encoded, $request->user()->id);
+                
+                \Log::info('Logo uploaded successfully', [
+                    'url' => $result['url'],
+                    'storage' => $result['storage']
+                ]);
+                
+                $projet->logo_url = $result['url'];
+                $projet->save();
+                
+            } catch (\Exception $e) {
+                \Log::error('Logo upload failed', [
+                    'error' => $e->getMessage(),
+                    'user_id' => $request->user()->id,
+                    'file_name' => $request->file('logo')->getClientOriginalName()
+                ]);
+                
+                // Continue without logo instead of failing completely
+                return back()->withErrors([
+                    'logo' => 'Erreur lors du téléchargement du logo. Vous pouvez continuer sans logo et l\'ajouter plus tard.'
+                ])->withInput();
+            }
         }
 
         \Log::info('Step 1 completed successfully, redirecting to step 2', [
