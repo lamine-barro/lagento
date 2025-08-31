@@ -37,7 +37,7 @@ class OnboardingController extends Controller
             'description' => 'nullable|string|max:1000',
             'annee_creation' => 'nullable|integer|min:2010|max:' . date('Y'),
             'formalise' => 'required|in:oui,non',
-            'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:1024',
+            'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:10240',
             'region' => 'required|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
@@ -82,15 +82,23 @@ class OnboardingController extends Controller
         // Gérer le logo si présent
         if ($request->hasFile('logo')) {
             try {
+                $originalSize = $request->file('logo')->getSize();
                 \Log::info('Starting logo upload process', [
                     'file_name' => $request->file('logo')->getClientOriginalName(),
-                    'file_size' => $request->file('logo')->getSize(),
+                    'original_size' => $originalSize,
                     'user_id' => $request->user()->id
                 ]);
                 
+                // Optimiser avec Intervention Image pour réduire la taille
                 $image = Image::read($request->file('logo'));
-                $image->scaleDown(1024, 1024); // limite dimensions
-                $encoded = $image->toJpeg(quality: 80);
+                $image->scaleDown(800, 600); // Redimensionner pour réduire la taille
+                $encoded = $image->toJpeg(quality: 60); // Qualité plus basse pour fichier plus léger
+                
+                \Log::info('Logo optimized', [
+                    'original_size' => $originalSize,
+                    'optimized_size' => strlen($encoded),
+                    'compression_ratio' => round((1 - strlen($encoded) / $originalSize) * 100, 2) . '%'
+                ]);
                 
                 // Use centralized file storage service
                 $fileStorage = app(\App\Services\FileStorageService::class);
