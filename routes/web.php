@@ -56,10 +56,10 @@ Route::get('/opportunites', [OpportunitesController::class, 'index'])->name('opp
 
 // Authentication routes
 Route::prefix('auth')->group(function () {
-    Route::post('/email', [AuthController::class, 'sendOtp'])->name('auth.email');
+    Route::post('/email', [AuthController::class, 'sendOtp'])->middleware('otp.rate.limit:5')->name('auth.email');
     Route::get('/verify-otp', [AuthController::class, 'showOtpForm'])->name('auth.verify-otp-form');
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('auth.verify-otp');
-    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('auth.resend-otp');
+    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->middleware('otp.rate.limit:5')->name('auth.resend-otp');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
@@ -117,7 +117,7 @@ Route::middleware(['auth'])->group(function () {
         
         
         // Email change with OTP verification
-        Route::post('/email-change/send-otp', [DiagnosticController::class, 'sendEmailChangeOtp'])->name('email-change.send-otp');
+        Route::post('/email-change/send-otp', [DiagnosticController::class, 'sendEmailChangeOtp'])->middleware('otp.rate.limit:5')->name('email-change.send-otp');
         Route::post('/email-change/verify', [DiagnosticController::class, 'verifyEmailChange'])->name('email-change.verify');
     });
     
